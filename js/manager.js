@@ -45,11 +45,16 @@ module.exports = function (oAppData) {
 				getScreens: function () {
 					var oScreens = {};
 					oScreens[MailSettings.HashModuleName] = function () {
-						return require('modules/MailWebclient/js/views/MailView.js');
+						return require('modules/%ModuleName%/js/views/MailView.js');
 					};
 					oScreens[MailSettings.HashModuleName + '-compose'] = function () {
-						var CComposeView = require('modules/MailWebclient/js/views/CComposeView.js');
-						return new CComposeView();
+						var
+							CComposeView = require('modules/MailWebclient/js/views/CComposeView.js'),
+							oComposeView = new CComposeView()
+						;
+						oComposeView.ViewTemplate = '%ModuleName%_ComposeView';
+						oComposeView.oHtmlEditor.ViewTemplate = '%ModuleName%_HtmlEditorView';
+						return oComposeView;
 					};
 					return oScreens;
 				},
