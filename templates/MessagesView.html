@@ -1,11 +1,41 @@
+<div class="searchbar" data-bind="css: {'searchbar-active': isFocused}">
+	<div class="searchbar-input">
+		<input type="search" spellcheck="false" placeholder="Search" data-bind="value: searchInput, onEnter: onSearchClick, i18n: {'key': 'COREWEBCLIENT/ACTION_SEARCH'}">
+		<a href="#" class="searchbar-clear"></a>
+	</div>
+	<a href="#" class="searchbar-cancel">Cancel</a>
+</div>
+
+<!--<div class="toolbar">
+	<span class="content">
+		<span class="item checkstate" data-bind="command: $parent.checkMailCommand, 
+				checkstate: {'activeClass': 'process', 'state': $parent.checkMailIndicator(), 'duration': 800}, 
+				customTooltip: '%MODULENAME%/ACTION_CHECK_MAIL'">
+			<span class="icon"></span>
+			<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_CHECK_MAIL'}"></span>
+		</span>
+	</span>
+</div>-->
+
+
+<div class="page-content">
+	<div class="list-block media-list message_list">
+		<ul class="message_sub_list" data-bind="foreach: collection, css: {'not_use_threads': !useThreads(), 'use_threads': useThreads}">
+			<!-- ko template: {name: '%ModuleName%_MessageItemView'} --><!-- /ko -->
+		</ul>
+	</div>
+</div>
+
+
+
 <div class="middle_bar" data-bind="css: {'advanced_search': bAdvancedSearch}">
 	<div class="panel_top">
 		<label class="custom_checkbox" data-bind="css: {'checked': checkAll, 'incomplete': checkAllIncomplite}">
 			<span class="icon"></span>
 			<input type="checkbox" data-bind="checked: checkAll" />
 		</label>
-		<!-- ko template: {name: '%ModuleName%_SearchView'} --><!-- /ko -->
 	</div>
+	
 	<div class="panel_center unselectable" data-bind="customScrollbar: {'reset': listChangedThrottle(), x: false}">
 		<div class="scroll-inner message_list_scroll">
 			<div class="items_list message_list" data-bind="initDom: messagesContainer">
@@ -55,11 +85,9 @@
 					</span>
 				</span>
 
-				<div class="items_sub_list message_sub_list" data-bind="foreach: collection, 
-					 draggablePlace: function (oMessage, bCtrl) {return $root.dragAndDropHelper(oMessage, bCtrl);},
-					 css: {'not_use_threads': !useThreads(), 'use_threads': useThreads}">
-					<!-- ko template: {name: '%ModuleName%_MessageItemView'} --><!-- /ko -->
-				</div>
+				
+				
+				
 
 				<span class="list_notification" data-bind="visible: visibleInfoLoading()">
 					<span class="description" data-bind="i18n: {'key': '%MODULENAME%/INFO_LOADING_MESSAGE_LIST'}"></span>
@@ -67,12 +95,7 @@
 				<span class="list_notification" data-bind="visible: visibleInfoSearchLoading()">
 					<span class="description" data-bind="i18n: {'key': '%MODULENAME%/INFO_SEARCHING_FOR_MESSAGES'}"></span>
 				</span>
-				<div class="uploader_mask" data-bind="initDom: uploaderArea, css: {'active': bDragActiveComp}, visible: folderType() !== Enums.FolderTypes.Spam">
-					<div class="inner"></div>
-				</div>
 			</div>
 		</div>
 	</div>
-
-	<div class="panel_bottom unselectable" data-bind="visible: oPageSwitcher.pages().length > 0, template: {name: oPageSwitcher.ViewTemplate, data: oPageSwitcher}"></div>
 </div>

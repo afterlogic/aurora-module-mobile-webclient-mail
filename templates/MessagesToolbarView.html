@@ -1,47 +1,33 @@
-<div class="toolbar">
-	<span class="resizer" data-bind="event: { 'dblclick': resizeDblClick}"></span>
-	<span class="content">
-		<span data-bind="click: gotoFolderList" class="item back">
-			<span class="icon"></span>
-			<span class="text"></span>
-		</span>
-		
-		<a href="javascript: void(0)" class="item new_message" data-bind="attr: {href: composeLink}">
-			<span class="icon"></span>
-			<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_NEW_MESSAGE'}"></span>
-		</a>
-		
-		<span class="group mark" data-bind="dropdown: {}, css: {disabled: oMessageList.isEmptyList()}, visible: visibleMarkTool">
-			<span class="item" data-bind="command: markAsReadCommand">
-				<span class="icon"></span>
-				<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_MARK_AS_READ'}"></span>
-			</span><span class="item control">
-				<span class="icon arrow"></span>
-				<span class="dropdown">
-					<span class="dropdown_helper">
-						<span class="dropdown_arrow"><span></span></span>
-						<span class="dropdown_content">
-							<span class="item allread" data-bind="command: markAllReadCommand, i18n: {'key': '%MODULENAME%/ACTION_MARK_ALL_READ'}"></span>
-							<span class="item unread" data-bind="command: markAsUnreadCommand, i18n: {'key': '%MODULENAME%/ACTION_MARK_AS_UNREAD'}"></span>
-						</span>
-					</span>
+<span class="link icon-only open-panel aurora-icons group mark" data-bind="dropdown: {}, css: {disabled: oMessageList.isEmptyList()}, visible: visibleMarkTool">
+	<span class="item" data-bind="command: markAsReadCommand">
+		<i class="icon"></i>
+		<!--<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_MARK_AS_READ'}"></span>-->
+	</span>
+<!--	<span class="item control">
+		<span class="icon arrow"></span>
+		<span class="dropdown">
+			<span class="dropdown_helper">
+				<span class="dropdown_arrow"><span></span></span>
+				<span class="dropdown_content">
+					<span class="item allread" data-bind="command: markAllReadCommand, i18n: {'key': '%MODULENAME%/ACTION_MARK_ALL_READ'}"></span>
+					<span class="item unread" data-bind="command: markAsUnreadCommand, i18n: {'key': '%MODULENAME%/ACTION_MARK_AS_UNREAD'}"></span>
 				</span>
 			</span>
 		</span>
+	</span>-->
+</span>
 
-		<span class="item delete" data-bind="command: deleteCommand" id="selenium_mail_delete_button">
-			<span class="icon"></span>
-			<span class="hint" data-bind="text: selectedCount, visible: selectedCount() > 0"></span>
-			<span class="text" data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_DELETE'}"></span>
-		</span>
+<span class="link icon-only open-panel aurora-icons delete" data-bind="command: deleteCommand" id="selenium_mail_delete_button">
+	<i class="icon"></i>
+	<!--<span class="hint" data-bind="text: selectedCount, visible: selectedCount() > 0"></span>-->
+	<!--<span class="text" data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_DELETE'}"></span>-->
+</span>
 
-		<span class="item spam" data-bind="command: spamCommand, visible: allowedSpamAction">
-			<span class="icon"></span>
-			<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_MARK_SPAM'}"></span>
-		</span>
-		<span class="item notspam" data-bind="command: notSpamCommand, visible: allowedNotSpamAction">
-			<span class="icon"></span>
-			<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_MARK_NOT_SPAM'}"></span>
-		</span>
-	</span>
-</div>
+<span class="link icon-only open-panel aurora-icons spam" data-bind="command: spamCommand, visible: allowedSpamAction">
+	<i class="icon"></i>
+	<!--<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_MARK_SPAM'}"></span>-->
+</span>
+<span class="link icon-only open-panel aurora-icons notspam" data-bind="command: notSpamCommand, visible: allowedNotSpamAction">
+	<i class="icon"></i>
+	<!--<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_MARK_NOT_SPAM'}"></span>-->
+</span>

@@ -3,13 +3,23 @@
 module.exports = function (oAppData) {
 	require('modules/MailWebclient/js/enums.js');
 	
+//	require('node_modules/framework7/dist/css/framework7.css');
+	require('node_modules/framework7/dist/css/framework7.material.css');
+	require('node_modules/framework7/dist/css/framework7.material.colors.css');
+//	require('node_modules/framework7/dist/css/framework7.ios.css');
+//	require('node_modules/framework7/dist/css/framework7.ios.colors.css');
+	
+	
 	var
 		_ = require('underscore'),
 		ko = require('knockout'),
+		$ = require('jquery'),
 		
 		App = require('%PathToCoreWebclientModule%/js/App.js'),
 		MailSettings = require('modules/MailWebclient/js/Settings.js')
 	;
+	
+	$('html').addClass("md");
 	
 	if (App.getUserRole() === Enums.UserRole.NormalUser)
 	{

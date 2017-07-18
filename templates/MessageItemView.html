@@ -1,40 +1,46 @@
-<div class="item dragHandle" data-bind="css: {
+<li class="item" data-bind="css: {
 		'unseen': !seen(), 'selected': selected(), 'checked': checked(),
 		'forwarded': forwarded(), 'answered': answered(), 'deleted': deleted() || threadHideAnimation(),
 		'nosubject': emptySubject(),
 		'threaded':  threadPart(),
 		'show': threadShowAnimation()
 	}">
-	<div class="item_content">
-		<span class="controls">
-			<span class="custom_checkbox" data-bind="click: function () { checked(!checked()); }, css: {'checked': checked()}">
-				<span class="icon"></span>
-			</span>
-			<span class="separator"></span>
-			<span class="flag" data-bind="css: {'flagged': flagged(), 'partial': partialFlagged()}"></span>
-		</span>
-		<span class="data">
-			<span class="size" data-bind="text: friendlySize()"></span>
-			<span class="date" data-bind="text: date"></span>
+	<div class="item-content">
+		<label class="label-checkbox custom_checkbox">
+			<input type="checkbox" data-bind="checked: checked">
+			<div class="item-media"><i class="icon icon-form-checkbox"></i></div>
+		</label>
+<!--		<label class="label-checkbox" data-bind="css: {'flagged': flagged(), 'partial': partialFlagged()}">
+			<input type="checkbox">
+			<div class="item-media"><i class="icon icon-form-checkbox"></i></div>
+		</label>-->
+		<div class="item-inner">
+			<div class="item-title-row">
+				<div class="item-title" data-bind="text: fromOrToText()"></div>
+				<!--<span class="from fadeout">
+					<span data-bind="text: fromOrToText()"></span>
+					<span class="other_senders" data-bind="text: threadSendersText(), visible: threadSendersVisible()"></span>
+					<span class="plus_more_senders" data-bind="text: threadMoreSendersText(), visible: threadMoreSendersVisible()"></span>
+				</span>-->
+				<!--<div class="item-after" data-bind="text: friendlySize()"></div>-->
+				<div class="item-after" data-bind="text: date()"></div>
+			</div>
+			<div class="item-subtitle">
+				<span data-bind="text: subjectForDisplay()"></span>
+				<span class="importance" data-bind="visible: importance() === Enums.Importance.High"></span>
+			</div>
+			<!--<div class="item-text">Lorem ipsum dolor sit amet...</div>-->
+
 			<span class="attachments has_attachments" data-bind="visible: hasAttachments(),
 				css: {'has_ical_attachment': hasIcalAttachment(), 'has_vcard_attachment': hasVcardAttachment()}"></span>
 			<span class="marker"></span>
-			<span class="from fadeout">
-				<span data-bind="text: fromOrToText()"></span>
-				<span class="other_senders" data-bind="text: threadSendersText(), visible: threadSendersVisible()"></span>
-				<span class="plus_more_senders" data-bind="text: threadMoreSendersText(), visible: threadMoreSendersVisible()"></span>
-			</span>
-			<span class="separator"></span>
+
 			<span class="thread-pin" data-bind="text: threadCount(), visible: threadCountVisible(), click: openThread, css: {'unread': threadUnreadCount() > 0}, customTooltip: threadCountHint"></span>
 			<span class="thread-pin loading" data-bind="i18n: {'key': 'COREWEBCLIENT/INFO_LOADING'}, visible: threadLoadingVisible()"></span>
-			<span class="subject fadeout">
-				<span class="importance" data-bind="visible: importance() === Enums.Importance.High"></span>
-				<span data-bind="text: subjectForDisplay()"></span>
-			</span>
-		</span>
-		<div class="separator"></div>
+		</div>
 	</div>
-</div>
+</li>
+
 <!-- ko if: threadNextLoadingVisible() -->
 <div class="item threaded thread_more_messages" data-bind="css:{'show': threadShowAnimation(), 'deleted': threadHideAnimation()}">
 	<div class="item_content">

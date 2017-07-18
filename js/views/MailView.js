@@ -10,7 +10,8 @@ var
 	
 	CFolderListView = require('modules/%ModuleName%/js/views/CFolderListView.js'),
 	
-	CMailView = require('modules/MailWebclient/js/views/CMailView.js')
+	CMailView = require('modules/MailWebclient/js/views/CMailView.js'),
+	$ = require('jquery');
 ;
 
 /**
@@ -29,12 +30,44 @@ function CMailMobileView()
 	MailCache.currentMessage.subscribe(function () {
 		this.gotoMessagePane();
 	}, this);
+	
+	this.appsDom = null;
+	this.showApps = ko.observable(false);
+	
+	this.init();
 }
 
 _.extendOwn(CMailMobileView.prototype, CMailView.prototype);
 
 CMailMobileView.prototype.ViewTemplate = '%ModuleName%_MailView';
 CMailMobileView.prototype.ViewConstructorName = 'CMailMobileView';
+
+CMailMobileView.prototype.init = function ()
+{
+	this.selectedPanel.subscribe(function (value) {
+		$('body').toggleClass('with-panel-left-reveal', value === Enums.MobilePanel.Groups);
+	});
+	
+	var self = this;
+	this.appsDom = $('#apps-list');
+	this.appsDom.on('click', function () {
+		self.showApps(false);
+	});
+	
+	this.showApps.subscribe(function (value) {
+		if (value) 
+		{
+			this.appsDom.css({'display': 'block'});
+		}
+		else
+		{
+			this.appsDom.css({'display': 'none'});
+		}
+		
+		
+		$('body').toggleClass('with-panel-left-reveal', value);
+	}, this);
+};
 
 CMailMobileView.prototype.gotoFolderList = function ()
 {
