@@ -44,6 +44,8 @@ CMailMobileView.prototype.ViewConstructorName = 'CMailMobileView';
 
 CMailMobileView.prototype.init = function ()
 {
+	
+	
 	this.selectedPanel.subscribe(function (value) {
 		$('body').toggleClass('with-panel-left-reveal', value === Enums.MobilePanel.Groups);
 	});
@@ -65,18 +67,28 @@ CMailMobileView.prototype.init = function ()
 		}
 		
 		
-		$('body').toggleClass('with-panel-left-reveal', value);
+		$('body').toggleClass('with-panel-right-cover', value);
 	}, this);
 };
 
 CMailMobileView.prototype.gotoFolderList = function ()
 {
 	this.changeSelectedPanel(Enums.MobilePanel.Groups);
+	
 };
 
 CMailMobileView.prototype.gotoMessageList = function ()
 {
 	this.changeSelectedPanel(Enums.MobilePanel.Items);
+	
+	var
+		sFolder = this.folderList().currentFolderFullName(),
+		iPage = this.oMessageList.oPageSwitcher.currentPage(),
+		sSearch = this.oMessageList.search(),
+		sFilters = this.oMessageList.filters()
+	;
+	this.oMessageList.changeRoutingForMessageList(sFolder, iPage, '', sSearch, sFilters);
+	
 	return true;
 };
 

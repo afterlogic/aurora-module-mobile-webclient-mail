@@ -2,9 +2,7 @@
 	<!-- Left panel with reveal effect-->
 
 	<div class="panel panel-left panel-reveal" data-bind="style: {'display': selectedPanel() === Enums.MobilePanel.Groups ? 'block' : ''}">
-		<div class="content-block">
-			<!-- ko template: {name: oFolderList.ViewTemplate, data: oFolderList} --><!-- /ko -->
-		</div>
+		<!-- ko template: {name: oFolderList.ViewTemplate, data: oFolderList} --><!-- /ko -->
 	</div>
 	<!-- Views -->
     <div class="views">
@@ -15,34 +13,40 @@
 				<div class="navbar-inner">
 					<!-- We need cool sliding animation on title element, so we have additional "sliding" class -->
 					<div class="left">
-						<span class="link icon-only open-panel" data-bind="click: function () { showApps(!showApps()) }; "><i class="icon icon-bars"></i></span>
+						<span class="link icon-only open-panel" data-bind="click: gotoFolderList, visible: selectedPanel() !== Enums.MobilePanel.View"><i class="icon icon-bars"></i></span>
+						
 						<span class="back link" data-bind="click: gotoMessageList, visible: selectedPanel() === Enums.MobilePanel.View">
 							<i class="icon icon-back"></i>
 							<!--<span>Back</span>-->
 						</span>
 					</div>
-					<div class="center sliding" data-bind="visible: selectedPanel() !== Enums.MobilePanel.View">Webmail</div>
+					
+					<div class="center sliding" data-bind="visible: selectedPanel() !== Enums.MobilePanel.View && oMessageList.checkedUids().length === 0">Webmail</div>
 					<div class="center sliding" data-bind="visible: selectedPanel() !== Enums.MobilePanel.View && oMessageList.checkedUids().length > 0, text: oMessageList.checkedUids().length">Webmail</div>
-					<div class="right" data-bind="visible: oMessageList.checkedUids().length === 0 &&  selectedPanel() === Enums.MobilePanel.Items">
+					
+					<div class="right" data-bind="visible: oMessageList.checkedUids().length === 0 &&  selectedPanel() !== Enums.MobilePanel.View">
 						<!-- 
 						  Right link contains only icon - additional "icon-only" class
 						  Additional "open-panel" class tells app to open panel when we click on this link
 						-->
-						<a class="link icon-only open-panel aurora-icons new_message" data-bind="attr: {href: composeLink}" href="javascript: void(0)">
+						<span class="link icon-only open-panel aurora-icons new_message" data-bind="attr: {href: composeLink}" href="javascript: void(0)">
 							<i class="icon"></i>
 							<!--<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_NEW_MESSAGE'}"></span>-->
-						</a>
-						<a href="#" class="link icon-only open-panel" data-bind="click: gotoFolderList"><i class="icon icon-bars"></i></a>
+						</span>
+						
+						<span class="link icon-only open-panel aurora-icons settings" data-bind="click: function () { showApps(!showApps()); }"><i class="icon"></i></span>
 					</div>
 						
-					<div class="right" data-bind="visible: oMessageList.checkedUids().length > 0 && selectedPanel() === Enums.MobilePanel.Items">
+					<div class="right" data-bind="visible: oMessageList.checkedUids().length > 0 && selectedPanel() !== Enums.MobilePanel.View">
 						<!-- ko template: { name: '%ModuleName%_MessagesToolbarView' } --><!-- /ko -->
 					</div>
 					
-					<div class="right" data-bind="visible: selectedPanel() === Enums.MobilePanel.View, with: messagePane">
-						<!-- ko template: {name: '%ModuleName%_MessageToolbarView'} --><!-- /ko -->
+					<div class="right" data-bind="visible: selectedPanel() === Enums.MobilePanel.View">
+						<!-- ko template: {name: '%ModuleName%_MessageToolbarView', data: messagePane} --><!-- /ko -->
 					</div>
-<!--					<div class="subnavbar">
+					
+					
+<!--				<div class="subnavbar">
 						 Sub navbar content, for example tabs buttons 
 						 ko template: { name: '%ModuleName%_MessagesToolbarView' }  /ko 
 					</div>-->

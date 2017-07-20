@@ -1,37 +1,39 @@
-<div data-bind="visible: visible(), attr: {'class': 'item folder-level' + (iLevel + 1)},
+<li data-bind="visible: visible(), attr: {'class': 'item folder-level' + (iLevel + 1)},
 	 css: { 'selected': selected, 'canSelect': bSelectable, 'canNotSelect': !bSelectable, 'exists': bExists, 'subscribed': subscribed,
 		'system': isSystem, 'user': !isSystem(), 'virtualEmpty': virtualEmpty, 'accordion': subfolders().length !== 0, 'expanded': expanded(), 'collapsed': !expanded()}">
-	<a class="title" href="javascript: void(0);" data-bind="
-		css: {'recivedAnim': recivedAnim()},
-		attr: {href: routingHash},
-		visible: bCanBeSelected,
-		droppable: {valueFunc: bVirtual ? false : function (oEvent, oUi) { $root.messagesDrop($data, oEvent, oUi); }, switchObserv: selected}
-	">
-		<span class="count" data-bind="visible: messageCountToShow() > 0, text: messageCountToShow(),
-			  css: {'unseen': showUnseenMessages}, click: executeUnseenFilter"></span>
-		<span class="name">
-			<span class="icon" data-bind="css: 'type' + type()"></span>
-			<span class="collapse_handler" data-bind="visible: canExpand, css: {'expanded': expanded(), 'collapsed': !expanded()}, click: onAccordion"></span>
-			<span class="text animGoal" data-bind="text: displayName"></span>
-		</span>
+	<a class="item-content" href="#" data-bind="attr: {href: routingHash}, visible: bCanBeSelected">
+		<div class="item-media aurora-icons">
+			<i class="icon" data-bind="css: 'type' + type()"></i>
+			<!--<span class="collapse_handler" data-bind="visible: canExpand, css: {'expanded': expanded(), 'collapsed': !expanded()}, click: onAccordion"></span>-->
+			<!--<span class="count" data-bind="visible: messageCountToShow() > 0, text: messageCountToShow(), css: {'unseen': showUnseenMessages}, "></span>-->
+		</div>
+		<div class="item-inner">
+			<div class="item-title" data-bind="text: displayName"></div>
+			<div class="item-after" data-bind="visible: messageCountToShow() > 0, click: executeUnseenFilter"><span class="badge" data-bind="text: messageCountToShow()"></span></div>
+		</div>
 	</a>
-	<span class="title" data-bind="visible: !bCanBeSelected">
-		<span class="count" data-bind="visible: messageCountToShow() > 0, text: messageCountToShow(),
-		  css: {'unseen': showUnseenMessages}"></span>
-		<span class="name">
-			<span class="icon" data-bind="css: 'type' + type()"></span>
-			<span class="collapse_handler" data-bind="visible: canExpand, css: {'expanded': expanded(), 'collapsed': !expanded()}, click: onAccordion"></span>
-			<span class="text animGoal" data-bind="text: displayName, attr: {'id':	(type() === Enums.FolderTypes.Inbox) ? 'selenium_folder_inbox' :
+	
+	<span class="item-content" data-bind="visible: !bCanBeSelected">
+		<div class="item-media aurora-icons">
+			<i class="icon" data-bind="css: 'type' + type()"></i>
+			<!--<span class="collapse_handler" data-bind="visible: canExpand, css: {'expanded': expanded(), 'collapsed': !expanded()}, click: onAccordion"></span>-->
+			<!--<span class="count" data-bind="visible: messageCountToShow() > 0, text: messageCountToShow(), css: {'unseen': showUnseenMessages}"></span>-->
+		</div>
+		<div class="item-inner">
+			<div class="item-title" data-bind="text: displayName, attr: {'id':	(type() === Enums.FolderTypes.Inbox) ? 'selenium_folder_inbox' :
 																					((type() === Enums.FolderTypes.Sent) ? 'selenium_folder_sent' :
 																					((type() === Enums.FolderTypes.Drafts) ? 'selenium_folder_drafts' :
 																					((type() === Enums.FolderTypes.Spam) ? 'selenium_folder_spam' :
-																					((type() === Enums.FolderTypes.Trash) ? 'selenium_folder_trash' : ''))))}"></span>
-		</span>
+																					((type() === Enums.FolderTypes.Trash) ? 'selenium_folder_trash' : ''))))}"></div>
+			<div class="item-after" data-bind="visible: messageCountToShow() > 0, click: executeUnseenFilter"><span class="badge" data-bind="text: messageCountToShow()"></span></div>
+			
+		</div>
 	</span>
 	<!-- ko if: !bNamespace -->
 	<div class="children" data-bind="template: { name: '%ModuleName%_FolderView', foreach: subfolders }"></div>
 	<!-- /ko -->
-</div>
+</li>
+
 <!-- ko if: bNamespace -->
 	<!-- ko template: {name: '%ModuleName%_FolderView', foreach: subfolders} --><!-- /ko -->
 <!-- /ko -->

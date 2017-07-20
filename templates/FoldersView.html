@@ -1,26 +1,37 @@
-<div class="middle_bar" data-bind="css: {'quota_visible': -1 < quotaProc()}, click: $parent.gotoMessageList.bind($parent)">
-	<div class="panel_center" data-bind="customScrollbar: {x: false}">
-		<div class="scroll-inner">
-			<div class="items_list collapsible">
-				<div class="accounts" data-bind="visible: accounts().length > 1, foreach: accounts">
-					<div class="item" data-bind="css: {'selected': isCurrent()}, click: changeAccount">
-						<label class="custom_radio" data-bind="css: {'checked': isCurrent()}">
-							<span class="icon"></span>
-							<input type="radio" id="account_text" data-bind="checked: isCurrent()" />
-						</label>
-						<label for="account_text" class="text" data-bind="text: email"></label>
+<div class="content-block" data-bind="css: {'quota_visible': -1 < quotaProc()}, click: $parent.gotoMessageList.bind($parent)">
+	<div class="content-block-title">Accounts</div>
+    <div class="list-block">
+		<ul data-bind="visible: accounts().length > 1, foreach: accounts">
+			<li class="item" data-bind="css: {'selected': isCurrent()}, click: changeAccount">
+				<label class="label-radio item-content">
+					<input type="radio" name="account-radio" data-bind="checked: isCurrent">
+					<div class="item-media">
+						<i class="icon icon-form-radio"></i>
+					</div>
+					<div class="item-inner">
+						<div class="item-title" data-bind="text: email"></div>
+					</div>
+				</label>
+			</li>
+		</ul>
+		<ul data-bind="visible: accounts().length === 1, foreach: accounts">
+			<li class="item" data-bind="css: {'selected': isCurrent()}, click: changeAccount">
+				<div class="item-content">
+					<div class="item-inner">
+						<div class="item-title" data-bind="text: email"></div>
 					</div>
 				</div>
-				<div class="empty_accounts" data-bind="visible: accounts().length === 1"></div>
-				<div class="folders">
-				<!-- ko template: {name: '%ModuleName%_FolderView', foreach: folderList().collection} --><!-- /ko -->
-				<span class="volumer" data-bind="visible: -1 < quotaProc(), click: $parent.onVolumerClick">
-					<span class="volumer_conteiner">
-						<span class="used" data-bind="style: {'width': '' + (-1 < quotaProc() ? quotaProc() : 0) + '%' }"></span>
-					</span>
-				</span>
-				</div>
-			</div>
-		</div>
+			</li>
+		</ul>
 	</div>
-</div>
+	<div class="content-block-title">Folders</div>
+    <div class="list-block">
+		<ul data-bind="template: {name: '%ModuleName%_FolderView', foreach: folderList().collection}">
+		</ul>
+	</div>
+	<span class="volumer" data-bind="visible: -1 < quotaProc(), click: $parent.onVolumerClick">
+		<span class="volumer_conteiner">
+			<span class="used" data-bind="style: {'width': '' + (-1 < quotaProc() ? quotaProc() : 0) + '%' }"></span>
+		</span>
+	</span>
+</div>		
