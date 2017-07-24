@@ -57,16 +57,6 @@ CMailMobileView.prototype.init = function ()
 	});
 	
 	this.showApps.subscribe(function (value) {
-		if (value) 
-		{
-			this.appsDom.css({'display': 'block'});
-		}
-		else
-		{
-			this.appsDom.css({'display': 'none'});
-		}
-		
-		
 		$('body').toggleClass('with-panel-right-cover', value);
 	}, this);
 };
@@ -87,6 +77,7 @@ CMailMobileView.prototype.gotoMessageList = function ()
 		sSearch = this.oMessageList.search(),
 		sFilters = this.oMessageList.filters()
 	;
+	
 	this.oMessageList.changeRoutingForMessageList(sFolder, iPage, '', sSearch, sFilters);
 	
 	return true;
@@ -109,13 +100,7 @@ CMailMobileView.prototype.gotoMessagePane = function ()
  */
 CMailMobileView.prototype.changeSelectedPanel = function (iPanel)
 {
-	if (App.isMobile())
-	{
-		if (this.selectedPanel() !== iPanel)
-		{
-			this.selectedPanel(iPanel);
-		}
-	}
+	this.selectedPanel(iPanel);
 };
 
 module.exports = new CMailMobileView();
