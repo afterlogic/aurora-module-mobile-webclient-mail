@@ -7,49 +7,44 @@
     <div class="views">
 		<!-- Your main view, should have "view-main" class -->
 		<div class="view webmail-view">
-			<!-- Top Navbar-->
-			<div class="navbar">
-				<div class="navbar-inner">
-					<!-- We need cool sliding animation on title element, so we have additional "sliding" class -->
-					<div class="left">
-						<a href="javascript:void(0)" class="link icon-only open-panel" data-bind="click: gotoFolderList, visible: !isEnableGroupOperations() && selectedPanel() !== Enums.MobilePanel.View"><i class="icon icon-bars"></i></a>
-						
-						<a href="javascript:void(0)" class="link back" data-bind="click: gotoMessageList, visible: selectedPanel() === Enums.MobilePanel.View"><i class="icon icon-back"></i></a>
-						
-						<a href="javascript:void(0)" class="link icon-only" data-bind="click: function () { oMessageList.checkAll(false); }, visible: isEnableGroupOperations() && selectedPanel() === Enums.MobilePanel.Items"><i class="icon icon-close"></i></a>
-					</div>
-					
-					<div class="center sliding" data-bind="visible: selectedPanel() !== Enums.MobilePanel.View && oMessageList.checkedUids().length === 0, i18n: {'key': '%MODULENAME%/HEADING_BROWSER_TAB'}"></div>
-					<div class="center sliding" data-bind="visible: selectedPanel() !== Enums.MobilePanel.View && oMessageList.checkedUids().length > 0, text: oMessageList.checkedUids().length"></div>
-					
-					<div class="right" data-bind="visible: oMessageList.checkedUids().length === 0 &&  selectedPanel() !== Enums.MobilePanel.View">
-						<!-- 
-						  Right link contains only icon - additional "icon-only" class
-						  Additional "open-panel" class tells app to open panel when we click on this link
-						-->
-						
-						<a href="javascript:void(0)" class="link icon-only open-panel aurora-icons settings" data-bind="click: function () { showApps(!showApps()); }"><i class="icon"></i></a>
-					</div>
-						
-					<div class="right" data-bind="visible: oMessageList.checkedUids().length > 0 && selectedPanel() !== Enums.MobilePanel.View">
-						<!-- ko template: { name: '%ModuleName%_MessagesToolbarView' } --><!-- /ko -->
-					</div>
-					
-					<div class="right" data-bind="visible: selectedPanel() === Enums.MobilePanel.View">
-						<!-- ko template: {name: '%ModuleName%_MessageToolbarView', data: messagePane} --><!-- /ko -->
-					</div>
-					
-					
-<!--				<div class="subnavbar">
-						 Sub navbar content, for example tabs buttons 
-						 ko template: { name: '%ModuleName%_MessagesToolbarView' }  /ko 
-					</div>-->
-				</div>
-			</div>
 			<!-- Pages container, because we use fixed-through navbar and toolbar, it has additional appropriate classes-->
 			<div class="pages navbar-fixed">
 
 				<div class="page message-list">
+					<div class="navbar">
+						<div class="navbar-inner">
+							<div class="left">
+								<a href="javascript:void(0)" class="link icon-only open-panel" data-bind="click: gotoFolderList, visible: !isEnableGroupOperations() && selectedPanel() !== Enums.MobilePanel.View"><i class="icon icon-bars"></i></a>
+
+								<a href="javascript:void(0)" class="link icon-only" data-bind="click: function () { oMessageList.checkAll(false); }, visible: isEnableGroupOperations() && selectedPanel() === Enums.MobilePanel.Items"><i class="icon icon-close"></i></a>
+							</div>
+
+							<!-- We need cool sliding animation on title element, so we have additional "sliding" class -->
+							<div class="center sliding" data-bind="visible: selectedPanel() !== Enums.MobilePanel.View && oMessageList.checkedUids().length === 0, i18n: {'key': '%MODULENAME%/HEADING_BROWSER_TAB'}"></div>
+							<div class="center sliding" data-bind="visible: selectedPanel() !== Enums.MobilePanel.View && oMessageList.checkedUids().length > 0, text: oMessageList.checkedUids().length"></div>
+
+							<div class="right" data-bind="visible: oMessageList.checkedUids().length === 0 &&  selectedPanel() !== Enums.MobilePanel.View">
+								<a href="javascript:void(0)" class="link icon-only open-panel aurora-icons settings" data-bind="click: function () { showApps(!showApps()); }"><i class="icon"></i></a>
+							</div>
+
+							<div class="right" data-bind="visible: oMessageList.checkedUids().length > 0 && selectedPanel() !== Enums.MobilePanel.View">
+								<!-- ko template: { name: '%ModuleName%_MessagesToolbarView' } --><!-- /ko -->
+							</div>
+						</div>
+					</div>
+					
+					<div class="toolbar toolbar-bottom" data-bind="with: oMessageList">
+						<div class="toolbar-inner" data-bind="visible: oPageSwitcher.pages().length > 0, template: {name: oPageSwitcher.ViewTemplate, data: oPageSwitcher}">
+							 Toolbar links 
+							<a href="#" class="link">Link 1</a>
+							<a href="#" class="link">Link 2</a>
+						</div>
+					</div>
+					
+					<!-- ko template: { name: oMessageList.ViewTemplate, data: oMessageList} --><!-- /ko -->
+					
+					
+					
 					<div class="speed-dial">
 						<!-- FAB inside will open Speed Dial actions -->
 						<a href="#" class="floating-button aurora-icons new_message" data-bind="attr: {href: composeLink}">
@@ -70,23 +65,26 @@
 							</a>
 						</div>-->
 					</div>
-					
-					<!-- Scrollable page content -->
-					<!-- ko template: { name: oMessageList.ViewTemplate, data: oMessageList} --><!-- /ko -->
 				</div>
 				
 				<div class="page message-viewer" data-bind="visible: selectedPanel() === Enums.MobilePanel.View">
+					<div class="navbar">
+						<div class="navbar-inner">
+							<!-- We need cool sliding animation on title element, so we have additional "sliding" class -->
+							<div class="left">
+								<a href="javascript:void(0)" class="link back" data-bind="click: gotoMessageList, visible: selectedPanel() === Enums.MobilePanel.View"><i class="icon icon-back"></i></a>
+							</div>
+
+							<div class="right" data-bind="visible: selectedPanel() === Enums.MobilePanel.View">
+								<!-- ko template: {name: '%ModuleName%_MessageToolbarView', data: messagePane} --><!-- /ko -->
+							</div>
+						</div>
+					</div>
+					
 					<div class="page-content" data-bind="template: {name: messagePane().ViewTemplate, data: messagePane}">
 					</div>
 				</div>
 			</div>
-<!--			<div class="toolbar" data-bind="with: oMessageList">
-				<div class="toolbar-inner" data-bind="visible: oPageSwitcher.pages().length > 0, template: {name: oPageSwitcher.ViewTemplate, data: oPageSwitcher}">
-					 Toolbar links 
-					<a href="#" class="link">Link 1</a>
-					<a href="#" class="link">Link 2</a>
-				</div>
-			</div>-->
 		</div>
     </div>
 </div>
