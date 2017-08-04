@@ -1,9 +1,10 @@
 <div class="searchbar" data-bind="css: {'searchbar-active': isFocused}">
 	<div class="searchbar-input">
-		<input type="search" spellcheck="false" placeholder="Search" data-bind="value: searchInput, onEnter: onSearchClick, i18n: {'key': 'COREWEBCLIENT/ACTION_SEARCH'}">
-		<a href="#" class="searchbar-clear"></a>
+		<input type="search" spellcheck="false" placeholder="Search" data-bind="value: searchInput, valueUpdate: 'afterkeydown', onEnter: onSearchClick, hasfocus: isFocused, i18n: {'key': 'COREWEBCLIENT/ACTION_SEARCH'}">
+		<!--<a href="#" class="searchbar-clear"></a>-->
 	</div>
-	<a href="#" class="searchbar-cancel">Cancel</a>
+	<a href="#" class="searchbar-cancel aurora-icons close" data-bind="css: {'show': !visibleInfoSearchLoading() && isSearch()} , click: onClearSearchClick"><span class="icon"></span></a>
+	<!--i18n: {'key': 'COREWEBCLIENT/ACTION_CLEAR_SEARCH'},--> 
 </div>
 
 <!--<div class="toolbar">
@@ -25,18 +26,18 @@
 	</span>
 
 	<span class="list_notification search_results" data-bind="visible: visibleInfoSearchList">
-		<span class="link" data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_CLEAR_SEARCH'}, click: onClearSearchClick"></span>
+		<!--<span class="link" data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_CLEAR_SEARCH'}, click: onClearSearchClick"></span>-->
 		<span class="description" data-bind="html: searchText"></span>
 	</span>
 
 	<span class="list_notification" data-bind="visible: visibleInfoSearchEmpty">
-		<span class="link" data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_CLEAR_SEARCH'}, click: onClearSearchClick"></span>
+		<!--<span class="link" data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_CLEAR_SEARCH'}, click: onClearSearchClick"></span>-->
 		<span class="description" data-bind="i18n: {'key': '%MODULENAME%/INFO_SEARCH_EMPTY'}"></span>
 	</span>
 
 	<span class="list_notification" data-bind="visible: visibleInfoSearchError">
 		<span class="link" data-bind="i18n: {'key': '%MODULENAME%/ACTION_RETRY'}, click: onRetryClick"></span>
-		<span class="link" data-bind="i18n: {'key': '%MODULENAME%/ACTION_SWITCH_TO_MESSAGE_LIST'}, click: onClearSearchClick"></span>
+		<!--<span class="link" data-bind="i18n: {'key': '%MODULENAME%/ACTION_SWITCH_TO_MESSAGE_LIST'}, click: onClearSearchClick"></span>-->
 		<span class="description" data-bind="i18n: {'key': '%MODULENAME%/INFO_SEARCH_ERROR'}"></span>
 	</span>
 
@@ -69,6 +70,7 @@
 			<!-- ko template: {name: '%ModuleName%_MessageItemView'} --><!-- /ko -->
 		</ul>
 	</div>
+	
 	<span class="list_notification" data-bind="visible: visibleInfoLoading()">
 		<span class="description" data-bind="i18n: {'key': '%MODULENAME%/INFO_LOADING_MESSAGE_LIST'}"></span>
 	</span>

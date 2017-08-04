@@ -45,7 +45,9 @@ CMailMobileView.prototype.ViewConstructorName = 'CMailMobileView';
 CMailMobileView.prototype.init = function ()
 {
 	this.selectedPanel.subscribe(function (value) {
-		$('body').toggleClass('with-panel-left-reveal', value === Enums.MobilePanel.Groups);
+		var bOpen = value === Enums.MobilePanel.Groups;
+
+		$('body').toggleClass('with-panel-left-reveal', bOpen).toggleClass('panel-closing', !bOpen);
 	});
 	
 	var self = this;
@@ -59,10 +61,10 @@ CMailMobileView.prototype.init = function ()
 	}, this);
 };
 
-CMailMobileView.prototype.togleFolderList = function (bValue)
+CMailMobileView.prototype.togleFolderList = function (oData, oEvent, bValue)
 {
 	var 
-		bValue = bValue || this.selectedPanel !== Enums.MobilePanel.Groups,
+		bValue = bValue || this.selectedPanel() !== Enums.MobilePanel.Groups,
 		newPanel = bValue ? Enums.MobilePanel.Groups : Enums.MobilePanel.Items
 	;
 	this.changeSelectedPanel(newPanel);
