@@ -1,6 +1,22 @@
 'use strict';
 
 module.exports = function (oAppData) {
+	var
+		_ = require('underscore'),
+		ko = require('knockout'),
+		$ = require('jquery'),
+		
+		App = require('%PathToCoreWebclientModule%/js/App.js'),
+		ModulesManager = require('%PathToCoreWebclientModule%/js/ModulesManager.js'),
+		
+		MailSettings = require('modules/MailWebclient/js/Settings.js')
+	;
+	
+	if (!ModulesManager.isModuleAvailable('CoreMobileWebclient'))
+	{
+		return null;
+	}
+	
 	require('modules/MailWebclient/js/enums.js');
 	
 //	require('node_modules/framework7/dist/css/framework7.css');
@@ -8,16 +24,6 @@ module.exports = function (oAppData) {
 	require('node_modules/framework7/dist/css/framework7.material.colors.css');
 //	require('node_modules/framework7/dist/css/framework7.ios.css');
 //	require('node_modules/framework7/dist/css/framework7.ios.colors.css');
-	
-	
-	var
-		_ = require('underscore'),
-		ko = require('knockout'),
-		$ = require('jquery'),
-		
-		App = require('%PathToCoreWebclientModule%/js/App.js'),
-		MailSettings = require('modules/MailWebclient/js/Settings.js')
-	;
 	
 	$('html').addClass("md");
 	
