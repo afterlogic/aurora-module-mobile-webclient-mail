@@ -1,4 +1,4 @@
-<div class="notice" data-bind="visible: visiblePicturesControl">
+<div class="content-block notice" data-bind="visible: visiblePicturesControl">
 	<span class="item">
 		<span data-bind="i18n: {'key': '%MODULENAME%/INFO_MESSAGE_BLOCKED'}"></span>
 		<span class="link" data-bind="i18n: {'key': '%MODULENAME%/ACTION_SHOW_PICTURES'}, click: showPictures, visible: visibleShowPicturesLink"></span>
@@ -8,91 +8,119 @@
 	</span>
 </div>
 
-<div class="notice" data-bind="visible: visibleConfirmationControl">
+<div class="content-block notice" data-bind="visible: visibleConfirmationControl">
 	<span data-bind="i18n: {'key': '%MODULENAME%/INFO_SENDER_ASKED_NOTIFY'}"></span>
 	<span class="link" data-bind="i18n: {'key': '%MODULENAME%/ACTION_NOTIFY_SENDER'}, click: notifySender"></span>
 </div>
 
 
-<div class="message_header" data-bind="initDom: domMessageHeader, visible: isCurrentMessage">
-	<span data-bind="click: switchDetailsVisibility, css: { 'compressed': !detailsVisible() }" class="table-compressor">
-		<span class="arrow"></span>
-	</span>
-
+<div class="content-block" data-bind="visible: isCurrentMessage">
 	<!-- ko foreach: topControllers -->
 		<!-- ko if: $data.ViewTemplate -->
 			<!-- ko template: { name: $data.ViewTemplate, data: $data} --><!-- /ko -->
 		<!-- /ko -->
 	<!-- /ko -->
 
-	<div class="header_content clearfix">
-		<div class="header_row">
-			<div class="message_info" data-bind="visible: !detailsVisible()">
-				<div class="message_info_line">
-					<span class="from contact address_capsule">
-						<span class="control address" data-bind="text: currentAccountEmail() === fromEmail() ? meSender : from, 
-								attr: {'data-email': fromEmail, 'data-name': oFromAddr() ? oFromAddr().sName : ''}"></span>
-					</span>
-					<span class="to_arrow" data-bind="visible: allRecipients().length > 0">&#8594;</span>
-					<span data-bind="foreach: allRecipients">
-						<span class="contact address_capsule">
-							<span class="address" data-bind="text: $parent.currentAccountEmail() === sEmail ? $parent.meRecipient : sDisplay, 
-									attr: {'data-email': sEmail, 'data-name': sName}">
-							</span>
-						</span>
-					</span>
-				</div>
-			</div>
-
-			<div class="message_info message_detail_info" data-bind="visible: detailsVisible()">
-				<div class="message_info_line">
-					<span class="title" data-bind="i18n: {'key': '%MODULENAME%/LABEL_FROM'}"></span>: 
-					<span class="contact address_capsule">
-						<span class="address" data-bind="text: fullFrom, 
-								attr: {'data-email': fromEmail, 'data-name': oFromAddr() ? oFromAddr().sName : ''}">
-						</span>
-					</span>
-				</div>
-
-				<div class="message_info_line" data-bind="visible: aToAddr().length > 0">
-					<span class="title" data-bind="i18n: {'key': '%MODULENAME%/LABEL_TO'}"></span>: 
-					<!-- ko foreach: aToAddr -->
-					<span class="contact address_capsule">
-						<span class="address" data-bind="text: sFull, attr: {'data-email': sEmail, 'data-name': sName}"></span>
-					</span>
-					<!-- /ko -->
-				</div>
-				<div class="message_info_line" data-bind="visible: aCcAddr().length > 0">
-					<span class="title" data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_CC'}"></span>: 
-					<!-- ko foreach: aCcAddr -->
-					<span class="contact address_capsule">
-						<span class="address" data-bind="text: sFull, attr: {'data-email': sEmail, 'data-name': sName}"></span>
-					</span>
-					<!-- /ko -->
-				</div>
-				<div class="message_info_line" data-bind="visible: aBccAddr().length > 0">
-					<span class="title" data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_BCC'}"></span>: 
-					<!-- ko foreach: aBccAddr -->
-					<span class="contact address_capsule">
-						<span class="address" data-bind="text: sFull, attr: {'data-email': sEmail, 'data-name': sName}"></span>
-					</span>
-					<!-- /ko -->
-				</div>
-				<div class="message_info_line">
-					<span class="title" data-bind="i18n: {'key': '%MODULENAME%/LABEL_DATE'}"></span>: 
-					<span data-bind="text: fullDate"></span>
-				</div>
-			</div>
-		</div>
-
-		
-	</div>
-
 	<!-- ko template: {name: sAttachmentsSwitcherViewTemplate} --><!-- /ko -->
 </div>
 
+
+<div class="list-block media-list" data-bind="visible: !detailsVisible()">
+	<ul>
+		<li>
+			<div class="item-content">
+				<div class="item-inner">
+					<div class="item-title-row">
+						<div class="item-title">
+							<span class="from contact address_capsule">
+								<span class="control address" data-bind="text: currentAccountEmail() === fromEmail() ? meSender : from, attr: {'data-email': fromEmail, 'data-name': oFromAddr() ? oFromAddr().sName : ''}"></span>
+							</span>
+							<span class="to_arrow" data-bind="visible: allRecipients().length > 0">&#8594;</span>
+							<span data-bind="foreach: allRecipients">
+								<span class="contact address_capsule">
+									<span class="address" data-bind="text: $parent.currentAccountEmail() === sEmail ? $parent.meRecipient : sDisplay, 
+											attr: {'data-email': sEmail, 'data-name': sName}">
+									</span>
+								</span>
+							</span>
+						</div>
+						<div class="item-after">
+							<span class="button" data-bind="click: switchDetailsVisibility, visible: !detailsVisible(), i18n: {'key': 'COREWEBCLIENT/ACTION_SHOW_DETAILS'}"></span>
+						</div>
+					</div>
+					<div class="item-text">
+						<span class="date" data-bind="text: midDate, visible: !detailsVisible()"></span>
+					</div>
+				</div>
+			</div>
+		</li>
+	</ul>
+</div>
+
+<div class="list-block" data-bind="visible: detailsVisible()">
+	<ul>
+		<li>
+			<div class="item-content">
+				<div class="item-inner">
+					<div class="item-title label"></div>
+					<div class="item-after">
+						<span class="button" data-bind="click: switchDetailsVisibility, visible: detailsVisible(), i18n: {'key': 'COREWEBCLIENT/ACTION_HIDE_DETAILS'}"></span>
+					</div>
+				</div>
+			</div>
+		</li>
+		<li>
+			<div class="item-content">
+				<div class="item-inner">
+					<div class="item-title label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_FROM'}"></div>
+					<div class="item-after" data-bind="text: fullFrom, attr: {'data-email': fromEmail, 'data-name': oFromAddr() ? oFromAddr().sName : ''}">
+					</div>
+				</div>
+			</div>
+		</li>
+		<li data-bind="visible: aToAddr().length > 0">
+			<div class="item-content">
+				<div class="item-inner">
+					<div class="item-title label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_TO'}"></div>
+					<div class="item-after" data-bind="foreach: aToAddr">
+						<span class="address" data-bind="text: sFull, attr: {'data-email': sEmail, 'data-name': sName}"></span>
+					</div>
+				</div>
+			</div>
+		</li>
+		<li data-bind="visible: aCcAddr().length > 0">
+			<div class="item-content">
+				<div class="item-inner">
+					<div class="item-title label" data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_CC'}"></div>
+					<div class="item-after" data-bind="foreach: aCcAddr">
+						<span class="address" data-bind="text: sFull, attr: {'data-email': sEmail, 'data-name': sName}"></span>
+					</div>
+				</div>
+			</div>
+		</li>
+		<li data-bind="visible: aBccAddr().length > 0">
+			<div class="item-content">
+				<div class="item-inner">
+					<div class="item-title label" data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_BCC'}"></div>
+					<div class="item-after" data-bind="foreach: aBccAddr">
+						<span class="address" data-bind="text: sFull, attr: {'data-email': sEmail, 'data-name': sName}"></span>
+					</div>
+				</div>
+			</div>
+		</li>
+		<li>
+			<div class="item-content">
+				<div class="item-inner">
+					<div class="item-title label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_DATE'}"></div>
+					<div class="item-after" data-bind="text: fullDate">
+					</div>
+				</div>
+			</div>
+		</li>
+	</ul>
+</div>
+
 <div class="content-block-title" data-bind="css: {'nosubject': emptySubject()}">
-	<span class="date" data-bind="text: midDate, visible: !detailsVisible()"></span>
 	<span class="icon importance" data-bind="visible: importance() === Enums.Importance.High"></span>
 	<h2 class="subject" data-bind="text: subjectForDisplay"></h2>
 </div>
@@ -114,9 +142,7 @@
 	<div class="content-block-inner">
 		<div class="message_body html" data-bind="initDom: domTextBody, attr: {'dir': rtlMessage() ? 'rtl' : 'ltr'}"></div>
 	</div>
-
 </div>
-
 
 <div class="attachments_panel" data-bind="visible: hasNotInlineAttachments">
 	<div class="attachments large">

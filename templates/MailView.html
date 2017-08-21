@@ -24,6 +24,9 @@
 							<div class="center sliding" data-bind="visible: oMessageList.checkedUids().length > 0, text: oMessageList.checkedUids().length"></div>
 
 							<div class="right" data-bind="visible: oMessageList.checkedUids().length === 0">
+								<a href="javascript:void(0)" class="link icon-only aurora-icons check-state" data-bind="command: checkMailCommand, checkstate: {'activeClass': 'rotate', 'state': checkMailIndicator(), 'duration': 800}"><i class="icon"></i></a>
+								<!--i18n: {'key': '%MODULENAME%/ACTION_CHECK_MAIL'}-->
+								
 								<a href="javascript:void(0)" class="link icon-only open-panel aurora-icons settings" data-bind="click: function () { showApps(!showApps()); }"><i class="icon"></i></a>
 							</div>
 
@@ -43,21 +46,7 @@
 						<!-- FAB inside will open Speed Dial actions -->
 						<a href="#" class="floating-button aurora-icons new_message" data-bind="attr: {href: composeLink}">
 							<i class="icon"></i>
-							<!--<i class="icon icon-close"></i>-->
-							<!--<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_NEW_MESSAGE'}"></span>-->
 						</a>
-						
-						<!-- Speed Dial Actions -->
-<!--						<div class="speed-dial-buttons">
-							<a href="#" class="aurora-icons new_group" data-bind="visible: showPersonalContacts, command: newGroupCommand">
-								<i class="icon"></i>
-								<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_NEW_GROUP'}"></span>
-							</a>
-							<a href="#" class="aurora-icons new_contact" data-bind="visible: showPersonalContacts, command: newContactCommand">
-								<i class="icon"></i>
-								<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_NEW_GROUP'}"></span>
-							</a>
-						</div>-->
 					</div>
 				</div>
 				
