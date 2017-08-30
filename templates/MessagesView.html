@@ -54,7 +54,7 @@
 	
 	
 	<div class="list-block media-list message_list">
-		<ul class="message_sub_list" data-bind="foreach: collection, css: {'not_use_threads': !useThreads(), 'use_threads': useThreads}">
+		<ul class="message_sub_list" data-bind="foreach: collection, css: {'not_use_threads': !useThreading(), 'use_threads': useThreading}">
 			<!-- ko template: {name: '%ModuleName%_MessageItemView'} --><!-- /ko -->
 		</ul>
 	</div>
