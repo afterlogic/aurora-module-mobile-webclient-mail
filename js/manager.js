@@ -19,13 +19,10 @@ module.exports = function (oAppData) {
 	
 	require('modules/MailWebclient/js/enums.js');
 	
-//	require('node_modules/framework7/dist/css/framework7.css');
-	require('node_modules/framework7/dist/css/framework7.material.css');
-	require('node_modules/framework7/dist/css/framework7.material.colors.css');
-//	require('node_modules/framework7/dist/css/framework7.ios.css');
-//	require('node_modules/framework7/dist/css/framework7.ios.colors.css');
+//	require('node_modules/framework7/dist/css/framework7.material.css');
+//	require('node_modules/framework7/dist/css/framework7.material.colors.css');
 	
-	$('html').addClass("md");
+//	$('html').addClass("md");
 	
 	if (App.getUserRole() === Enums.UserRole.NormalUser)
 	{
