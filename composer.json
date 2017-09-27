@@ -7,9 +7,6 @@
 		"afterlogic/aurora-module-webclient-mail": "~0.6 || dev-master"
 	},
 	"extra": {
-		"installer-name": "MailMobileWebclient",
-		"include-in-mobile": true,
-		"include-in-desktop": false,
-		"require": ["MailWebclient"]
+		"installer-name": "MailMobileWebclient"
 	}
 }
