@@ -55,7 +55,7 @@ module.exports = function (oAppData) {
 							return oAccount.useToAuthorize();
 						});
 
-						MailSettings.userAccountsCount(aAuthAcconts.length);
+						MailSettings.userMailAccountsCount(aAuthAcconts.length);
 					}, this);
 				},
 				getScreens: function () {
