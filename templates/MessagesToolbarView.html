@@ -1,8 +1,8 @@
 <span class="link icon-only open-panel aurora-icons group mark" data-bind="dropdown: {}, css: {disabled: oMessageList.isEmptyList()}, visible: visibleMarkTool">
-	<span class="item" data-bind="command: markAsReadCommand">
-		<i class="icon"></i>
+	<!--<span class="item" data-bind="command: markAsReadCommand">-->
+		<!--<i class="icon"></i>-->
 		<!--<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_MARK_AS_READ'}"></span>-->
-	</span>
+	<!--</span>-->
 <!--	<span class="item control">
 		<span class="icon arrow"></span>
 		<span class="dropdown">
@@ -17,17 +17,17 @@
 	</span>-->
 </span>
 
-<span class="link icon-only open-panel aurora-icons delete" data-bind="command: deleteCommand" id="selenium_mail_delete_button">
+<a href="javascript:void(0)" class="link icon-only open-panel aurora-icons delete" data-bind="command: deleteCommand" id="selenium_mail_delete_button">
 	<i class="icon"></i>
 	<!--<span class="hint" data-bind="text: selectedCount, visible: selectedCount() > 0"></span>-->
 	<!--<span class="text" data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_DELETE'}"></span>-->
-</span>
+</a>
 
-<span class="link icon-only open-panel aurora-icons spam" data-bind="command: spamCommand, visible: allowedSpamAction">
+<a href="javascript:void(0)" class="link icon-only open-panel aurora-icons spam" data-bind="command: spamCommand, visible: allowedSpamAction">
 	<i class="icon"></i>
 	<!--<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_MARK_SPAM'}"></span>-->
-</span>
-<span class="link icon-only open-panel aurora-icons notspam" data-bind="command: notSpamCommand, visible: allowedNotSpamAction">
+</a>
+<a href="javascript:void(0)" class="link icon-only open-panel aurora-icons notspam" data-bind="command: notSpamCommand, visible: allowedNotSpamAction">
 	<i class="icon"></i>
 	<!--<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_MARK_NOT_SPAM'}"></span>-->
-</span>
+</a>

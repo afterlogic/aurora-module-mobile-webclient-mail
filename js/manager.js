@@ -64,10 +64,38 @@ module.exports = function (oAppData) {
 						return require('modules/%ModuleName%/js/views/MailView.js');
 					};
 					oScreens[MailSettings.HashModuleName + '-compose'] = function () {
-						var
-							CComposeView = require('modules/MailWebclient/js/views/CComposeView.js'),
-							oComposeView = new CComposeView()
-						;
+						var CComposeView = require('modules/MailWebclient/js/views/CComposeView.js');
+						CComposeView.prototype.registerOwnToolbarControllers = function ()
+{							this.registerToolbarController({
+								ViewTemplate: 'MailWebclient_Compose_BackButtonView',
+								sId: 'back',
+								bOnlyMobile: true,
+								backToListCommand: this.backToListCommand
+							});
+							this.registerToolbarController({
+								ViewTemplate: '%ModuleName%_Compose_SendButtonView',
+								sId: 'send',
+								bAllowMobile: true,
+								sendCommand: this.sendCommand
+							});
+							this.registerToolbarController({
+								ViewTemplate: 'MailWebclient_Compose_SaveButtonView',
+								sId: 'save',
+								bAllowMobile: true,
+								saveCommand: this.saveCommand
+							});
+							this.registerToolbarController({
+								ViewTemplate: 'MailWebclient_Compose_ImportanceDropdownView',
+								sId: 'importance',
+								selectedImportance: this.selectedImportance
+							});
+							this.registerToolbarController({
+								ViewTemplate: 'MailWebclient_Compose_ConfirmationCheckboxView',
+								sId: 'confirmation',
+								sendReadingConfirmation: this.sendReadingConfirmation
+							});
+						};
+						var oComposeView = new CComposeView();
 						oComposeView.ViewTemplate = '%ModuleName%_ComposeView';
 						oComposeView.oHtmlEditor.ViewTemplate = '%ModuleName%_HtmlEditorView';
 						return oComposeView;
