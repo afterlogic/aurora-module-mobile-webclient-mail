@@ -23,7 +23,7 @@ function CMailMobileView()
 	
 	this.oFolderList = new CFolderListView();
 	this.oMessageList.ViewTemplate = '%ModuleName%_MessagesView';
-	
+	this.oMessageList.oPageSwitcher.ViewTemplate = 'CoreMobileWebclient_PageSwitcherView'
 	this.oBaseMessagePaneView.ViewTemplate = '%ModuleName%_MessagePaneView';
 	
 	this.selectedPanel = ko.observable(Enums.MobilePanel.Items);
