@@ -79,7 +79,7 @@ module.exports = function (oAppData) {
 								sendCommand: this.sendCommand
 							});
 							this.registerToolbarController({
-								ViewTemplate: 'MailWebclient_Compose_SaveButtonView',
+								ViewTemplate: '%ModuleName%_Compose_SaveButtonView',
 								sId: 'save',
 								bAllowMobile: true,
 								saveCommand: this.saveCommand
