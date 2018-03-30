@@ -98,6 +98,23 @@ module.exports = function (oAppData) {
 						var oComposeView = new CComposeView();
 						oComposeView.ViewTemplate = '%ModuleName%_ComposeView';
 						oComposeView.oHtmlEditor.ViewTemplate = '%ModuleName%_HtmlEditorView';
+						oComposeView.executeBackToList = function ()
+						{
+							if (App.isNewTab())
+							{
+								window.close();
+							}
+							else if (!!this.shown && this.shown())
+							{
+								var
+									HeaderItemView = require('modules/MailMobileWebclient/js/views/HeaderItemView.js'),
+									Routing = require('%PathToCoreWebclientModule%/js/Routing.js')
+								;
+								HeaderItemView.hash(HeaderItemView.baseHash());
+								Routing.setPreviousHash();
+							}
+							this.backToListOnSendOrSave(false);
+						};
 						return oComposeView;
 					};
 					return oScreens;
