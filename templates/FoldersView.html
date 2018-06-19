@@ -1,5 +1,5 @@
 <div class="content-block" data-bind="css: {'quota_visible': -1 < quotaProc()}, click: $parent.gotoMessageList.bind($parent)">
-	<div class="content-block-title">Accounts</div>
+	<div class="content-block-title" data-bind="i18n: {'key': '%MODULENAME%/HEADING_ACCOUNTS'}"></div>
     <div class="list-block">
 		<ul data-bind="visible: accounts().length > 1, foreach: accounts">
 			<li class="item" data-bind="css: {'selected': isCurrent()}, click: function(oThisAcc, oEvent) { changeAccount(); oEvent.stopPropagation(); }">
@@ -24,7 +24,7 @@
 			</li>
 		</ul>
 	</div>
-	<div class="content-block-title">Folders</div>
+	<div class="content-block-title" data-bind="i18n: {'key': '%MODULENAME%/HEADING_FOLDERS'}"></div>
     <div class="list-block">
 		<ul data-bind="template: {name: '%ModuleName%_FolderView', foreach: folderList().collection}">
 		</ul>
