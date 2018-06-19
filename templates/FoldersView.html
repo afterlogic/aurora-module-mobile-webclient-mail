@@ -2,7 +2,7 @@
 	<div class="content-block-title">Accounts</div>
     <div class="list-block">
 		<ul data-bind="visible: accounts().length > 1, foreach: accounts">
-			<li class="item" data-bind="css: {'selected': isCurrent()}, click: changeAccount">
+			<li class="item" data-bind="css: {'selected': isCurrent()}, click: function(oThisAcc, oEvent) { changeAccount(); oEvent.stopPropagation(); }">
 				<label class="label-radio item-content">
 					<input type="radio" name="account-radio" data-bind="checked: isCurrent">
 					<div class="item-media">
@@ -15,7 +15,7 @@
 			</li>
 		</ul>
 		<ul data-bind="visible: accounts().length === 1, foreach: accounts">
-			<li class="item" data-bind="css: {'selected': isCurrent()}, click: changeAccount">
+			<li class="item" data-bind="css: {'selected': isCurrent()}">
 				<div class="item-content">
 					<div class="item-inner">
 						<div class="item-title" data-bind="text: email"></div>

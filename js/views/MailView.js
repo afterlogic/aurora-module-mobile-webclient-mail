@@ -35,6 +35,10 @@ function CMailMobileView()
 	this.showApps = ko.observable(false);
 	
 	this.init();
+	
+	MailCache.currentAccountId.subscribe(function () {
+		this.selectedPanel(Enums.MobilePanel.Items);
+	}, this);
 }
 
 _.extendOwn(CMailMobileView.prototype, CMailView.prototype);
