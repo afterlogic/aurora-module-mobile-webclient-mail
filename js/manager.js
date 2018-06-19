@@ -12,6 +12,8 @@ module.exports = function (oAppData) {
 		MailSettings = require('modules/MailWebclient/js/Settings.js')
 	;
 	
+	MailSettings.init(oAppData);
+	
 	if (!ModulesManager.isModuleAvailable('CoreMobileWebclient'))
 	{
 		return null;
