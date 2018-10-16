@@ -1,7 +1,7 @@
 <li data-bind="visible: visible(), attr: {'class': 'item folder-level' + (iLevel + 1)},
-	 css: { 'selected': selected, 'canSelect': bSelectable, 'canNotSelect': !bSelectable, 'exists': bExists, 'subscribed': subscribed,
+	 css: { 'selected': selected, 'canSelect': canBeSelected, 'canNotSelect': !canBeSelected(), 'exists': bExists, 'subscribed': subscribed,
 		'system': isSystem, 'user': !isSystem(), 'virtualEmpty': virtualEmpty, 'accordion': subfolders().length !== 0, 'expanded': expanded(), 'collapsed': !expanded()}">
-	<a class="item-content external" href="#" data-bind="attr: {href: routingHash}, visible: bCanBeSelected">
+	<a class="item-content external" href="#" data-bind="attr: {href: routingHash}, visible: canBeSelected">
 		<div class="item-media aurora-icons">
 			<i class="icon" data-bind="css: 'type' + type()"></i>
 			<!--<span class="collapse_handler" data-bind="visible: canExpand, css: {'expanded': expanded(), 'collapsed': !expanded()}, click: onAccordion"></span>-->
@@ -13,7 +13,7 @@
 		</div>
 	</a>
 	
-	<span class="item-content" data-bind="visible: !bCanBeSelected">
+	<span class="item-content" data-bind="visible: !canBeSelected()">
 		<div class="item-media aurora-icons">
 			<i class="icon" data-bind="css: 'type' + type()"></i>
 			<!--<span class="collapse_handler" data-bind="visible: canExpand, css: {'expanded': expanded(), 'collapsed': !expanded()}, click: onAccordion"></span>-->
