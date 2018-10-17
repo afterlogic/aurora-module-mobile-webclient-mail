@@ -146,26 +146,6 @@
 
 <div class="attachments_panel" data-bind="visible: hasNotInlineAttachments">
 	<div class="attachments large">
-		<div class="download_menu">
-			<span class="link hover" data-bind="visible: visibleExtendedDownload">
-				<span class="icon"></span>
-				<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_GET_ALL_ATTACHMENTS'}"></span>
-			</span>
-
-			<div class="content">
-				<span class="link separately"
-				   data-bind="click: downloadAllAttachmentsSeparately, visible: visibleDownloadAllAttachmentsSeparately">
-					<span class="icon"></span>
-					<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_DOWNLOAD_ATTACHMENTS_SEPARATELY'}"></span>
-				</span>
-				<!-- ko foreach: allAttachmentsDownloadMethods -->
-				<span class="link" data-bind="click: function () { $parent.executeAllAttachmentsDownloadMethod(Handler); }">
-					<span class="icon"></span>
-					<span class="text" data-bind="text: Text"></span>
-				</span>
-				<!-- /ko -->
-			</div>
-		</div>
 		<div data-bind="template: {name: 'CoreMobileWebclient_FileView', foreach: notInlineAttachments}"></div>
 	</div>
 </div>
