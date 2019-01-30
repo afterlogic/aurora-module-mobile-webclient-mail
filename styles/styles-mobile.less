@@ -41,4 +41,22 @@ label.label-checkbox input[type="radio"],
 		z-index: 12345;
 	}
 }
-	@import "./common/attachments.less";
+
+@import "./common/attachments.less";
+
+.ui-autocomplete.ui-front {
+	z-index: 5000;
+	overflow: scroll;
+}
+
+.ui-menu .ui-menu-item {
+	border-bottom: 1px solid #aaa;
+}
+
+.ui-menu .ui-menu-item:last-child {
+	border-bottom: none;
+}
+
+.ui-menu .ui-menu-item .ui-state-active {
+	border: none;
+}
