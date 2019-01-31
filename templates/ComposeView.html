@@ -4,7 +4,7 @@
 			<div class="pages navbar-fixed">
 				<div class="page message-list">
 					<div class="navbar">
-						<div class="navbar-inner">
+						<div class="navbar-inner" style="overflow: inherit;">
 							<div class="left">
 								<a href="javascript:void(0)" class="link icon-only back" data-bind="click: function () { $root.backToListCommand(); }">
 									<i class="icon icon-back"></i>
@@ -14,13 +14,16 @@
 
 							<!--<div class="center sliding" data-bind="i18n: {'key': '%MODULENAME%/HEADING_COMPOSE_BROWSER_TAB'}"></div>-->
 
-							<div class="right" data-bind="foreach: toolbarControllers">
+							<div class="right" data-bind="foreach: toolbarFirstMobileControllers">
 								<!-- ko template: { name: $data.ViewTemplate, data: $data} --><!-- /ko -->
-
-					<!--			<a href="javascript:void(0)" class="link icon-only" data-bind="">
-									<i class="icon icon-plus"></i>
-									_i18n: {'key': 'COREWEBCLIENT/ACTION_SAVE'}
-								</a>-->
+							</div>
+							<div class="right" data-bind="visible: toolbarNextMobileControllers().length > 0">
+								<a href="javascript:void(0)" class="link icon-only aurora-icons more" data-bind="click: function () { showMore(!showMore()); }">
+									<i class="icon"></i>
+									<div data-bind="visible: showMore, foreach: toolbarNextMobileControllers" style="position: absolute; right: 0; top: 0; background: rgb(33, 150, 243); padding: 10px;">
+										<!-- ko template: { name: $data.ViewTemplate, data: $data} --><!-- /ko -->
+									</div>
+								</a>
 							</div>
 						</div>
 					</div>

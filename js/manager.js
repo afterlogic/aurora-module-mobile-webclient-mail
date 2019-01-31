@@ -66,58 +66,7 @@ module.exports = function (oAppData) {
 						return require('modules/%ModuleName%/js/views/MailView.js');
 					};
 					oScreens[MailSettings.HashModuleName + '-compose'] = function () {
-						var CComposeView = require('modules/MailWebclient/js/views/CComposeView.js');
-						CComposeView.prototype.registerOwnToolbarControllers = function ()
-{							this.registerToolbarController({
-								ViewTemplate: 'MailWebclient_Compose_BackButtonView',
-								sId: 'back',
-								bOnlyMobile: true,
-								backToListCommand: this.backToListCommand
-							});
-							this.registerToolbarController({
-								ViewTemplate: '%ModuleName%_Compose_SendButtonView',
-								sId: 'send',
-								bAllowMobile: true,
-								sendCommand: this.sendCommand
-							});
-							this.registerToolbarController({
-								ViewTemplate: '%ModuleName%_Compose_SaveButtonView',
-								sId: 'save',
-								bAllowMobile: true,
-								saveCommand: this.saveCommand
-							});
-							this.registerToolbarController({
-								ViewTemplate: 'MailWebclient_Compose_ImportanceDropdownView',
-								sId: 'importance',
-								selectedImportance: this.selectedImportance
-							});
-							this.registerToolbarController({
-								ViewTemplate: 'MailWebclient_Compose_ConfirmationCheckboxView',
-								sId: 'confirmation',
-								sendReadingConfirmation: this.sendReadingConfirmation
-							});
-						};
-						var oComposeView = new CComposeView();
-						oComposeView.ViewTemplate = '%ModuleName%_ComposeView';
-						oComposeView.oHtmlEditor.ViewTemplate = '%ModuleName%_HtmlEditorView';
-						oComposeView.executeBackToList = function ()
-						{
-							if (App.isNewTab())
-							{
-								window.close();
-							}
-							else if (!!this.shown && this.shown())
-							{
-								var
-									HeaderItemView = require('modules/MailMobileWebclient/js/views/HeaderItemView.js'),
-									Routing = require('%PathToCoreWebclientModule%/js/Routing.js')
-								;
-								HeaderItemView.hash(HeaderItemView.baseHash());
-								Routing.setPreviousHash();
-							}
-							this.backToListOnSendOrSave(false);
-						};
-						return oComposeView;
+						return require('modules/%ModuleName%/js/views/ComposeView.js');
 					};
 					return oScreens;
 				},
@@ -126,6 +75,10 @@ module.exports = function (oAppData) {
 						item: require('modules/%ModuleName%/js/views/HeaderItemView.js'),
 						name: MailSettings.HashModuleName
 					};
+				},
+				registerComposeToolbarController: function (oController) {
+					var ComposeView = require('modules/%ModuleName%/js/views/ComposeView.js');
+					ComposeView.registerToolbarController(oController);
 				}
 			};
 		}
