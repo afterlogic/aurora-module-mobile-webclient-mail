@@ -4,7 +4,7 @@ var
 	_ = require('underscore'),
 	ko = require('knockout'),
 	
-	App = require('%PathToCoreWebclientModule%/js/App.js'),
+	Routing = require('%PathToCoreWebclientModule%/js/Routing.js'),
 	
 	MailCache = require('modules/MailWebclient/js/Cache.js'),
 	
@@ -83,14 +83,10 @@ CMailMobileView.prototype.gotoMessageList = function ()
 {
 	this.changeSelectedPanel(Enums.MobilePanel.Items);
 	
-	var
-		sFolder = this.folderList().currentFolderFullName(),
-		iPage = this.oMessageList.oPageSwitcher.currentPage(),
-		sSearch = this.oMessageList.search(),
-		sFilters = this.oMessageList.filters()
-	;
-	
-	this.oMessageList.changeRoutingForMessageList(sFolder, iPage, '', sSearch, sFilters);
+	if (MailCache.currentMessage())
+	{
+		Routing.replaceHashWithoutMessageUid(MailCache.currentMessage().uid());
+	}
 	
 	return true;
 };
