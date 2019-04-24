@@ -20,7 +20,7 @@
 							<div class="right" data-bind="visible: toolbarNextMobileControllers().length > 0">
 								<a href="javascript:void(0)" class="link icon-only aurora-icons more" data-bind="click: function () { showMore(!showMore()); }">
 									<i class="icon"></i>
-									<div data-bind="visible: showMore, foreach: toolbarNextMobileControllers" style="position: absolute; right: 0; top: 0; background: rgb(33, 150, 243); padding: 10px;">
+									<div data-bind="visible: showMore, foreach: toolbarNextMobileControllers" class="compose-more-menu">
 										<!-- ko template: { name: $data.ViewTemplate, data: $data} --><!-- /ko -->
 									</div>
 								</a>
