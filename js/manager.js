@@ -29,7 +29,7 @@ module.exports = function (oAppData) {
 	
 	$('html').addClass("md");
 	
-	if (App.getUserRole() === Enums.UserRole.NormalUser)
+	if (App.isUserNormalOrTenant())
 	{
 		if (App.isMobile())
 		{
