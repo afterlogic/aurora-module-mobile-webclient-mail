@@ -1,6 +1,8 @@
 'use strict';
 
 module.exports = function (oAppData) {
+	require('modules/MailWebclient/js/enums.js');
+	
 	var
 		_ = require('underscore'),
 		ko = require('knockout'),
@@ -18,8 +20,6 @@ module.exports = function (oAppData) {
 	{
 		return null;
 	}
-	
-	require('modules/MailWebclient/js/enums.js');
 	
 //	require('node_modules/framework7/dist/css/framework7.css');
 	require('node_modules/framework7/dist/css/framework7.material.css');
