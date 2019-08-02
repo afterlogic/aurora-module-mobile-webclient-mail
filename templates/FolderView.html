@@ -1,5 +1,5 @@
 <!-- ko if: visible -->
-	<li data-bind="visible: visible(), attr: {'class': 'item folder-level' + (iLevel + 1)},
+	<li data-bind="visible: visible(), attr: {'class': 'item folder-level' + (getDisplayedLevel() + 1)},
 		 css: { 'selected': selected, 'canSelect': canBeSelected, 'canNotSelect': !canBeSelected(), 'exists': bExists, 'subscribed': subscribed,
 			'system': isSystem, 'user': !isSystem(), 'virtualEmpty': virtualEmpty, 'accordion': subfolders().length !== 0, 'expanded': expanded(), 'collapsed': !expanded()}">
 		<a class="item-content external" href="#" data-bind="attr: {href: routingHash}, visible: canBeSelected">
