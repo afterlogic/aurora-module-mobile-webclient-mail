@@ -3,15 +3,14 @@
 var
 	_ = require('underscore'),
 	ko = require('knockout'),
+	$ = require('jquery'),
 	
 	Routing = require('%PathToCoreWebclientModule%/js/Routing.js'),
-	
 	MailCache = require('modules/MailWebclient/js/Cache.js'),
+	App = require('%PathToCoreWebclientModule%/js/App.js'),
 	
 	CFolderListView = require('modules/%ModuleName%/js/views/CFolderListView.js'),
-	
-	CMailView = require('modules/MailWebclient/js/views/CMailView.js'),
-	$ = require('jquery');
+	CMailView = require('modules/MailWebclient/js/views/CMailView.js')
 ;
 
 /**
@@ -39,6 +38,8 @@ function CMailMobileView()
 	MailCache.currentAccountId.subscribe(function () {
 		this.selectedPanel(Enums.MobilePanel.Items);
 	}, this);
+
+	App.broadcastEvent('%ModuleName%::ConstructView::after', {'Name': this.ViewConstructorName, 'View': this});
 }
 
 _.extendOwn(CMailMobileView.prototype, CMailView.prototype);

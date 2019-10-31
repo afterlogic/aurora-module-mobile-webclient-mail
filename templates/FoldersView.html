@@ -1,6 +1,6 @@
 <div class="content-block" data-bind="css: {'quota_visible': -1 < quotaProc()}, click: $parent.gotoMessageList.bind($parent)">
 	<div class="content-block-title" data-bind="i18n: {'key': '%MODULENAME%/HEADING_ACCOUNTS'}"></div>
-    <div class="list-block">
+	<div class="list-block">
 		<ul data-bind="visible: accounts().length > 1, foreach: accounts">
 			<li class="item" data-bind="css: {'selected': isCurrent()}, click: function(oThisAcc, oEvent) { changeAccount(); oEvent.stopPropagation(); }">
 				<label class="label-radio item-content">
@@ -25,7 +25,7 @@
 		</ul>
 	</div>
 	<div class="content-block-title" data-bind="i18n: {'key': '%MODULENAME%/HEADING_FOLDERS'}"></div>
-    <div class="list-block">
+	<div class="list-block">
 		<ul data-bind="template: {name: '%ModuleName%_FolderView', foreach: folderList().collection}">
 		</ul>
 	</div>
@@ -34,4 +34,4 @@
 			<span class="used" data-bind="style: {'width': '' + (-1 < quotaProc() ? quotaProc() : 0) + '%' }"></span>
 		</span>
 	</span>
-</div>		
+</div>
