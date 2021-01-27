@@ -9,7 +9,8 @@ var
 	UserSettings = require('%PathToCoreWebclientModule%/js/Settings.js'),
 	
 	AccountList = require('modules/MailWebclient/js/AccountList.js'),
-	MailCache = require('modules/MailWebclient/js/Cache.js')
+	MailCache = require('modules/MailWebclient/js/Cache.js'),
+	Settings = require('modules/MailWebclient/js/Settings.js')
 ;
 
 /**
@@ -20,7 +21,10 @@ function CFolderListView()
 	this.accounts = AccountList.collection;
 	
 	this.folderList = MailCache.folderList;
-	
+
+	this.bAllowUnifiedInbox = Settings.AllowUnifiedInbox;
+	this.oUnifiedInbox = MailCache.oUnifiedInbox;
+
 	this.quotaProc = ko.observable(-1);
 	this.quotaDesc = ko.observable('');
 
