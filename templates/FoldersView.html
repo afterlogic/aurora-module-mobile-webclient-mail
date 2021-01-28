@@ -24,9 +24,9 @@
 			</li>
 		</ul>
 	</div>
-	<div class="content-block-title" data-bind="i18n: {'key': '%MODULENAME%/HEADING_UNIFIED_FOLDERS'}"></div>
-	<div class="list-block">
-		<ul data-bind="template: {name: '%ModuleName%_FolderView', data: oUnifiedInbox}, visible: bAllowUnifiedInbox"></ul>
+	<div class="content-block-title" data-bind="i18n: {'key': '%MODULENAME%/HEADING_UNIFIED_FOLDERS'}, visible: unifiedInboxAllowed"></div>
+	<div class="list-block" data-bind="visible: unifiedInboxAllowed">
+		<ul data-bind="template: {name: '%ModuleName%_FolderView', data: oUnifiedInbox}"></ul>
 	</div>
 	<div class="content-block-title" data-bind="i18n: {'key': '%MODULENAME%/HEADING_FOLDERS'}"></div>
 	<div class="list-block">

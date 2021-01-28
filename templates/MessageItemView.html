@@ -15,7 +15,8 @@
 				<span class="custom_checkbox flag aurora-icons" data-bind="css: {'flagged': flagged(), 'partial': partialFlagged()}"><i class="icon"></i></span>
 				<div class="item-title" data-bind="text: fromOrToText()"></div>
 				
-				<!--<div class="item-after" data-bind="text: friendlySize()"></div>-->
+				<span class="unified_marker" data-bind="visible: showUnifiedMailboxLabel, text: unifiedMailboxLabelText, style: {'background': unifiedMailboxLabelColor}"></span>
+<!--				<div class="item-after" data-bind="text: friendlySize()"></div>-->
 				<div class="item-after" data-bind="text: date()"></div>
 			</div>
 			<div class="item-subtitle">
