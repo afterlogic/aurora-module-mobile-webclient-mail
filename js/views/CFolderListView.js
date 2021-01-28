@@ -22,7 +22,7 @@ function CFolderListView()
 	
 	this.folderList = MailCache.folderList;
 
-	this.bAllowUnifiedInbox = Settings.AllowUnifiedInbox;
+	this.bAllowUnifiedInbox = Settings.AllowUnifiedInbox && this.accounts().length > 1;
 	this.oUnifiedInbox = MailCache.oUnifiedInbox;
 
 	this.quotaProc = ko.observable(-1);
