@@ -1,4 +1,4 @@
-<div class="content-block" data-bind="css: {'quota_visible': -1 < quotaProc()}, click: $parent.gotoMessageList.bind($parent)">
+<div class="content-block" data-bind="css: {'quota_visible': -1 < quotaProc(), 'quota_has_text_below': !bShowQuotaBarTextAsTooltip}, click: $parent.gotoMessageList.bind($parent)">
 	<div class="content-block-title" data-bind="i18n: {'key': '%MODULENAME%/HEADING_ACCOUNTS'}"></div>
 	<div class="list-block">
 		<ul data-bind="visible: accounts().length > 1, foreach: accounts">
@@ -33,8 +33,9 @@
 		<ul data-bind="template: {name: '%ModuleName%_FolderView', foreach: folderList().collection}"></ul>
 	</div>
 	<span class="volumer" data-bind="visible: -1 < quotaProc(), click: $parent.onVolumerClick">
-		<span class="volumer_conteiner">
+		<span class="volumer_conteiner" data-bind="customTooltip: bShowQuotaBarTextAsTooltip ? quotaDesc() : false">
 			<span class="used" data-bind="style: {'width': '' + (-1 < quotaProc() ? quotaProc() : 0) + '%' }"></span>
 		</span>
+		<span data-bind="visible: !bShowQuotaBarTextAsTooltip, text: quotaDesc"></span>
 	</span>
 </div>
