@@ -86,8 +86,7 @@ CMailMobileView.prototype.gotoMessageList = function ()
 	
 	if (MailCache.currentMessage())
 	{
-		Routing.replaceHashWithoutMessageUid(MailCache.currentMessage().uid());
-		Routing.replaceHashWithoutMessageUid(MailCache.currentMessage().unifiedUid());
+		Routing.replaceHashWithoutMessageUid(MailCache.currentMessage().longUid());
 	}
 	
 	return true;
