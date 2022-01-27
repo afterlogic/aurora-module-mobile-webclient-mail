@@ -1,0 +1,4 @@
+  {
+    path: '/mail',
+    component: () => import('src/../../../FilesMobileWebclient/vue-mobile/pages/Mail'),
+  },
