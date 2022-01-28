@@ -8,4 +8,14 @@ export default {
   init (appdata) {
     settings.init(appdata)
   },
+
+  getNormalUserPages () {
+    return [
+      {
+        pageName: 'mail',
+        pagePath: '/mail',
+        pageComponent: () => import('./pages/Mail')
+      },
+    ]
+  },
 }

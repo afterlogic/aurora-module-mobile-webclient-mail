@@ -1,10 +1,8 @@
-
-import typesUtils from 'src/utils/types'
+// import typesUtils from 'src/utils/types'
 
 class MailSettings {
   constructor (appData) {
-    const mailData = typesUtils.pObject(appData.Mail)
-    console.log('mailData', mailData)
+    // const mailData = typesUtils.pObject(appData.Mail)
   }
 }
 
