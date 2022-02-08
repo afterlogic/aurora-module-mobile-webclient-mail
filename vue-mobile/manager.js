@@ -19,4 +19,15 @@ export default {
       },
     ]
   },
+
+  getPageFooterButtons () {
+    return [
+      {
+        pageName: 'mail',
+        pagePath: '/mail',
+        highlightPaths: ['/mail'],
+        getIconComponent: () => import('./components/MailFooterIcon'),
+      },
+    ]
+  },
 }
