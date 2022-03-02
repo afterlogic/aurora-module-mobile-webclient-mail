@@ -1,5 +1,5 @@
 import settings from './settings'
-
+import { defineAsyncComponent } from "vue";
 export default {
   moduleName: 'MailMobileWebclient',
 
@@ -26,7 +26,7 @@ export default {
         pageName: 'mail',
         pagePath: '/mail',
         highlightPaths: ['/mail'],
-        getIconComponent: () => import('./components/MailFooterIcon'),
+        iconComponent: defineAsyncComponent(() => import('./components/MailFooterIcon')),
       },
     ]
   },

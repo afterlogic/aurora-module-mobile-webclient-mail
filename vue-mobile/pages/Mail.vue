@@ -1,5 +1,5 @@
 <template>
-  <main-layout title="Mail">
+  <main-layout>
     <div>
       <div>Mail 1</div>
       <div>Mail 2</div>
