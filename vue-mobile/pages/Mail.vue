@@ -1,5 +1,8 @@
 <template>
   <main-layout>
+    <template v-slot:drawer>
+      <drawer-content />
+    </template>
     <div>
       <div>Mail 1</div>
       <div>Mail 2</div>
@@ -14,10 +17,14 @@
 
 <script>
 import MainLayout from 'src/layouts/MainLayout'
+import DrawerContent from '../components/DrawerContent'
+
 export default {
   name: 'Mail',
+
   components: {
     MainLayout,
+    DrawerContent,
   },
 }
 </script>

@@ -27,11 +27,9 @@
 <script>
 export default {
   name: 'MailFooterIcon',
+
   props: {
-    color: {
-      type: String,
-      default: '#B6B5B5',
-    },
+    color: { type: String, default: '#B6B5B5' },
   },
 }
 </script>

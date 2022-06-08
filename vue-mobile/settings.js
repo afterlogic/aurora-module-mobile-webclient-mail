@@ -1,8 +1,11 @@
-// import types from 'src/utils/types'
+import store from 'src/store'
+
+import types from 'src/utils/types'
 
 class MailSettings {
   constructor (appData) {
-    // const mailData = types.pObject(appData.Mail)
+    const mailData = types.pObject(appData.Mail)
+    store.dispatch('mailmobile/parseAccounts', types.pArray(mailData?.Accounts))
   }
 }
 
