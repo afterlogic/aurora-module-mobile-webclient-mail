@@ -1,17 +1,18 @@
 <template>
-  <q-item :style="indent" class="q-pb-lg" dense clickable v-ripple @click.prevent="selectFolder">
+  <q-item :style="indent" class="q-pb-lg" dense :active="selected" clickable v-ripple @click.prevent="selectFolder">
     <q-item-section avatar>
       <folder-icon />
     </q-item-section>
     <q-item-section>
-      <q-item-label class="text-subtitle1">{{ folder.name }}</q-item-label>
+      <q-item-label class="text-subtitle1" :class="selected ? 'text-bold' : ''">{{ folder.name }}</q-item-label>
     </q-item-section>
   </q-item>
-  <folder-item v-for="subFolder in folder.subFolders" :key="subFolder.fullName" :folder="subFolder" :level="level + 1" />
+  <folder-item v-for="subFolder in folder.subFolders" :key="subFolder.fullName"
+               :folder="subFolder" :selected="currentFolderFullName === subFolder.fullName" :level="level + 1" />
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 import eventBus from 'src/event-bus'
 
@@ -26,10 +27,19 @@ export default {
 
   props: {
     folder: { type: Object, default: null },
+    selected: { type: Boolean, default: false },
     level: { type: Number, default: 0 },
   },
 
   computed: {
+    ...mapGetters('mailmobile', [
+      'currentFolder',
+    ]),
+
+    currentFolderFullName () {
+      return this.currentFolder && this.currentFolder.fullName || ''
+    },
+
     indent() {
       return { transform: `translate(${this.level * 20}px)` }
     },

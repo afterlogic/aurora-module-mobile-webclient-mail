@@ -1,7 +1,7 @@
 <template>
-  <q-item class="q-mb-sm" dense :active="active" clickable v-ripple @click.prevent="selectStorage">
+  <q-item class="q-mb-md" dense :active="selected" clickable v-ripple @click.prevent="selectStorage">
     <q-item-section>
-      <q-item-label>{{ accountEmail }}</q-item-label>
+      <q-item-label :class="selected ? 'text-bold' : ''">{{ accountEmail }}</q-item-label>
     </q-item-section>
   </q-item>
 </template>
@@ -16,7 +16,7 @@ export default {
 
   props: {
     account: { type: Object, default: null },
-    active: { type: Boolean, default: false }
+    selected: { type: Boolean, default: false },
   },
 
   computed: {

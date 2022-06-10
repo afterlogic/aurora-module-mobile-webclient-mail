@@ -16,4 +16,19 @@ export default {
       })
       .catch(error => null)
   },
+
+  getMessages: async (parameters) => {
+    return webApi.sendRequest({
+      moduleName: 'Mail',
+      methodName: 'GetMessages',
+      parameters,
+    })
+      .then(result => {
+        if (Array.isArray(result && result['@Collection'])) {
+          return result['@Collection']
+        }
+        return []
+      })
+      .catch(error => null)
+  },
 }

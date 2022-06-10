@@ -24,13 +24,14 @@ function getDisplayName(folderType, folderName, isUnifiedInbox = false) {
   }
 }
 
-function parseFolder(folderData, namespace, oldFolder) {
+function parseFolder(accountId, folderData, namespace, oldFolder) {
   const
     type = types.pInt(folderData.Type),
     name = types.pString(folderData.Name),
     fullName = types.pString(folderData.FullNameRaw),
     delimiter = types.pString(folderData.Delimiter)
   return {
+    accountId,
     fullName,
     name,
     type,
@@ -66,7 +67,7 @@ function parseFolders(accountId, result) {
       const oldFolder = oldFlatList[folderData.FullNameRaw]
       delete oldFlatList[folderData.FullNameRaw]
 
-      const newFolder = parseFolder(folderData, namespace, oldFolder)
+      const newFolder = parseFolder(accountId, folderData, namespace, oldFolder)
       if (folderData.SubFolders && folderData.SubFolders['@Collection']) {
         const subFoldersData = _recursive(folderData.SubFolders['@Collection'])
         newFolder.subFolders = subFoldersData.tree

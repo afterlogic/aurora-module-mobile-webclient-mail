@@ -4,5 +4,9 @@ export default function () {
     currentAccountId: 0,
 
     folderLists: {},
+    currentFolder: null,
+
+    isMessageListLoading: false,
+    currentMessageList: [],
   }
 }

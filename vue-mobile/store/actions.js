@@ -37,7 +37,32 @@ export default {
     }
   },
 
-  changeCurrentFolder: ({ commit, getters }, folder) => {
-    console.log('folder', folder)
+  changeCurrentFolder: ({ commit }, folder) => {
+    commit('setCurrentFolder', folder)
+  },
+
+  asyncGetMessages: async ({ getters, dispatch, commit }) => {
+    const currentFolder = getters['currentFolder']
+    if (!currentFolder) {
+      return
+    }
+
+    const parameters = {
+      AccountID: currentFolder.accountId,
+      Folder: currentFolder.fullName,
+      Offset: 0,
+      Limit: 20,
+      Search: '',
+      Filters: '',
+      SortBy: 'arrival',
+      SortOrder: 1,
+      UseThreading: true,
+      InboxUidnext: ''
+    }
+    commit('setMessageListLoading', true)
+    const messages = await mailWebApi.getMessages(parameters)
+    commit('setMessageListLoading', false)
+    console.log('messages', messages)
+    commit('setMessageList', { accountId: parameters.AccountID, folderFullName: parameters.Folder, list: messages })
   },
 }

@@ -1,13 +1,13 @@
 <template>
-  <div class="flex items-center justify-between q-pa-md q-pl-lg">
-    <div class="text-grey">
+  <div class="flex items-center justify-between q-pl-lg q-pt-lg">
+    <div class="text-grey q-pt-sm">
       {{ accountsHeading }}
     </div>
   </div>
 
-  <div class="q-pl-sm q-pt-sm">
+  <div class="q-pl-sm q-pt-lg">
     <account-item v-for="account in accountList" :key="account.id"
-                  :account="account" :active="currentAccountId === account.id"
+                  :account="account" :selected="currentAccountId === account.id"
     />
   </div>
 
@@ -18,7 +18,9 @@
   </div>
 
   <div class="q-pl-sm">
-    <folder-item v-for="folder in currentFoldersTree" :key="folder.fullName" :folder="folder" />
+    <folder-item v-for="folder in currentFoldersTree" :key="folder.fullName"
+                 :folder="folder" :selected="currentFolderFullName === folder.fullName"
+    />
   </div>
 </template>
 
@@ -41,6 +43,7 @@ export default {
       'accountList',
       'currentAccount',
       'currentFoldersTree',
+      'currentFolder',
     ]),
 
     currentAccountId () {
@@ -49,6 +52,10 @@ export default {
 
     accountsHeading () {
       return this.currentAccount && this.currentAccount.friendlyName || this.$t('MAILMOBILEWEBCLIENT.HEADING_ACCOUNTS')
+    },
+
+    currentFolderFullName () {
+      return this.currentFolder && this.currentFolder.fullName || ''
     },
   },
 
@@ -66,16 +73,9 @@ export default {
     ...mapActions('mailmobile', [
       'asyncGetFolders',
     ]),
-
   }
-};
-</script>
-<style>
-.contacts__drawer-head {
-  font-style: normal;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 25px;
-  color: #969494;
 }
+</script>
+
+<style lang="scss" scoped>
 </style>

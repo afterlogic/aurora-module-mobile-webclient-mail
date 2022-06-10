@@ -16,4 +16,16 @@ export default {
     const currentFolderList = state.folderLists && state.folderLists[state.currentAccountId]
     return currentFolderList ? currentFolderList.count : 0
   },
+
+  currentFolder: state => {
+    return state.currentFolder
+  },
+
+  isMessageListLoading: state => {
+    return state.isMessageListLoading
+  },
+
+  currentMessageList: state => {
+    return state.currentMessageList
+  },
 }
