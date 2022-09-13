@@ -16,31 +16,31 @@
 							<div class="left">
 								<a href="javascript:void(0)" class="link icon-only open-panel" data-bind="click: togleFolderList, visible: !isEnableGroupOperations()"><i class="icon icon-bars"></i></a>
 
-								<a href="javascript:void(0)" class="link icon-only" data-bind="click: function () { oMessageList.checkAll(false); }, visible: isEnableGroupOperations()"><i class="icon icon-close"></i></a>
+								<a href="javascript:void(0)" class="link icon-only" data-bind="click: function () { messageList().checkAll(false); }, visible: isEnableGroupOperations()"><i class="icon icon-close"></i></a>
 							</div>
 
 							<!-- We need cool sliding animation on title element, so we have additional "sliding" class -->
-							<div class="center sliding" data-bind="visible: oMessageList.checkedUids().length === 0, i18n: {'key': '%MODULENAME%/HEADING_BROWSER_TAB'}"></div>
-							<div class="center sliding" data-bind="visible: oMessageList.checkedUids().length > 0, text: oMessageList.checkedUids().length"></div>
+							<div class="center sliding" data-bind="visible: messageList().checkedUids().length === 0, i18n: {'key': '%MODULENAME%/HEADING_BROWSER_TAB'}"></div>
+							<div class="center sliding" data-bind="visible: messageList().checkedUids().length > 0, text: messageList().checkedUids().length"></div>
 
-							<div class="right" data-bind="visible: oMessageList.checkedUids().length === 0">
+							<div class="right" data-bind="visible: messageList().checkedUids().length === 0">
 								<a href="javascript:void(0)" class="link icon-only aurora-icons check-state" data-bind="command: checkMailCommand, checkstate: {'activeClass': 'rotate', 'state': checkMailIndicator(), 'duration': 800}"><i class="icon"></i></a>
 								<!--i18n: {'key': '%MODULENAME%/ACTION_CHECK_MAIL'}-->
 								
 								<a href="javascript:void(0)" class="link icon-only open-panel aurora-icons settings" data-bind="click: function () { showApps(!showApps()); }"><i class="icon"></i></a>
 							</div>
 
-							<div class="right" data-bind="visible: oMessageList.checkedUids().length > 0">
+							<div class="right" data-bind="visible: messageList().checkedUids().length > 0">
 								<!-- ko template: { name: '%ModuleName%_MessagesToolbarView' } --><!-- /ko -->
 							</div>
 						</div>
 					</div>
 					
-					<div class="toolbar toolbar-bottom" data-bind="visible: oMessageList.oPageSwitcher.pages().length > 0, with: oMessageList.oPageSwitcher">
+					<div class="toolbar toolbar-bottom" data-bind="visible: messageList().oPageSwitcher.pages().length > 0, with: messageList().oPageSwitcher">
 						<div class="toolbar-inner" data-bind="template: {name: ViewTemplate}"></div>
 					</div>
 					
-					<!-- ko template: { name: oMessageList.ViewTemplate, data: oMessageList} --><!-- /ko -->
+					<!-- ko template: { name: messageList().ViewTemplate, data: messageList()} --><!-- /ko -->
 					
 					<div class="speed-dial">
 						<!-- FAB inside will open Speed Dial actions -->
