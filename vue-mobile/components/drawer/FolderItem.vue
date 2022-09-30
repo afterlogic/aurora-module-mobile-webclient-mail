@@ -4,7 +4,7 @@
       <folder-icon />
     </q-item-section>
     <q-item-section>
-      <q-item-label class="text-subtitle1 text-size" :class="selected ? 'text-bold' : ''">{{ folder.name }}</q-item-label>
+      <q-item-label class="text-subtitle1 text-size">{{ folder.name }}</q-item-label>
     </q-item-section>
   </q-item>
   <folder-item v-for="subFolder in folder.subFolders" :key="subFolder.fullName"

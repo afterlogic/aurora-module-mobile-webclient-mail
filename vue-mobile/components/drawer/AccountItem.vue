@@ -1,7 +1,7 @@
 <template>
   <q-item class="q-mb-md" dense :active="selected" clickable v-ripple @click.prevent="selectStorage">
     <q-item-section>
-      <q-item-label :class="selected ? 'text-bold' : ''">{{ accountEmail }}</q-item-label>
+      <q-item-label>{{ accountEmail }}</q-item-label>
     </q-item-section>
   </q-item>
 </template>
