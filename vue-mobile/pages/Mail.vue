@@ -24,6 +24,7 @@ import { mapActions, mapGetters } from 'vuex'
 import MainLayout from 'src/layouts/MainLayout'
 import DrawerContent from '../components/DrawerContent'
 import MessageItem from '../components/message-list/Messagetem'
+import AppPullRefresh from "../../../CoreMobileWebclient/vue-mobile/src/components/common/AppPullRefresh";
 
 export default {
   name: 'Mail',
@@ -32,6 +33,7 @@ export default {
     MainLayout,
     DrawerContent,
     MessageItem,
+    AppPullRefresh
   },
 
   computed: {
