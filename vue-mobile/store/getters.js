@@ -1,3 +1,5 @@
+import { getFilteredItems } from '../utils/common'
+
 export default {
   accountList: state => state.accountList,
 
@@ -27,5 +29,10 @@ export default {
 
   currentMessageList: state => {
     return state.currentMessageList
+  },
+
+  selectedMessages: (state) => {
+    const items = getFilteredItems(state.currentMessageList, 'isSelected')
+    return items
   },
 }

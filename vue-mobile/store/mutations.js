@@ -58,4 +58,9 @@ export default {
       state.currentMessageList = list
     }
   },
+
+  setSelectStatus: (state, email) => { 
+    console.log('setSelectStatus')
+    email.isSelected = !email.isSelected
+  },
 }

@@ -2,6 +2,7 @@ import _ from 'lodash'
 
 import accountsUtils from '../utils/accounts'
 import mailWebApi from '../mail-web-api'
+import { getParsedMessages } from '../utils/common'
 
 export default {
   parseAccounts: ({ commit }, accountsData) => {
@@ -63,6 +64,11 @@ export default {
     const messages = await mailWebApi.getMessages(parameters)
     commit('setMessageListLoading', false)
     console.log('messages', messages)
-    commit('setMessageList', { accountId: parameters.AccountID, folderFullName: parameters.Folder, list: messages })
+    commit('setMessageList', { accountId: parameters.AccountID, folderFullName: parameters.Folder, list: getParsedMessages(messages) })
+  },
+
+  changeSelectStatus: ({ commit }, mail) => {
+    console.log('changeSelectStatus', mail)
+    commit('setSelectStatus', mail)
   },
 }

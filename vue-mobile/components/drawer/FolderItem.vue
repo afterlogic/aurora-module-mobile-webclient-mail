@@ -2,7 +2,7 @@
   <q-item class="folder" dense :active="selected" clickable v-ripple @click.prevent="selectFolder">
     <q-item-section class="folder-indent" :style="indent" side></q-item-section>
     <q-item-section side>
-      <folder-icon :icon="folder.type" :color="selected ? '#469CF8' : '#969494'" />
+      <folder-icon :icon="'' + folder.type" :color="selected ? '#469CF8' : '#969494'" />
     </q-item-section>
     <q-item-section class="folder-name">
       {{ folder.name }}

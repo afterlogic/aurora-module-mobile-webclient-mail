@@ -17,7 +17,7 @@ export default {
         pageName: 'mail',
         pagePath: '/mail',
         pageComponent: () => import('./pages/Mail'),
-        pageHeaderComponent: () => import('./components/MailHeader'),
+        pageHeaderComponent: () => import('./components/header/MailHeader'),
       },
     ]
   },

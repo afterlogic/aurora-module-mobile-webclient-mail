@@ -6,15 +6,24 @@
     <q-scroll-area :thumb-style="{ width: '5px' }" class="contacts__list" v-if="!isMessageListLoading && currentMessageList.length">
       <app-pull-refresh :refresh-action="asyncGetMessages">
         <q-list>
-          <message-item v-for="message in currentMessageList" :key="message.unifiedUid" :message="message" class="contact" />
+          <message-item 
+            v-for="message in currentMessageList" 
+            :key="message.unifiedUid"
+            :message="message"
+            :isSelectMode="isSelectMode"
+            class="mail"
+            :selectMessage="selectItem"
+            v-touch-hold.mouse="event => longPress(message, event)" />
         </q-list>
-<!--        <div style="height: 70px" class="full-width" />-->
+<!--    <div style="height: 70px" class="full-width" />-->
       </app-pull-refresh>
     </q-scroll-area>
 <!--    <empty-contacts v-if="isContactsEmpty" />-->
     <div class="q-mt-xl flex items-center justify-center" v-if="isMessageListLoading">
       <q-circular-progress indeterminate size="40px" color="primary" class="q-ma-md" />
     </div>
+
+    <app-create-button _:classes="appButtonClasses" _:show-dialog="showCreateButtonsDialog" v-if="isShowCreateButtons"/>
   </main-layout>
 </template>
 
@@ -23,7 +32,7 @@ import { mapActions, mapGetters } from 'vuex'
 
 import MainLayout from 'src/layouts/MainLayout'
 import DrawerContent from '../components/DrawerContent'
-import MessageItem from '../components/message-list/Messagetem'
+import MessageItem from '../components/message-list/MessageItem'
 import AppPullRefresh from "../../../CoreMobileWebclient/vue-mobile/src/components/common/AppPullRefresh";
 
 export default {
@@ -36,28 +45,53 @@ export default {
     AppPullRefresh
   },
 
-  computed: {
-    ...mapGetters('mailmobile', [
-      'currentFolder',
-      'isMessageListLoading',
-      'currentMessageList',
-    ]),
-  },
-
-  watch: {
-    currentFolder () {
-      this.asyncGetMessages()
-    },
+  data() {
+    return {
+      isSelectMode: false,
+    }
   },
 
   mounted () {
     this.asyncGetMessages()
   },
 
+  watch: {
+    currentFolder () {
+      this.asyncGetMessages()
+    },
+    selectedMessages(items) {
+      if (!items.length) {
+        this.isSelectMode = false
+      }
+    },
+  },
+
+  computed: {
+    ...mapGetters('mailmobile', [
+      'currentFolder',
+      'isMessageListLoading',
+      'currentMessageList',
+      'selectedMessages',
+    ]),
+    isShowCreateButtons() {
+      // return this.currentHeader !== 'SearchHeader' && !this.isSelectMode
+      return !this.isSelectMode
+    },
+  },
+
   methods: {
     ...mapActions('mailmobile', [
       'asyncGetMessages',
+      'changeSelectStatus',
     ]),
+    selectItem(item) {
+      console.log('selectItem');
+      this.changeSelectStatus(item)
+    },
+    longPress(item) {
+      this.isSelectMode = true
+      this.selectItem(item)
+    },
   }
 }
 </script>
