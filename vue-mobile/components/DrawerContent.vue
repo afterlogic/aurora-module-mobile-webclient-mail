@@ -6,8 +6,11 @@
   </div>
 
   <div class="q-pl-sm q-pt-lg">
-    <account-item v-for="account in accountList" :key="account.id"
-                  :account="account" :selected="currentAccountId === account.id"
+    <account-item 
+      v-for="account in accountList"
+      :key="account.id"
+      :account="account"
+      :selected="currentAccountId === account.id"
     />
   </div>
 
@@ -17,9 +20,12 @@
     </div>
   </div>
 
-  <div class="q-pl-sm">
-    <folder-item v-for="folder in currentFoldersTree" :key="folder.fullName"
-                 :folder="folder" :selected="currentFolderFullName === folder.fullName"
+  <div class="">
+    <folder-item
+      v-for="folder in currentFoldersTree"
+      :key="folder.fullName"
+      :folder="folder"
+      :selected="currentFolderFullName === folder.fullName"
     />
   </div>
 </template>
