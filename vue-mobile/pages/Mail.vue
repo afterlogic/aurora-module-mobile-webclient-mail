@@ -24,8 +24,9 @@
     <div class="q-mt-xl flex items-center justify-center" v-if="isMessageListLoading">
       <q-circular-progress indeterminate size="40px" color="primary" class="q-ma-md" />
     </div>
-
-    <app-create-button _:classes="appButtonClasses" _:show-dialog="showCreateButtonsDialog" v-if="isShowCreateButtons"/>
+    <app-create-button :classes="appButtonClasses" @click="showCreateButtonsDialog" v-if="isShowCreateButtons">
+      <compose-icon color="#fff" />
+    </app-create-button>
   </main-layout>
 </template>
 
@@ -38,6 +39,10 @@ import MessageItem from '../components/message-list/MessageItem'
 import EmptyFolder from '../components/message-list/EmptyFolder'
 
 import AppPullRefresh from 'src/components/common/AppPullRefresh'
+import AppCreateButton from 'src/components/common/AppCreateButton'
+import ComposeIcon from '../components/icons/ComposeIcon'
+
+import notification from 'src/utils/notification'
 
 export default {
   name: 'Mail',
@@ -48,11 +53,14 @@ export default {
     MessageItem,
     EmptyFolder,
     AppPullRefresh,
+    AppCreateButton,
+    ComposeIcon,
   },
 
   data() {
     return {
       isSelectMode: false,
+      appButtonPressed: false
     }
   },
 
@@ -77,10 +85,20 @@ export default {
       'isMessageListLoading',
       'currentMessageList',
       'selectedMessages',
+      'dialogComponent',
     ]),
     isListEmpty() {
       // return !this.currentMessageList.length && !this.loadingStatus
       return !this.currentMessageList.length
+    },
+    appButtonClasses() {
+      // if (this.dialogComponent?.component === 'CreateButtonsDialogs') {
+      if (this.appButtonPressed) {
+        return 'z-index-max rotate'
+      }
+      else {
+        return 'z-index-min'
+      }
     },
     isShowCreateButtons() {
       // return this.currentHeader !== 'SearchHeader' && !this.isSelectMode
@@ -94,12 +112,15 @@ export default {
       'changeSelectStatus',
     ]),
     selectItem(item) {
-      console.log('selectItem');
       this.changeSelectStatus(item)
     },
     longPress(item) {
       this.isSelectMode = true
       this.selectItem(item)
+    },
+    showCreateButtonsDialog() {
+      this.appButtonPressed = !this.appButtonPressed
+      notification.showReport('Comming soon')
     },
   }
 }
