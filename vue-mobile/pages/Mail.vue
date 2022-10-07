@@ -24,7 +24,7 @@
     <div class="q-mt-xl flex items-center justify-center" v-if="isMessageListLoading">
       <q-circular-progress indeterminate size="40px" color="primary" class="q-ma-md" />
     </div>
-    <app-create-button :classes="appButtonClasses" @click="showCreateButtonsDialog" v-if="isShowCreateButtons">
+    <app-create-button @click="showCreateButtonsDialog" v-if="isShowCreateButtons">
       <compose-icon color="#fff" />
     </app-create-button>
   </main-layout>
@@ -90,15 +90,6 @@ export default {
     isListEmpty() {
       // return !this.currentMessageList.length && !this.loadingStatus
       return !this.currentMessageList.length
-    },
-    appButtonClasses() {
-      // if (this.dialogComponent?.component === 'CreateButtonsDialogs') {
-      if (this.appButtonPressed) {
-        return 'z-index-max rotate'
-      }
-      else {
-        return 'z-index-min'
-      }
     },
     isShowCreateButtons() {
       // return this.currentHeader !== 'SearchHeader' && !this.isSelectMode
