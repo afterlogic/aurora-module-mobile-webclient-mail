@@ -18,7 +18,9 @@
 <!--    <div style="height: 70px" class="full-width" />-->
       </app-pull-refresh>
     </q-scroll-area>
-<!--    <empty-contacts v-if="isContactsEmpty" />-->
+
+    <empty-folder v-if="isListEmpty" />
+
     <div class="q-mt-xl flex items-center justify-center" v-if="isMessageListLoading">
       <q-circular-progress indeterminate size="40px" color="primary" class="q-ma-md" />
     </div>
@@ -33,7 +35,9 @@ import { mapActions, mapGetters } from 'vuex'
 import MainLayout from 'src/layouts/MainLayout'
 import DrawerContent from '../components/DrawerContent'
 import MessageItem from '../components/message-list/MessageItem'
-import AppPullRefresh from "../../../CoreMobileWebclient/vue-mobile/src/components/common/AppPullRefresh";
+import EmptyFolder from '../components/message-list/EmptyFolder'
+
+import AppPullRefresh from 'src/components/common/AppPullRefresh'
 
 export default {
   name: 'Mail',
@@ -42,7 +46,8 @@ export default {
     MainLayout,
     DrawerContent,
     MessageItem,
-    AppPullRefresh
+    EmptyFolder,
+    AppPullRefresh,
   },
 
   data() {
@@ -73,6 +78,10 @@ export default {
       'currentMessageList',
       'selectedMessages',
     ]),
+    isListEmpty() {
+      // return !this.currentMessageList.length && !this.loadingStatus
+      return !this.currentMessageList.length
+    },
     isShowCreateButtons() {
       // return this.currentHeader !== 'SearchHeader' && !this.isSelectMode
       return !this.isSelectMode
