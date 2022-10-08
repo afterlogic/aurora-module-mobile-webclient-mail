@@ -1,8 +1,10 @@
 <template>
-  <q-toolbar style="height: 55px" class="justify-between">
-    <q-btn icon="menu" @click="$emit('openDrawer')" color="black" flat round dense />
+  <q-toolbar class="app-header justify-between">
+    <div class="col">
+      <q-btn icon="menu" @click="$emit('openDrawer')" color="black" flat round dense />
+    </div>
 
-    <div class="flex column">
+    <div class="col flex column">
       <span class="header-title text-black text-center">
         {{ $t('MAILWEBCLIENT.HEADING_BROWSER_TAB') }}
       </span>
@@ -11,7 +13,9 @@
       </span>
     </div>
 
-    <q-btn icon="search" @click="showSearchHeader" color="black" flat round dense />
+    <div class="col">
+      <q-btn icon="search" @click="showSearchHeader" color="black" flat round dense />
+    </div>
   </q-toolbar>
 </template>
 

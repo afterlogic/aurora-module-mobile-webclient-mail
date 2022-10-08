@@ -1,13 +1,13 @@
 <template>
-  <q-toolbar style="padding: 0">
-    <q-card-actions align="left" class="col-4">
-      <q-btn @click="reset" icon="close" color="black" flat round dense />
-    </q-card-actions>
-    <div class="text-center text-black text-bold col-4">
+  <q-toolbar class="app-header">
+    <div class="col">
+      <q-btn @click="resetSelection" icon="close" color="black" flat round dense />
+    </div>
+    <div class="col text-black text-bold text-center">
       <span>{{ `Selected: ${items.length}` }}</span>
     </div>
-    <!-- <div class="col-4 flex no-wrap justify-end q-pr-sm">
-      <div v-if="isShowAction(actions.emailTo)">
+    <div class="col flex no-wrap justify-end">
+    <!--   <div v-if="isShowAction(actions.emailTo)">
         <action-icon
             class="q-mr-md"
             color="black"
@@ -30,43 +30,49 @@
             :icon="actions.delete.icon"
             @click="deleteItems"
         />
-      </div>
-    </div> -->
+      </div> -->
+    </div>
   </q-toolbar>
 </template>
 
 <script>
-// import ActionIcon from '../common/ActionIcon'
-import notification from 'src/utils/notification'
-
 import {mapActions, mapGetters} from 'vuex'
-import store from "src/store";
+import store from 'src/store'
+import notification from 'src/utils/notification'
+// import ActionIcon from '../common/ActionIcon'
 // import { contactActions } from '../../utils/contact-actions'
 
 export default {
   name: 'SelectHeader',
+
   components: {
     // ActionIcon,
   },
+
   props: {
     items: {
       type: Array,
       default: () => [],
     },
-
   },
+
   computed: {
-    ...mapGetters('contactsmobile', ['currentStorage', 'currentGroup', 'selectedContacts']),
+    ...mapGetters('contactsmobile', [
+      'currentStorage',
+      'currentGroup',
+      'selectedContacts'
+    ]),
     actions() {
       // return contactActions
     },
   },
+
   methods: {
     ...mapActions('contactsmobile', [
       'resetSelectedItems',
       'changeDialogComponent',
     ]),
-    reset() {
+    resetSelection() {
       this.resetSelectedItems({ items: this.items })
     },
     emailToItems() {
@@ -100,5 +106,3 @@ export default {
   },
 }
 </script>
-
-<style scoped></style>
