@@ -4,7 +4,7 @@
       <q-btn icon="menu" @click="$emit('openDrawer')" color="black" flat round dense />
     </div>
 
-    <div class="col flex column">
+    <div class="col column">
       <span class="header-title text-black text-center">
         {{ $t('MAILWEBCLIENT.HEADING_BROWSER_TAB') }}
       </span>
@@ -13,7 +13,7 @@
       </span>
     </div>
 
-    <div class="col">
+    <div class="col flex no-wrap justify-end">
       <q-btn icon="search" @click="showSearchHeader" color="black" flat round dense />
     </div>
   </q-toolbar>
