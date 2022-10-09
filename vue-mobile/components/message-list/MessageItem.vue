@@ -6,27 +6,29 @@
     clickable
     :active="message.isSelected"
     @click="listItemClick"
-    class="main-list-item"
+    class="list-item"
     >
-    <!-- <q-item class="main-list-item q-py-md"> -->
-      <q-item-section>
-        <q-item-label class="main-list-item__text main-list-item__text-secondary message__name">{{ recipients }}</q-item-label>
-        <q-item-label class="main-list-item__text main-list-item__text-primary message__subject" lines="1">{{ message.Subject }}</q-item-label>
-      </q-item-section>
+    <q-item-section class="list-item__text">
+      <q-item-label class="list-item__text_secondary message__name">
+        {{ recipients }}
+      </q-item-label>
+      <q-item-label class="list-item__text_primary message__subject">
+        {{ message.Subject }}
+      </q-item-label>
+    </q-item-section>
 
-      <q-item-section side class="main-list-item__side">
-        <q-item-label class="main-list-item__text main-list-item__text-secondary">
-          <attachment-icon v-if="message.HasAttachments" color="#949496" class="main-list-item__icon"/>
-          <span class="message__date">{{ messageDate }}</span>
-        </q-item-label>
-        <q-item-label class="message__status">
-          <replied-icon v-if="message.IsAnswered" color="#949496" class="main-list-item__icon message__status-forwarded" />
-          <forwarded-icon v-if="message.IsForwarded" color="#949496" class="main-list-item__icon message__status-forwarded" />
-          <q-icon v-if="message.IsFlagged" name="star" class="color-flagged message__status-flagged" size="18px" />
-          <q-icon v-else name="star_border" color="primary" size="18px" />
-        </q-item-label>
-      </q-item-section>
-    <!-- </q-item> -->
+    <q-item-section side class="list-item__side">
+      <q-item-label class="list-item__text_secondary message__info">
+        <attachment-icon v-if="message.HasAttachments" class="list-item__icon message__icon-attachment"/>
+        <span class="message__date">{{ messageDate }}</span>
+      </q-item-label>
+      <q-item-label class="message__status">
+        <replied-icon v-if="message.IsAnswered" class="list-item__icon message__status-replied" />
+        <forwarded-icon v-if="message.IsForwarded" color="#949496" class="list-item__icon message__status-forwarded" />
+        <q-icon v-if="message.IsFlagged" name="star" class="color-flagged message__status-flagged" size="18px" />
+        <q-icon v-else name="star_border" color="primary" size="18px" />
+      </q-item-label>
+    </q-item-section>
   </app-item>
 </template>
 
@@ -88,6 +90,11 @@ export default {
   &__date {
     // font-size: 80%;
   }
+  &__info {
+    display: flex;
+    align-items: flex-end;
+  }
+
   &__status {
     display: flex;
     align-content: center;
@@ -97,47 +104,18 @@ export default {
     justify-content: center;
     align-items: center;
   }
-  // &__name {
-  //   font-style: normal;
-  //   font-weight: 400;
-  //   font-size: 16px;
-  //   line-height: 16px !important;
-  //   letter-spacing: 0.3px;
-  // }
-  // &__name-text {
-  //   white-space: nowrap;
-  //   overflow: hidden;
-  //   text-overflow: ellipsis;
-  // }
-  // &__name-me {
-  //   font-style: normal;
-  //   font-weight: 400;
-  //   font-size: 10px;
-  //   line-height: 16px;
-  //   color: #469CF8;
-  //   letter-spacing: 0.3px;
-  // }
-  // &__email {
-  //   font-style: normal;
-  //   font-weight: normal;
-  //   font-size: 12px;
-  //   white-space: nowrap;
-  //   overflow: hidden;
-  //   text-overflow: ellipsis;
-  // }
-  // &__avatar {
-  //   width: 32px;
-  //   height: 32px;
-  //   background: rgba(178, 216, 255, 0.25);
-  //   border-radius: 8px;
-  // }
-  // &__avatar-title {
-  //   font-style: normal;
-  //   font-weight: 400;
-  //   font-size: 16px;
-  //   line-height: 16px;
-  //   letter-spacing: 0.3px;
-  //   color: #469CF8;
-  // }
+ 
+  &__icon-attachment,
+  &__status-replied,
+  &__status-forwarded {
+    fill: $secondary;
+  }
+  .list-item__selected  &__icon-attachment {
+    fill: #000;
+  }
+  .list-item__selected  &__status-replied,
+  .list-item__selected  &__status-forwarded {
+    fill: #5a5a5a;
+  }
 }
 </style>
