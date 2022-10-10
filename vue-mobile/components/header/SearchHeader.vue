@@ -1,28 +1,28 @@
 <template>
   <div>
     <q-toolbar class="app-header search-toolbar">
-      <div class="col">
+      <div class="col app-header__left">
         <q-btn icon="close" @click="onCloseSearch" color="black" round flat dense />
       </div>
-      <div class="col flex column text-center text-black search">
-        <span class="header-title">
+      <div class="col app-header__title">
+        <span class="app-header__title-main">
           {{ $t('CONTACTSMOBILEWEBCLIENT.LABEL_SEARCH') }}
         </span>
-        <span class="header-caption" style="margin-top: 5px">
+        <span class="app-header__title-secondary">
           {{ storageName }}
         </span>
       </div>
+      <div class="col app-header__right"></div>
     </q-toolbar>
-    <q-toolbar class="col flex row search-toolbar-input">
+    <q-toolbar class="search-toolbar__field">
       <q-input
         v-model="text"
-        :style="{ height: '48px' }"
-        :input-style="{ height: '48px' }"
         :placeholder="$t('CONTACTSMOBILEWEBCLIENT.LABEL_SEARCH')"
         autofocus
         borderless
         outlined
-        class="col-12 q-px-md search"
+        dense
+        class="search-toolbar__input"
         debounce="400"
       />
     </q-toolbar>

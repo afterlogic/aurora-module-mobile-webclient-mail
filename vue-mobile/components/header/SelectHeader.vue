@@ -1,12 +1,14 @@
 <template>
   <q-toolbar class="app-header">
-    <div class="col">
+    <div class="col app-header__left">
       <q-btn @click="resetSelection" icon="close" color="black" flat round dense />
     </div>
-    <div class="col text-black text-bold text-center">
-      <span>{{ `Selected: ${items.length}` }}</span>
+
+    <div class="col app-header__title">
+      {{ `Selected: ${items.length}` }}
     </div>
-    <div class="col flex no-wrap justify-end">
+    
+    <div class="col app-header__right">
     <!--   <div v-if="isShowAction(actions.emailTo)">
         <action-icon
             class="q-mr-md"
