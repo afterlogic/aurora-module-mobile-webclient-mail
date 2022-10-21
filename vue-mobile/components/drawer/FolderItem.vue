@@ -7,18 +7,21 @@
     <q-item-section class="folder-name">
       {{ folder.name }}
     </q-item-section>
-    <q-item-section side _v-if="folder.counter" v-if="folder.name === 'INBOX'">
-      <div class="folder-counter">{{folder.counter}} 20</div>
+    <q-item-section side v-if="folder.unseenCount" clickable @click.stop="showUnseenMessages">
+      <div class="folder-counter">{{ folder.unseenCount }}</div>
     </q-item-section>
   </q-item>
-  <folder-item v-for="subFolder in folder.subFolders" :key="subFolder.fullName"
-               :folder="subFolder" :selected="currentFolderFullName === subFolder.fullName" :level="level + 1" />
+  <folder-item
+    v-for="subFolder in folder.subFolders"
+    :key="subFolder.fullName"
+    :folder="subFolder"
+    :selected="currentFolderFullName === subFolder.fullName"
+    :level="level + 1"
+  />
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
-
-import eventBus from 'src/event-bus'
+import { mapGetters } from 'vuex'
 
 import FolderIcon from '../FolderIcon'
 
@@ -36,12 +39,10 @@ export default {
   },
 
   computed: {
-    ...mapGetters('mailmobile', [
-      'currentFolder',
-    ]),
+    ...mapGetters('mailmobile', ['currentAccountId', 'currentFolder']),
 
-    currentFolderFullName () {
-      return this.currentFolder && this.currentFolder.fullName || ''
+    currentFolderFullName() {
+      return (this.currentFolder && this.currentFolder.fullName) || ''
     },
 
     indent() {
@@ -50,13 +51,12 @@ export default {
   },
 
   methods: {
-    ...mapActions('mailmobile', [
-      'changeCurrentFolder',
-    ]),
+    selectFolder() {
+      this.$router.push(`/mail/${this.currentAccountId}/${this.folder.fullName}/`)
+    },
 
-    async selectFolder() {
-      this.changeCurrentFolder(this.folder)
-      eventBus.$emit('closeDrawer')
+    showUnseenMessages() {
+      this.$router.push(`/mail/${this.currentAccountId}/${this.folder.fullName}/filter~unseen~`)
     },
   },
 }
@@ -67,10 +67,10 @@ export default {
   padding: 0 24px;
 
   &.q-item--active {
-    color: #469CF8;
+    color: #469cf8;
 
     .folder-counter {
-      background-color: #469CF8
+      background-color: #469cf8;
     }
   }
   &-name {
@@ -78,7 +78,7 @@ export default {
   }
   &-counter {
     color: #fff;
-    border-radius:100px;
+    border-radius: 100px;
     background-color: #969494;
     height: 24px;
     min-width: 24px;

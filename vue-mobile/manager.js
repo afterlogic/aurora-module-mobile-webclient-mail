@@ -7,22 +7,43 @@ export default {
 
   requiredModules: [],
 
-  init (appdata) {
+  init(appdata) {
     settings.init(appdata)
   },
 
-  getNormalUserPages () {
+  getNormalUserPages() {
     return [
       {
         pageName: 'mail',
         pagePath: '/mail',
         pageComponent: () => import('./pages/Mail'),
+        pageStrict: true,
         pageHeaderComponent: () => import('./components/header/MailHeader'),
+        pageChildren: [
+          {
+            name: 'message-list',
+            path: ':accountId(\\d+)/:folderPath*/',
+            strict: true,
+            component: () => import('./pages/MessageList'),
+          },
+          {
+            name: 'message-list-filter',
+            path: ':accountId(\\d+)/:folderPath*/filter~:filter(unseen|flagged)~',
+            strict: true,
+            component: () => import('./pages/MessageList'),
+          },
+          {
+            name: 'message-view',
+            path: ':accountId(\\d+)/:folderPath*/:messageUid(\\d+)',
+            component: () => import('./pages/MessageView'),
+            strict: true,
+          },
+        ],
       },
     ]
   },
 
-  getPageFooterButtons () {
+  getPageFooterButtons() {
     return [
       {
         pageName: 'mail',

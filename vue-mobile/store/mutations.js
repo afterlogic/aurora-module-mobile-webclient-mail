@@ -1,52 +1,77 @@
 import { FOLDER_TYPES } from '../enums'
 
-function assignCurrentFolder (state) {
-  const currentFolderList = state.folderLists[state.currentAccountId]
-  if (currentFolderList) {
-    const flatList = currentFolderList.flatList
-    let currentFolder = state.currentFolder
-    if (currentFolder && currentFolder.accountId !== state.currentAccountId) {
-      currentFolder = null
-    }
-    if (currentFolder && !flatList.find(folder => folder.fullName === currentFolder.fullName)) {
-      currentFolder = null
-    }
-    if (!currentFolder) {
-      currentFolder = flatList.find(folder => folder.type === FOLDER_TYPES.INBOX)
-      if (!currentFolder && flatList.length > 0) {
-        currentFolder = flatList[0]
-      }
-    }
-    state.currentFolder = currentFolder
-  } else {
-    state.currentFolder = null
-  }
-}
-
 export default {
   setAccountList: (state, accountList) => {
     state.accountList = accountList
   },
 
-  setCurrentAccountId: (state, currentAccountId) => {
-    if (state.currentAccountId !== currentAccountId) {
-      state.currentAccountId = currentAccountId
-      assignCurrentFolder(state)
+  setCurrentAccountId: (state, newAccountId) => {
+    const parsedNewAccountId = parseInt(newAccountId, 10)
+    if (
+      state.currentAccountId !== parsedNewAccountId &&
+      Array.isArray(state.accountList) &&
+      state.accountList.length > 0
+    ) {
+      if (state.accountList.find((account) => account.id === parsedNewAccountId)) {
+        state.currentAccountId = parsedNewAccountId
+      } else if (!state.accountList.find((account) => account.id === state.currentAccountId)) {
+        state.currentAccountId = state.accountList[0].id
+      }
     }
   },
 
-  setFolderList: (state, {accountId, namespace, tree, flatList}) => {
-    state.folderLists[accountId] = {accountId, namespace, tree, flatList, count: flatList.length}
-    console.log(state.folderLists[accountId])
-    if (accountId === state.currentAccountId) {
-      assignCurrentFolder(state)
+  setFolderListLoading: (state, isFolderListLoading) => {
+    state.isFolderListLoading = isFolderListLoading
+  },
+
+  setFolderList: (state, { accountId, namespace, tree, flatList }) => {
+    state.folderLists[accountId] = {
+      accountId,
+      namespace,
+      tree,
+      flatList,
+      count: flatList.length,
     }
   },
 
-  setCurrentFolder: (state, folder) => {
-    if (folder.accountId === state.currentAccountId) {
-      state.currentFolder = folder
+  setRelevantFoldersInformation: (state, relevantFoldersInformation) => {
+    const currentFolderList = state.folderLists && state.folderLists[state.currentAccountId]
+    if (currentFolderList && currentFolderList.flatList) {
+      Object.keys(relevantFoldersInformation).forEach((folderFullName) => {
+        const folder = currentFolderList.flatList.find((folder) => folder.fullName === folderFullName)
+        if (folder) {
+          const [count, unseenCount, nextUid, hash] = relevantFoldersInformation[folderFullName]
+          folder.count = count
+          folder.unseenCount = unseenCount
+          folder.nextUid = nextUid
+          folder.hash = hash
+        }
+      })
     }
+  },
+
+  setCurrentFolder: (state, folderFullName) => {
+    const currentFolderList = state.folderLists && state.folderLists[state.currentAccountId]
+    if (currentFolderList) {
+      const { flatList } = currentFolderList
+      let folder = flatList.find((folder) => folder.fullName === folderFullName)
+      if (!folder) {
+        folder = state.currentFolder
+      }
+      if (!folder) {
+        folder = flatList.find((folder) => folder.type === FOLDER_TYPES.INBOX)
+      }
+      if (!folder && flatList.length > 0) {
+        folder = flatList[0]
+      }
+      if (!state.currentFolder || folder.fullName !== state.currentFolder.fullName) {
+        state.currentFolder = folder
+      }
+    }
+  },
+
+  setCurrentFilter: (state, currentFilter) => {
+    state.currentFilter = currentFilter
   },
 
   setMessageListLoading: (state, isMessageListLoading) => {
@@ -59,8 +84,21 @@ export default {
     }
   },
 
-  setSelectStatus: (state, email) => { 
-    console.log('setSelectStatus')
-    email.isSelected = !email.isSelected
+  setSelectStatus: (state, message) => {
+    message.isSelected = !message.isSelected
+  },
+
+  setCurrentMessageLoading: (state, isCurrentMessageLoading) => {
+    state.isCurrentMessageLoading = isCurrentMessageLoading
+  },
+
+  setCurrentMessageUid: (state, currentMessageUid) => {
+    state.currentMessageUid = currentMessageUid
+    state.currentMessageHeaders =
+      state.currentMessageList.find((messageListItem) => messageListItem.Uid === currentMessageUid) || null
+  },
+
+  setCurrentMessage: (state, currentMessage) => {
+    state.currentMessage = currentMessage
   },
 }

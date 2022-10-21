@@ -2,7 +2,7 @@ import _ from 'lodash'
 
 import accountsUtils from '../utils/accounts'
 import mailWebApi from '../mail-web-api'
-import { getParsedMessages } from '../utils/common'
+import { addMessageToCache, getMessageFromCache } from '../cache'
 
 export default {
   parseAccounts: ({ commit }, accountsData) => {
@@ -11,38 +11,47 @@ export default {
     commit('setCurrentAccountId', parsedAccountsData.currentAccountId)
   },
 
-  changeCurrentAccount: ({ commit, getters }, account) => {
-    console.log('account', account)
+  changeCurrentAccount: ({ commit, getters }, accountId) => {
+    commit('setCurrentAccountId', accountId)
   },
 
   asyncGetFolders: async ({ getters, dispatch, commit }) => {
     const parameters = {
-      AccountID: getters['currentAccountId']
+      AccountID: getters['currentAccountId'],
     }
+    commit('setFolderListLoading', true)
     const foldersData = await mailWebApi.getFolders(parameters)
+    commit('setFolderListLoading', false)
     if (_.isObject(foldersData)) {
-      const {accountId, namespace, tree, flatList, newFoldersFullNames} = foldersData
-      commit('setFolderList', {accountId, namespace, tree, flatList})
+      const { accountId, namespace, tree, flatList, newFoldersFullNames } = foldersData
+      commit('setFolderList', { accountId, namespace, tree, flatList })
       dispatch('asyncGetRelevantFoldersInformation', newFoldersFullNames)
     }
   },
 
   asyncGetRelevantFoldersInformation: async ({ commit, getters }, foldersFullNames) => {
     if (!_.isEmpty(foldersFullNames)) {
-      // const parameters = {
-      //   AccountID: getters['currentAccountId'],
-      //   Folders: foldersFullNames,
-      //   UseListStatusIfPossible: getters['currentFoldersCount'] < 100 || foldersFullNames.length > 50
-      // }
-      // const foldersData = await mailWebApi.getRelevantFoldersInformation(parameters)
+      const parameters = {
+        AccountID: getters['currentAccountId'],
+        Folders: foldersFullNames,
+        UseListStatusIfPossible: getters['currentFoldersCount'] < 100 || foldersFullNames.length > 50,
+      }
+      const foldersData = await mailWebApi.getRelevantFoldersInformation(parameters)
+      if (foldersData?.Counts) {
+        commit('setRelevantFoldersInformation', foldersData.Counts)
+      }
     }
   },
 
-  changeCurrentFolder: ({ commit }, folder) => {
-    commit('setCurrentFolder', folder)
+  changeCurrentFolder: ({ commit }, folderFullName) => {
+    commit('setCurrentFolder', folderFullName)
   },
 
-  asyncGetMessages: async ({ getters, dispatch, commit }) => {
+  changeCurrentFilter: ({ commit }, currentFilter) => {
+    commit('setCurrentFilter', currentFilter)
+  },
+
+  asyncGetMessages: async ({ getters, commit }) => {
     const currentFolder = getters['currentFolder']
     if (!currentFolder) {
       return
@@ -54,21 +63,56 @@ export default {
       Offset: 0,
       Limit: 20,
       Search: '',
-      Filters: '',
+      Filters: getters['currentFilter'],
       SortBy: 'arrival',
       SortOrder: 1,
       UseThreading: true,
-      InboxUidnext: ''
+      InboxUidnext: '',
     }
     commit('setMessageListLoading', true)
     const messages = await mailWebApi.getMessages(parameters)
     commit('setMessageListLoading', false)
-    console.log('messages', messages)
-    commit('setMessageList', { accountId: parameters.AccountID, folderFullName: parameters.Folder, list: getParsedMessages(messages) })
+    commit('setMessageList', {
+      accountId: parameters.AccountID,
+      folderFullName: parameters.Folder,
+      list: messages,
+    })
   },
 
-  changeSelectStatus: ({ commit }, mail) => {
-    console.log('changeSelectStatus', mail)
-    commit('setSelectStatus', mail)
+  changeSelectStatus: ({ commit }, message) => {
+    commit('setSelectStatus', message)
+  },
+
+  changeCurrentMessageUid: ({ commit }, currentMessageUid) => {
+    let parsedMessageUid = parseInt(currentMessageUid, 10)
+    if (Number.isNaN(parsedMessageUid)) {
+      parsedMessageUid = 0
+    }
+    commit('setCurrentMessageUid', parsedMessageUid)
+  },
+
+  asyncGetCurrentMessage: async ({ getters, commit }) => {
+    const currentFolder = getters['currentFolder']
+    const currentMessageUid = getters['currentMessageUid']
+    if (!currentFolder || currentMessageUid === 0) {
+      return
+    }
+
+    const messageFromCache = getMessageFromCache(currentFolder.accountId, currentFolder.fullName, currentMessageUid)
+    if (messageFromCache) {
+      commit('setCurrentMessage', messageFromCache)
+    } else {
+      const parameters = {
+        AccountID: currentFolder.accountId,
+        Folder: currentFolder.fullName,
+        Uid: currentMessageUid,
+        MessageBodyTruncationThreshold: 650000, // TODO: use the setting
+      }
+      commit('setCurrentMessageLoading', true)
+      const messageFromServer = await mailWebApi.getMessage(parameters)
+      commit('setCurrentMessage', messageFromServer)
+      commit('setCurrentMessageLoading', false)
+      addMessageToCache(currentFolder.accountId, currentFolder.fullName, currentMessageUid, messageFromServer)
+    }
   },
 }

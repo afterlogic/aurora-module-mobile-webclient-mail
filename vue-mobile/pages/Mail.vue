@@ -1,124 +1,142 @@
 <template>
-  <main-layout>
+  <MainLayout>
     <template v-slot:drawer>
-      <drawer-content />
+      <DrawerContent />
     </template>
-    <q-scroll-area :thumb-style="{ width: '5px' }" class="contacts__list" v-if="!isMessageListLoading && currentMessageList.length">
-      <app-pull-refresh :refresh-action="asyncGetMessages">
-        <q-list>
-          <message-item 
-            v-for="message in currentMessageList" 
-            :key="message.unifiedUid"
-            :message="message"
-            :isSelectMode="isSelectMode"
-            class="mail"
-            :selectMessage="selectItem"
-            v-touch-hold.mouse="event => longPress(message, event)" />
-        </q-list>
-<!--    <div style="height: 70px" class="full-width" />-->
-      </app-pull-refresh>
-    </q-scroll-area>
 
-    <empty-folder v-if="isListEmpty" />
+    <q-linear-progress
+      v-if="isFolderListLoading || isMessageListLoading"
+      class="full-width"
+      indeterminate
+      track-color="grey-1"
+      color="primary"
+    />
+    <router-view v-else></router-view>
 
-    <div class="q-mt-xl flex items-center justify-center" v-if="isMessageListLoading">
-      <q-circular-progress indeterminate size="40px" color="primary" class="q-ma-md" />
-    </div>
-    <app-create-button @click="showCreateButtonsDialog" v-if="isShowCreateButtons">
-      <compose-icon color="#fff" />
-    </app-create-button>
-  </main-layout>
+    <AppCreateButton @click="showCreateButtonsDialog" v-if="!isSelectMode">
+      <ComposeIcon color="#fff" />
+    </AppCreateButton>
+  </MainLayout>
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
 
-import MainLayout from 'src/layouts/MainLayout'
-import DrawerContent from '../components/DrawerContent'
-import MessageItem from '../components/message-list/MessageItem'
-import EmptyFolder from '../components/message-list/EmptyFolder'
-
-import AppPullRefresh from 'src/components/common/AppPullRefresh'
-import AppCreateButton from 'src/components/common/AppCreateButton'
-import ComposeIcon from '../components/icons/ComposeIcon'
-
 import notification from 'src/utils/notification'
+
+import MainLayout from 'src/layouts/MainLayout'
+import AppCreateButton from 'src/components/common/AppCreateButton'
+
+import DrawerContent from '../components/DrawerContent'
+import ComposeIcon from '../components/icons/ComposeIcon'
 
 export default {
   name: 'Mail',
 
   components: {
     MainLayout,
-    DrawerContent,
-    MessageItem,
-    EmptyFolder,
-    AppPullRefresh,
     AppCreateButton,
+    DrawerContent,
     ComposeIcon,
   },
 
   data() {
     return {
-      isSelectMode: false,
-      appButtonPressed: false
+      appButtonPressed: false,
     }
-  },
-
-  mounted () {
-    this.asyncGetMessages()
-  },
-
-  watch: {
-    currentFolder () {
-      this.asyncGetMessages()
-    },
-    selectedMessages(items) {
-      if (!items.length) {
-        this.isSelectMode = false
-      }
-    },
   },
 
   computed: {
     ...mapGetters('mailmobile', [
+      'currentAccountId',
+      'isFolderListLoading',
+      'currentFoldersTree',
+      'currentFoldersDelimiter',
       'currentFolder',
+      'currentFilter',
       'isMessageListLoading',
-      'currentMessageList',
-      'selectedMessages',
-      'dialogComponent',
+      'isSelectMode',
     ]),
-    isListEmpty() {
-      // return !this.currentMessageList.length && !this.loadingStatus
-      return !this.currentMessageList.length
+  },
+
+  watch: {
+    '$route.params.accountId': {
+      handler: async function () {
+        this.setAccountFromRoute()
+      },
+      immediate: true,
     },
-    isShowCreateButtons() {
-      // return this.currentHeader !== 'SearchHeader' && !this.isSelectMode
-      return !this.isSelectMode
+
+    '$route.params.folderPath': {
+      handler: function () {
+        this.setFolderFromRoute()
+      },
+      immediate: true,
+    },
+
+    '$route.params.filter': {
+      handler: function () {
+        this.setFilterFromRoute()
+      },
+      immediate: true,
+    },
+
+    currentFoldersTree() {
+      this.setFolderFromRoute()
+    },
+
+    currentFolder() {
+      this.asyncGetMessages()
+    },
+
+    currentFilter() {
+      this.asyncGetMessages()
     },
   },
 
   methods: {
     ...mapActions('mailmobile', [
+      'changeCurrentAccount',
+      'changeCurrentFolder',
+      'changeCurrentFilter',
       'asyncGetMessages',
-      'changeSelectStatus',
     ]),
-    selectItem(item) {
-      this.changeSelectStatus(item)
+
+    setAccountFromRoute() {
+      const parsedAccountId = parseInt(this.$route.params.accountId, 10)
+      this.changeCurrentAccount(parsedAccountId)
+      if (parsedAccountId !== this.currentAccountId) {
+        if (this.currentFolder) {
+          this.$router.replace(`/mail/${this.currentAccountId}/${this.currentFolder.fullName}/`)
+        } else {
+          this.$router.replace(`/mail/${this.currentAccountId}/INBOX/`)
+        }
+      }
     },
-    longPress(item) {
-      this.isSelectMode = true
-      this.selectItem(item)
+
+    setFolderFromRoute() {
+      const folderPath = Array.isArray(this.$route.params.folderPath) ? this.$route.params.folderPath : []
+      const folderFullName = folderPath.join(this.currentFoldersDelimiter)
+      this.changeCurrentFolder(folderFullName)
+      if (this.currentFolder && folderFullName !== this.currentFolder.fullName) {
+        this.$router.replace(`/mail/${this.currentAccountId}/${this.currentFolder.fullName}/`)
+      }
     },
+
+    setFilterFromRoute() {
+      const filter = this.$route.params.filter
+      this.changeCurrentFilter(filter)
+      if (this.currentFolder && filter !== this.currentFilter) {
+        this.$router.replace(`/mail/${this.currentAccountId}/${this.currentFolder.fullName}/`)
+      }
+    },
+
     showCreateButtonsDialog() {
       this.appButtonPressed = !this.appButtonPressed
       notification.showReport('Comming soon')
     },
-  }
+  },
 }
 </script>
 
-<style scoped>
-.contacts__list {
-  height: 100%;
-}
-</style>
+<style scoped></style>
