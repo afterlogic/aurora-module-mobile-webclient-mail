@@ -60,7 +60,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('mailmobile', ['currentAccountId', 'currentFolder', 'isSelectMode']),
+    ...mapGetters('mailmobile', ['currentAccountId', 'getFoldersDelimiter', 'currentFolder', 'isSelectMode']),
 
     recipients() {
       return addressUtils.getDisplayNamesFromMailsoAddresses(this.message.From).join(', ')
@@ -78,7 +78,14 @@ export default {
       if (this.isSelectMode) {
         this.changeSelectStatus(this.message)
       } else {
-        this.$router.push(`/mail/${this.currentAccountId}/${this.currentFolder.fullName}/${this.message.Uid}`)
+        this.$router.push({
+          name: 'message-view',
+          params: {
+            accountId: this.message.AccountId,
+            folderPath: this.message.Folder.split(this.getFoldersDelimiter(this.message.AccountId)),
+            messageUid: this.message.Uid,
+          },
+        })
       }
     },
   },

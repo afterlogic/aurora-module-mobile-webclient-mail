@@ -28,7 +28,10 @@ export default {
 
   methods: {
     async selectStorage() {
-      this.$router.push(`/mail/${this.account.id}/INBOX/`)
+      this.$router.push({
+        name: 'message-list',
+        params: { accountId: this.account.id, folderPath: ['INBOX'] },
+      })
       eventBus.$emit('closeDrawer')
     },
   },

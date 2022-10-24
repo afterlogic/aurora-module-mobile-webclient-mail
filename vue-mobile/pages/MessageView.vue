@@ -9,6 +9,7 @@ import { mapActions, mapGetters } from 'vuex'
 
 import addressUtils from 'src/utils/address'
 import dateUtils from 'src/utils/date'
+import types from 'src/utils/types'
 
 export default {
   name: 'MessageView',
@@ -20,10 +21,12 @@ export default {
   computed: {
     ...mapGetters('mailmobile', [
       'currentAccountId',
+      'isUnifiedInbox',
+      'currentFoldersDelimiter',
       'currentFolder',
       'currentMessageList',
       'isCurrentMessageLoading',
-      'currentMessageUid',
+      'currentMessageIdentifiers',
       'currentMessageHeaders',
       'currentMessage',
     ]),
@@ -61,17 +64,35 @@ export default {
 
     isNoMessageOnServer() {
       if (this.isNoMessageOnServer && this.currentFolder) {
-        this.$router.push(`/mail/${this.currentAccountId}/${this.currentFolder.fullName}/`)
+        if (this.isUnifiedInbox) {
+          this.$router.push({ name: 'message-list-unified' })
+        } else {
+          this.$router.push({
+            name: 'message-list',
+            params: {
+              accountId: this.currentAccountId,
+              folderPath: this.currentFolder.fullName.split(this.currentFoldersDelimiter),
+            },
+          })
+        }
       }
     },
   },
 
   methods: {
-    ...mapActions('mailmobile', ['changeCurrentMessageUid', 'asyncGetCurrentMessage']),
+    ...mapActions('mailmobile', ['changeCurrentMessageIdentifiers', 'asyncGetCurrentMessage']),
 
     setMessageFromRoute() {
-      this.changeCurrentMessageUid(this.$route.params.messageUid)
-      this.asyncGetCurrentMessage()
+      const accountId = types.pInt(this.$route.params.accountId)
+      const folderPath = Array.isArray(this.$route.params.folderPath) ? this.$route.params.folderPath : []
+      const folder = folderPath.join(this.currentFoldersDelimiter)
+      const uid = types.pInt(this.$route.params.messageUid)
+      if (uid === 0) {
+        this.changeCurrentMessageIdentifiers(null)
+      } else {
+        this.changeCurrentMessageIdentifiers({ accountId, folder, uid })
+        this.asyncGetCurrentMessage()
+      }
     },
   },
 }

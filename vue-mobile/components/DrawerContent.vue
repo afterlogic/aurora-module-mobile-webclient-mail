@@ -6,7 +6,7 @@
   </div>
 
   <div class="q-pl-sm q-pt-lg">
-    <account-item 
+    <AccountItem
       v-for="account in accountList"
       :key="account.id"
       :account="account"
@@ -14,14 +14,24 @@
     />
   </div>
 
+  <template v-if="isAllowedUnifiedInbox">
+    <div class="flex items-center justify-between q-pa-md q-pl-lg">
+      <div class="text-grey">
+        {{ $t('MAILMOBILEWEBCLIENT.HEADING_UNIFIED_FOLDERS') }}
+      </div>
+    </div>
+
+    <UnifiedInboxesItem />
+  </template>
+
   <div class="flex items-center justify-between q-pa-md q-pl-lg">
     <div class="text-grey">
       {{ $t('MAILMOBILEWEBCLIENT.HEADING_FOLDERS') }}
     </div>
   </div>
 
-  <div class="">
-    <folder-item
+  <div>
+    <FolderItem
       v-for="folder in currentFoldersTree"
       :key="folder.fullName"
       :folder="folder"
@@ -33,8 +43,11 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 
+import settings from '../settings'
+
 import AccountItem from './drawer/AccountItem'
 import FolderItem from './drawer/FolderItem'
+import UnifiedInboxesItem from './drawer/UnifiedInboxesItem'
 
 export default {
   name: 'DrawerContent',
@@ -42,46 +55,51 @@ export default {
   components: {
     AccountItem,
     FolderItem,
+    UnifiedInboxesItem,
+  },
+
+  data() {
+    return {}
   },
 
   computed: {
     ...mapGetters('mailmobile', [
       'accountList',
+      'isAllowedUnifiedInbox',
       'currentAccount',
       'currentFoldersTree',
       'currentFolder',
     ]),
 
-    currentAccountId () {
-      return this.currentAccount && this.currentAccount.id || 0
+    currentAccountId() {
+      return (this.currentAccount && this.currentAccount.id) || 0
     },
 
-    accountsHeading () {
-      return this.currentAccount && this.currentAccount.friendlyName || this.$t('MAILMOBILEWEBCLIENT.HEADING_ACCOUNTS')
+    accountsHeading() {
+      return (
+        (this.currentAccount && this.currentAccount.friendlyName) || this.$t('MAILMOBILEWEBCLIENT.HEADING_ACCOUNTS')
+      )
     },
 
-    currentFolderFullName () {
-      return this.currentFolder && this.currentFolder.fullName || ''
+    currentFolderFullName() {
+      return (this.currentFolder && this.currentFolder.fullName) || ''
     },
   },
 
   watch: {
-    currentAccountId () {
+    currentAccountId() {
       this.asyncGetFolders()
     },
   },
 
-  mounted () {
+  mounted() {
     this.asyncGetFolders()
   },
 
   methods: {
-    ...mapActions('mailmobile', [
-      'asyncGetFolders',
-    ]),
-  }
+    ...mapActions('mailmobile', ['asyncGetFolders']),
+  },
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

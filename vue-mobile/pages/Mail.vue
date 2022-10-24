@@ -49,6 +49,8 @@ export default {
   computed: {
     ...mapGetters('mailmobile', [
       'currentAccountId',
+      'isUnifiedInbox',
+      'isAllowedUnifiedInbox',
       'isFolderListLoading',
       'currentFoldersTree',
       'currentFoldersDelimiter',
@@ -57,32 +59,57 @@ export default {
       'isMessageListLoading',
       'isSelectMode',
     ]),
+
+    accountIdFromRoute() {
+      return parseInt(this.$route.params.accountId, 10)
+    },
+
+    folderFullNameFromRoute() {
+      const folderPath = Array.isArray(this.$route.params.folderPath) ? this.$route.params.folderPath : []
+      return folderPath.join(this.currentFoldersDelimiter)
+    },
   },
 
   watch: {
-    '$route.params.accountId': {
-      handler: async function () {
-        this.setAccountFromRoute()
-      },
-      immediate: true,
-    },
-
-    '$route.params.folderPath': {
+    '$route.path': {
       handler: function () {
-        this.setFolderFromRoute()
-      },
-      immediate: true,
-    },
+        const routeName = this.$route.name
+        if (this.isAllowedUnifiedInbox && routeName === 'message-list-unified') {
+          this.showUnifiedInbox(true)
+        } else if (routeName !== 'message-view') {
+          this.showUnifiedInbox(false)
 
-    '$route.params.filter': {
-      handler: function () {
-        this.setFilterFromRoute()
+          if (this.accountIdFromRoute !== this.currentAccountId) {
+            this.changeCurrentAccount(this.accountIdFromRoute)
+          }
+
+          if (this.folderFullNameFromRoute !== (this.currentFolder && this.currentFolder.fullName)) {
+            this.changeCurrentFolder(this.folderFullNameFromRoute)
+          }
+
+          const filter = this.$route.params.filter
+          if (filter !== this.currentFilter) {
+            this.changeCurrentFilter(filter)
+          }
+
+          if (
+            this.accountIdFromRoute !== this.currentAccountId ||
+            this.folderFullNameFromRoute !== (this.currentFolder && this.currentFolder.fullName) ||
+            filter !== this.currentFilter
+          ) {
+            this.replaceRouteWithCurrentMessageList()
+          }
+        }
       },
       immediate: true,
     },
 
     currentFoldersTree() {
-      this.setFolderFromRoute()
+      this.changeCurrentFolder(this.folderFullNameFromRoute)
+    },
+
+    isUnifiedInbox() {
+      this.asyncGetMessages()
     },
 
     currentFolder() {
@@ -96,38 +123,27 @@ export default {
 
   methods: {
     ...mapActions('mailmobile', [
+      'showUnifiedInbox',
       'changeCurrentAccount',
       'changeCurrentFolder',
       'changeCurrentFilter',
       'asyncGetMessages',
     ]),
 
-    setAccountFromRoute() {
-      const parsedAccountId = parseInt(this.$route.params.accountId, 10)
-      this.changeCurrentAccount(parsedAccountId)
-      if (parsedAccountId !== this.currentAccountId) {
-        if (this.currentFolder) {
-          this.$router.replace(`/mail/${this.currentAccountId}/${this.currentFolder.fullName}/`)
-        } else {
-          this.$router.replace(`/mail/${this.currentAccountId}/INBOX/`)
-        }
-      }
-    },
-
-    setFolderFromRoute() {
-      const folderPath = Array.isArray(this.$route.params.folderPath) ? this.$route.params.folderPath : []
-      const folderFullName = folderPath.join(this.currentFoldersDelimiter)
-      this.changeCurrentFolder(folderFullName)
-      if (this.currentFolder && folderFullName !== this.currentFolder.fullName) {
-        this.$router.replace(`/mail/${this.currentAccountId}/${this.currentFolder.fullName}/`)
-      }
-    },
-
-    setFilterFromRoute() {
-      const filter = this.$route.params.filter
-      this.changeCurrentFilter(filter)
-      if (this.currentFolder && filter !== this.currentFilter) {
-        this.$router.replace(`/mail/${this.currentAccountId}/${this.currentFolder.fullName}/`)
+    replaceRouteWithCurrentMessageList() {
+      if (this.currentFolder) {
+        this.$router.replace({
+          name: 'message-list',
+          params: {
+            accountId: this.currentAccountId,
+            folderPath: this.currentFolder.fullName.split(this.currentFoldersDelimiter),
+          },
+        })
+      } else {
+        this.$router.replace({
+          name: 'message-list',
+          params: { accountId: this.currentAccountId, folderPath: ['INBOX'] },
+        })
       }
     },
 

@@ -1,6 +1,7 @@
 export default function () {
   return {
     accountList: [],
+    isUnifiedInbox: false,
     currentAccountId: 0,
 
     isFolderListLoading: false,
@@ -12,7 +13,7 @@ export default function () {
     currentMessageList: [],
 
     isCurrentMessageLoading: false,
-    currentMessageUid: 0,
+    currentMessageIdentifiers: null,
     currentMessageHeaders: null,
     currentMessage: null,
   }

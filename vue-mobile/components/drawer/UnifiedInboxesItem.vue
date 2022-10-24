@@ -2,31 +2,26 @@
   <q-item class="folder" dense :active="selected" clickable v-ripple @click.prevent="selectFolder">
     <q-item-section class="folder-indent" :style="indent" side></q-item-section>
     <q-item-section side>
-      <FolderIcon :folderType="folder.type" :color="selected ? '#469CF8' : '#969494'" />
+      <FolderIcon :folderType="folderType" :color="selected ? '#469CF8' : '#969494'" />
     </q-item-section>
     <q-item-section class="folder-name">
-      {{ folder.name }}
+      {{ $t('MAILWEBCLIENT.LABEL_FOLDER_ALL_INBOXES') }}
     </q-item-section>
-    <q-item-section side v-if="folder.unseenCount" clickable @click.stop="showUnseenMessages">
-      <div class="folder-counter">{{ folder.unseenCount }}</div>
-    </q-item-section>
+    <!--    <q-item-section side v-if="folder.unseenCount" clickable @click.stop="showUnseenMessages">-->
+    <!--      <div class="folder-counter">{{ folder.unseenCount }}</div>-->
+    <!--    </q-item-section>-->
   </q-item>
-  <folder-item
-    v-for="subFolder in folder.subFolders"
-    :key="subFolder.fullName"
-    :folder="subFolder"
-    :selected="currentFolderFullName === subFolder.fullName"
-    :level="level + 1"
-  />
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 
+import { FOLDER_TYPES } from '../../enums'
+
 import FolderIcon from '../FolderIcon'
 
 export default {
-  name: 'FolderItem',
+  name: 'UnifiedInboxesItem',
 
   components: {
     FolderIcon,
@@ -38,8 +33,14 @@ export default {
     level: { type: Number, default: 0 },
   },
 
+  data() {
+    return {
+      folderType: FOLDER_TYPES.ALL,
+    }
+  },
+
   computed: {
-    ...mapGetters('mailmobile', ['currentAccountId', 'currentFoldersDelimiter', 'currentFolder']),
+    ...mapGetters('mailmobile', ['currentAccountId', 'currentFolder']),
 
     currentFolderFullName() {
       return (this.currentFolder && this.currentFolder.fullName) || ''
@@ -52,25 +53,10 @@ export default {
 
   methods: {
     selectFolder() {
-      this.$router.push({
-        name: 'message-list',
-        params: {
-          accountId: this.currentAccountId,
-          folderPath: this.folder.fullName.split(this.currentFoldersDelimiter),
-        },
-      })
+      this.$router.push({ name: 'message-list-unified' })
     },
 
-    showUnseenMessages() {
-      this.$router.push({
-        name: 'message-list-filter',
-        params: {
-          accountId: this.currentAccountId,
-          folderPath: this.folder.fullName.split(this.currentFoldersDelimiter),
-          filter: 'unseen',
-        },
-      })
-    },
+    showUnseenMessages() {},
   },
 }
 </script>

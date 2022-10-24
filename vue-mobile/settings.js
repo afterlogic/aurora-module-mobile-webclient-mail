@@ -3,8 +3,12 @@ import store from 'src/store'
 import types from 'src/utils/types'
 
 class MailSettings {
-  constructor (appData) {
+  constructor(appData) {
+    const mailWebclientData = types.pObject(appData.MailWebclient)
+    this.MessageBodyTruncationThreshold = types.pNonNegativeInt(mailWebclientData?.MessageBodyTruncationThreshold)
+
     const mailData = types.pObject(appData.Mail)
+    this.AllowUnifiedInbox = !!mailData?.AllowUnifiedInbox
     store.dispatch('mailmobile/parseAccounts', types.pArray(mailData?.Accounts))
   }
 }
@@ -12,7 +16,11 @@ class MailSettings {
 let settings = null
 
 export default {
-  init (appData) {
+  init(appData) {
     settings = new MailSettings(appData)
+  },
+
+  get(settingName) {
+    return settings ? settings[settingName] : null
   },
 }

@@ -33,6 +33,12 @@ export default {
             component: () => import('./pages/MessageList'),
           },
           {
+            name: 'message-list-unified',
+            path: 'unified-inboxes',
+            strict: true,
+            component: () => import('./pages/MessageList'),
+          },
+          {
             name: 'message-view',
             path: ':accountId(\\d+)/:folderPath*/:messageUid(\\d+)',
             component: () => import('./pages/MessageView'),

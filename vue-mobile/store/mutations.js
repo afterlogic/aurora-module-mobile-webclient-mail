@@ -5,6 +5,10 @@ export default {
     state.accountList = accountList
   },
 
+  setUnifiedInbox: (state, isUnifiedInbox) => {
+    state.isUnifiedInbox = isUnifiedInbox
+  },
+
   setCurrentAccountId: (state, newAccountId) => {
     const parsedNewAccountId = parseInt(newAccountId, 10)
     if (
@@ -79,7 +83,10 @@ export default {
   },
 
   setMessageList: (state, { accountId, folderFullName, list }) => {
-    if (accountId === state.currentFolder.accountId && folderFullName === state.currentFolder.fullName) {
+    if (
+      state.isUnifiedInbox ||
+      (accountId === state.currentFolder.accountId && folderFullName === state.currentFolder.fullName)
+    ) {
       state.currentMessageList = list
     }
   },
@@ -92,10 +99,17 @@ export default {
     state.isCurrentMessageLoading = isCurrentMessageLoading
   },
 
-  setCurrentMessageUid: (state, currentMessageUid) => {
-    state.currentMessageUid = currentMessageUid
+  setCurrentMessageIdentifiers: (state, messageIdentifiers) => {
+    state.currentMessageIdentifiers = messageIdentifiers
     state.currentMessageHeaders =
-      state.currentMessageList.find((messageListItem) => messageListItem.Uid === currentMessageUid) || null
+      (messageIdentifiers &&
+        state.currentMessageList.find(
+          (messageListItem) =>
+            messageListItem.AccountId === messageIdentifiers.accountId &&
+            messageListItem.Folder === messageIdentifiers.folder &&
+            messageListItem.Uid === messageIdentifiers.uid
+        )) ||
+      null
   },
 
   setCurrentMessage: (state, currentMessage) => {

@@ -1,4 +1,6 @@
+import types from 'src/utils/types'
 import webApi from 'src/api/web-api'
+
 import foldersUtils from './utils/folders'
 
 export default {
@@ -31,17 +33,29 @@ export default {
       .catch((error) => null)
   },
 
-  getMessages: async (parameters) => {
+  getMessages: async (parameters, isUnifiedInboxes = false) => {
     return webApi
       .sendRequest({
         moduleName: 'Mail',
-        methodName: 'GetMessages',
+        methodName: isUnifiedInboxes ? 'GetUnifiedMailboxMessages' : 'GetMessages',
         parameters,
       })
       .then((result) => {
         if (Array.isArray(result && result['@Collection'])) {
           return result['@Collection'].map((message) => {
+            let accountId = 0
+            if (isUnifiedInboxes) {
+              const identifiers = message.UnifiedUid.split(':')
+              if (identifiers.length === 3) {
+                accountId = types.pInt(identifiers[0])
+              }
+            } else {
+              accountId = parameters.AccountID
+            }
+            message.AccountId = accountId
+
             message.isSelected = false
+
             return message
           })
         }

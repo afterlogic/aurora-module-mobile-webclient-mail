@@ -1,5 +1,17 @@
+import settings from '../settings'
+
 export default {
   accountList: (state) => state.accountList,
+
+  isAllowedUnifiedInbox: (state) => {
+    if (settings.get('AllowUnifiedInbox')) {
+      const includedAccounts = state.accountList.filter((account) => account.includeInUnifiedMailbox)
+      return includedAccounts.length > 1
+    }
+    return false
+  },
+
+  isUnifiedInbox: (state) => state.isUnifiedInbox,
 
   currentAccountId: (state) => state.currentAccountId,
 
@@ -21,6 +33,15 @@ export default {
     return currentFolderList && currentFolderList.tree && currentFolderList.tree.length > 0
       ? currentFolderList.tree[0].delimiter
       : '/'
+  },
+
+  getFoldersDelimiter: (state) => {
+    return (accountId) => {
+      const currentFolderList = state.folderLists && state.folderLists[accountId]
+      return currentFolderList && currentFolderList.tree && currentFolderList.tree.length > 0
+        ? currentFolderList.tree[0].delimiter
+        : '/'
+    }
   },
 
   currentFoldersCount: (state) => {
@@ -56,8 +77,8 @@ export default {
     return state.isCurrentMessageLoading
   },
 
-  currentMessageUid: (state) => {
-    return state.currentMessageUid
+  currentMessageIdentifiers: (state) => {
+    return state.currentMessageIdentifiers
   },
 
   currentMessageHeaders: (state) => {
