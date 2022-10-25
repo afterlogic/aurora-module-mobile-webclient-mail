@@ -8,6 +8,7 @@
     @click="onMessageClick"
     v-touch-hold.mouse="() => changeSelectStatus(message)"
     class="list-item"
+    :style="{ background: message.isSeen ? '' : '#f1dcf3' }"
   >
     <q-item-section class="list-item__text">
       <q-item-label class="list-item__text_secondary message__name">

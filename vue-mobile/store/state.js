@@ -5,8 +5,14 @@ export default function () {
     currentAccountId: 0,
 
     isFolderListLoading: false,
-    folderLists: {},
+    folderLists: new Map(),
     currentFolder: null,
+    unifiedInboxInfo: {
+      count: 0,
+      unseenCount: 0,
+      nextUid: '',
+      hash: '',
+    },
 
     isMessageListLoading: false,
     currentFilter: '',

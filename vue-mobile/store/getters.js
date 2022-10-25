@@ -13,6 +13,8 @@ export default {
 
   isUnifiedInbox: (state) => state.isUnifiedInbox,
 
+  unifiedInboxUnseenCount: (state) => state.unifiedInboxInfo.unseenCount,
+
   currentAccountId: (state) => state.currentAccountId,
 
   currentAccount: (state) => {
@@ -20,20 +22,41 @@ export default {
   },
 
   getAccount: (state) => {
-    return (accountId) => (state.accountList && state.accountList.find((account) => account.id === accountId)) || null
+    return (accountId) => state.accountList.find((account) => account.id === accountId) || null
   },
 
   isFolderListLoading: (state) => {
     return state.isFolderListLoading
   },
 
+  hasFolderList: (state) => {
+    return (accountId) => {
+      return state.folderLists.has(accountId)
+    }
+  },
+
+  newFoldersFullNames: (state) => {
+    return state.accountList
+      .map((account) => {
+        const folderList = state.folderLists.get(account.id)
+        return folderList && Array.isArray(folderList.newFoldersFullNames) && folderList.newFoldersFullNames.length > 0
+          ? {
+              accountId: folderList.accountId,
+              newFoldersFullNames: folderList.newFoldersFullNames,
+              totalFoldersCount: folderList.count,
+            }
+          : null
+      })
+      .filter((data) => data !== null)
+  },
+
   currentFoldersTree: (state) => {
-    const currentFolderList = state.folderLists && state.folderLists[state.currentAccountId]
+    const currentFolderList = state.folderLists.get(state.currentAccountId)
     return currentFolderList ? currentFolderList.tree : []
   },
 
   currentFoldersDelimiter: (state) => {
-    const currentFolderList = state.folderLists && state.folderLists[state.currentAccountId]
+    const currentFolderList = state.folderLists.get(state.currentAccountId)
     return currentFolderList && currentFolderList.tree && currentFolderList.tree.length > 0
       ? currentFolderList.tree[0].delimiter
       : '/'
@@ -41,15 +64,13 @@ export default {
 
   getFoldersDelimiter: (state) => {
     return (accountId) => {
-      const currentFolderList = state.folderLists && state.folderLists[accountId]
-      return currentFolderList && currentFolderList.tree && currentFolderList.tree.length > 0
-        ? currentFolderList.tree[0].delimiter
-        : '/'
+      const folderList = state.folderLists.get(accountId)
+      return folderList && folderList.tree && folderList.tree.length > 0 ? folderList.tree[0].delimiter : '/'
     }
   },
 
   currentFoldersCount: (state) => {
-    const currentFolderList = state.folderLists && state.folderLists[state.currentAccountId]
+    const currentFolderList = state.folderLists.get(state.currentAccountId)
     return currentFolderList ? currentFolderList.count : 0
   },
 

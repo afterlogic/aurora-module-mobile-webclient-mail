@@ -20,31 +20,74 @@ export default {
     commit('setCurrentAccountId', accountId)
   },
 
-  asyncGetFolders: async ({ getters, dispatch, commit }) => {
-    const parameters = {
-      AccountID: getters['currentAccountId'],
+  asyncGetFolders: async ({ getters, dispatch, commit }, accountId = 0) => {
+    if (accountId === 0) {
+      accountId = getters['currentAccountId']
     }
-    commit('setFolderListLoading', true)
-    const foldersData = await mailWebApi.getFolders(parameters)
-    commit('setFolderListLoading', false)
-    if (_.isObject(foldersData)) {
-      const { accountId, namespace, tree, flatList, newFoldersFullNames } = foldersData
-      commit('setFolderList', { accountId, namespace, tree, flatList })
-      dispatch('asyncGetRelevantFoldersInformation', newFoldersFullNames)
+    if (!getters['hasFolderList'](accountId)) {
+      const parameters = { AccountID: accountId }
+      commit('setFolderListLoading', true)
+      const foldersData = await mailWebApi.getFolders(parameters)
+      commit('setFolderListLoading', false)
+      if (_.isObject(foldersData)) {
+        const { accountId, namespace, tree, flatList, newFoldersFullNames } = foldersData
+        commit('setFolderList', { accountId, namespace, tree, flatList, newFoldersFullNames })
+
+        // wait until messages will be requested
+        setTimeout(() => {
+          if (getters['isAllowedUnifiedInbox']) {
+            const account = getters['accountList'].find(
+              (account) => account.includeInUnifiedMailbox && !getters['hasFolderList'](account.id)
+            )
+            if (account) {
+              dispatch('asyncGetFolders', account.id)
+            } else {
+              dispatch('asyncGetUnifiedRelevantFoldersInformation')
+            }
+          } else {
+            dispatch('asyncGetRelevantFoldersInformation')
+          }
+        })
+      }
     }
   },
 
-  asyncGetRelevantFoldersInformation: async ({ commit, getters }, foldersFullNames) => {
-    if (!_.isEmpty(foldersFullNames)) {
+  asyncGetUnifiedRelevantFoldersInformation: async ({ commit, getters }) => {
+    const newFoldersFullNames = getters['newFoldersFullNames']
+    if (newFoldersFullNames.length > 0) {
+      commit('clearNewFoldersFullNames')
       const parameters = {
-        AccountID: getters['currentAccountId'],
+        AccountsData: newFoldersFullNames.map((data) => ({
+          AccountID: data.accountId,
+          Folders: data.newFoldersFullNames,
+          UseListStatusIfPossible: data.totalFoldersCount < 100 || data.newFoldersFullNames.length > 50,
+        })),
+      }
+      const foldersData = await mailWebApi.getRelevantFoldersInformation(parameters, true)
+      commit('setRelevantFoldersInformation', foldersData?.Accounts)
+      commit('setRelevantUnifiedInboxInformation', foldersData?.Unified)
+    }
+  },
+
+  asyncGetRelevantFoldersInformation: async ({ commit, getters }, foldersFullNames = []) => {
+    const currentAccountId = getters['currentAccountId']
+    if (foldersFullNames.length === 0) {
+      foldersFullNames = getters['newFoldersFullNames'].find((data) => data.accountId === currentAccountId)
+      commit('clearNewFoldersFullNames', currentAccountId)
+    }
+    if (foldersFullNames.length !== 0) {
+      const parameters = {
+        AccountID: currentAccountId,
         Folders: foldersFullNames,
         UseListStatusIfPossible: getters['currentFoldersCount'] < 100 || foldersFullNames.length > 50,
       }
-      const foldersData = await mailWebApi.getRelevantFoldersInformation(parameters)
-      if (foldersData?.Counts) {
-        commit('setRelevantFoldersInformation', foldersData.Counts)
-      }
+      const foldersData = await mailWebApi.getRelevantFoldersInformation(parameters, false)
+      commit('setRelevantFoldersInformation', [
+        {
+          AccountId: currentAccountId,
+          Counts: foldersData?.Counts,
+        },
+      ])
     }
   },
 
@@ -64,7 +107,7 @@ export default {
       Filters: getters['currentFilter'],
       SortBy: 'arrival',
       SortOrder: 1,
-      UseThreading: true,
+      UseThreading: false,
       InboxUidnext: '',
     }
 

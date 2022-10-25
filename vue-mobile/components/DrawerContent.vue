@@ -76,20 +76,6 @@ export default {
       )
     },
   },
-
-  watch: {
-    currentAccountId() {
-      this.asyncGetFolders()
-    },
-  },
-
-  mounted() {
-    this.asyncGetFolders()
-  },
-
-  methods: {
-    ...mapActions('mailmobile', ['asyncGetFolders']),
-  },
 }
 </script>
 

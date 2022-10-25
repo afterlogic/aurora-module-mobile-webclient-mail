@@ -7,9 +7,9 @@
     <q-item-section class="folder-name">
       {{ $t('MAILWEBCLIENT.LABEL_FOLDER_ALL_INBOXES') }}
     </q-item-section>
-    <!--    <q-item-section side v-if="folder.unseenCount" clickable @click.stop="showUnseenMessages">-->
-    <!--      <div class="folder-counter">{{ folder.unseenCount }}</div>-->
-    <!--    </q-item-section>-->
+    <q-item-section side v-if="unifiedInboxUnseenCount" clickable @click.stop="showUnseenMessages">
+      <div class="folder-counter">{{ unifiedInboxUnseenCount }}</div>
+    </q-item-section>
   </q-item>
 </template>
 
@@ -42,7 +42,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('mailmobile', ['currentAccountId', 'isUnifiedInbox']),
+    ...mapGetters('mailmobile', ['currentAccountId', 'isUnifiedInbox', 'unifiedInboxUnseenCount']),
 
     indent() {
       return { width: `${this.level * 16}px` }
@@ -56,6 +56,7 @@ export default {
     },
 
     showUnseenMessages() {
+      this.$router.push({ name: 'message-list-unified-filter', params: { filter: 'unseen' } })
       eventBus.$emit('closeDrawer')
     },
   },

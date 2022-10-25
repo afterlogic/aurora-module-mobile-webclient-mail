@@ -74,8 +74,19 @@ export default {
     '$route.path': {
       handler: function () {
         const routeName = this.$route.name
-        if (this.isAllowedUnifiedInbox && routeName === 'message-list-unified') {
+        if (
+          this.isAllowedUnifiedInbox &&
+          (routeName === 'message-list-unified' || routeName === 'message-list-unified-filter')
+        ) {
           this.showUnifiedInbox(true)
+          const filter = this.$route.params.filter || ''
+          if (filter !== this.currentFilter) {
+            this.changeCurrentFilter(filter)
+          }
+
+          if (filter !== this.currentFilter) {
+            this.$router.replace({ name: 'message-list-unified' })
+          }
         } else if (routeName !== 'message-view') {
           this.showUnifiedInbox(false)
 
@@ -87,7 +98,7 @@ export default {
             this.changeCurrentFolder(this.folderFullNameFromRoute)
           }
 
-          const filter = this.$route.params.filter
+          const filter = this.$route.params.filter || ''
           if (filter !== this.currentFilter) {
             this.changeCurrentFilter(filter)
           }
@@ -104,8 +115,15 @@ export default {
       immediate: true,
     },
 
+    currentAccountId() {
+      this.asyncGetFolders()
+    },
+
     currentFoldersTree() {
       this.changeCurrentFolder(this.folderFullNameFromRoute)
+      if (this.currentFolder && this.folderFullNameFromRoute !== this.currentFolder.fullName) {
+        this.replaceRouteWithCurrentMessageList()
+      }
     },
 
     isUnifiedInbox() {
@@ -121,12 +139,17 @@ export default {
     },
   },
 
+  mounted() {
+    this.asyncGetFolders()
+  },
+
   methods: {
     ...mapActions('mailmobile', [
       'showUnifiedInbox',
       'changeCurrentAccount',
       'changeCurrentFolder',
       'changeCurrentFilter',
+      'asyncGetFolders',
       'asyncGetMessages',
     ]),
 

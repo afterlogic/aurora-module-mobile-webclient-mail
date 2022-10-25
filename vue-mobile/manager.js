@@ -34,7 +34,13 @@ export default {
           },
           {
             name: 'message-list-unified',
-            path: 'unified-inboxes',
+            path: 'unified-inbox',
+            strict: true,
+            component: () => import('./pages/MessageList'),
+          },
+          {
+            name: 'message-list-unified-filter',
+            path: 'unified-inbox/filter~:filter(unseen|flagged)~',
             strict: true,
             component: () => import('./pages/MessageList'),
           },

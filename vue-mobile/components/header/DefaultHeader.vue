@@ -26,9 +26,13 @@ export default {
   name: 'MailHeader',
 
   computed: {
-    ...mapGetters('mailmobile', ['currentFolder']),
+    ...mapGetters('mailmobile', ['isUnifiedInbox', 'currentFolder']),
+
     folderName() {
-      return this.currentFolder?.name || ''
+      if (this.isUnifiedInbox) {
+        return this.$t('MAILWEBCLIENT.LABEL_FOLDER_ALL_INBOXES')
+      }
+      return this.currentFolder?.displayName || ''
     },
   },
 

@@ -1,5 +1,7 @@
 <template>
-  <div v-if="currentFilter" style="position: absolute; background: #a6dbed">currentFilter: {{ currentFilter }}</div>
+  <div v-if="currentFilter" style="position: absolute; z-index: 1; background: #a6dbed">
+    currentFilter: {{ currentFilter }}
+  </div>
   <EmptyFolder v-if="this.currentMessageList.length === 0" />
   <q-scroll-area v-else :thumb-style="{ width: '5px' }" class="contacts__list">
     <AppPullRefresh :refresh-action="asyncGetMessages">
@@ -29,6 +31,12 @@ export default {
 
   computed: {
     ...mapGetters('mailmobile', ['currentFolder', 'currentFilter', 'currentMessageList']),
+  },
+
+  watch: {
+    currentFilter() {
+      console.log('currentFilter', this.currentFilter)
+    },
   },
 
   methods: {

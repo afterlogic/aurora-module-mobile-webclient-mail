@@ -28,34 +28,57 @@ export default {
     state.isFolderListLoading = isFolderListLoading
   },
 
-  setFolderList: (state, { accountId, namespace, tree, flatList }) => {
-    state.folderLists[accountId] = {
+  setFolderList: (state, { accountId, namespace, tree, flatList, newFoldersFullNames }) => {
+    state.folderLists.set(accountId, {
       accountId,
       namespace,
       tree,
       flatList,
       count: flatList.length,
-    }
+      newFoldersFullNames,
+    })
   },
 
-  setRelevantFoldersInformation: (state, relevantFoldersInformation) => {
-    const currentFolderList = state.folderLists && state.folderLists[state.currentAccountId]
-    if (currentFolderList && currentFolderList.flatList) {
-      Object.keys(relevantFoldersInformation).forEach((folderFullName) => {
-        const folder = currentFolderList.flatList.find((folder) => folder.fullName === folderFullName)
-        if (folder) {
-          const [count, unseenCount, nextUid, hash] = relevantFoldersInformation[folderFullName]
-          folder.count = count
-          folder.unseenCount = unseenCount
-          folder.nextUid = nextUid
-          folder.hash = hash
+  clearNewFoldersFullNames: (state, currentAccountId = 0) => {
+    state.folderLists.forEach((folderList) => {
+      if (currentAccountId === 0 || currentAccountId === folderList.accountId) {
+        folderList.newFoldersFullNames = []
+      }
+    })
+  },
+
+  setRelevantFoldersInformation: (state, accountsFoldersData) => {
+    if (Array.isArray(accountsFoldersData)) {
+      accountsFoldersData.forEach((accountFoldersData) => {
+        const currentFolderList = state.folderLists.get(accountFoldersData.AccountId)
+        if (currentFolderList && _.isObject(accountFoldersData.Counts)) {
+          Object.keys(accountFoldersData.Counts).forEach((folderFullName) => {
+            const folder = currentFolderList.flatList.find((folder) => folder.fullName === folderFullName)
+            if (folder) {
+              const [count, unseenCount, nextUid, hash] = accountFoldersData.Counts[folderFullName]
+              folder.count = count
+              folder.unseenCount = unseenCount
+              folder.nextUid = nextUid
+              folder.hash = hash
+            }
+          })
         }
       })
     }
   },
 
+  setRelevantUnifiedInboxInformation: (state, relevantUnifiedInboxInformation) => {
+    if (Array.isArray(relevantUnifiedInboxInformation)) {
+      const [count, unseenCount, nextUid, hash] = relevantUnifiedInboxInformation
+      state.unifiedInboxInfo.count = count
+      state.unifiedInboxInfo.unseenCount = unseenCount
+      state.unifiedInboxInfo.nextUid = nextUid
+      state.unifiedInboxInfo.hash = hash
+    }
+  },
+
   setCurrentFolder: (state, folderFullName) => {
-    const currentFolderList = state.folderLists && state.folderLists[state.currentAccountId]
+    const currentFolderList = state.folderLists.get(state.currentAccountId)
     if (currentFolderList) {
       const { flatList } = currentFolderList
       let folder = flatList.find((folder) => folder.fullName === folderFullName)

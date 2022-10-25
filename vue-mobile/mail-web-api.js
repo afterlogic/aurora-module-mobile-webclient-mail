@@ -20,11 +20,11 @@ export default {
       .catch((error) => null)
   },
 
-  getRelevantFoldersInformation: async (parameters) => {
+  getRelevantFoldersInformation: async (parameters, isAllowedUnifiedInbox) => {
     return webApi
       .sendRequest({
         moduleName: 'Mail',
-        methodName: 'GetRelevantFoldersInformation',
+        methodName: isAllowedUnifiedInbox ? 'GetUnifiedRelevantFoldersInformation' : 'GetRelevantFoldersInformation',
         parameters,
       })
       .then((result) => {
