@@ -1,5 +1,5 @@
 <template>
-  <div v-if="currentMessageHeaders">{{ currentMessageHeaders.Subject }}</div>
+  <div v-if="currentMessageHeaders">{{ currentMessageHeaders.subject }}</div>
   <div v-if="isCurrentMessageLoading">Loading...</div>
   <div v-else-if="currentMessage">{{ recipients }}<br />{{ messageDate }}</div>
 </template>
@@ -39,14 +39,14 @@ export default {
       if (!this.currentMessage) {
         return ''
       }
-      return addressUtils.getDisplayNamesFromMailsoAddresses(this.currentMessage.From).join(', ')
+      return addressUtils.getDisplayNamesFromMailsoAddresses(this.currentMessage.from).join(', ')
     },
 
     messageDate() {
       if (!this.currentMessage) {
         return ''
       }
-      return dateUtils.getShortDate(this.currentMessage.TimeStampInUTC, true)
+      return dateUtils.getShortDate(this.currentMessage.timeStampInUTC, true)
     },
   },
 

@@ -1,5 +1,5 @@
 <template>
-  <q-item class="folder" dense :active="selected" clickable v-ripple @click.prevent="selectFolder">
+  <q-item class="folder" dense :active="isUnifiedInbox" clickable v-ripple @click="selectUnifiedInbox">
     <q-item-section class="folder-indent" :style="indent" side></q-item-section>
     <q-item-section side>
       <FolderIcon :folderType="folderType" :color="selected ? '#469CF8' : '#969494'" />
@@ -15,6 +15,8 @@
 
 <script>
 import { mapGetters } from 'vuex'
+
+import eventBus from 'src/event-bus'
 
 import { FOLDER_TYPES } from '../../enums'
 
@@ -40,11 +42,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('mailmobile', ['currentAccountId', 'currentFolder']),
-
-    currentFolderFullName() {
-      return (this.currentFolder && this.currentFolder.fullName) || ''
-    },
+    ...mapGetters('mailmobile', ['currentAccountId', 'isUnifiedInbox']),
 
     indent() {
       return { width: `${this.level * 16}px` }
@@ -52,11 +50,14 @@ export default {
   },
 
   methods: {
-    selectFolder() {
+    selectUnifiedInbox() {
       this.$router.push({ name: 'message-list-unified' })
+      eventBus.$emit('closeDrawer')
     },
 
-    showUnseenMessages() {},
+    showUnseenMessages() {
+      eventBus.$emit('closeDrawer')
+    },
   },
 }
 </script>

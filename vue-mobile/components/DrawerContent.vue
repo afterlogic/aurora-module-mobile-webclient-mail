@@ -31,12 +31,7 @@
   </div>
 
   <div>
-    <FolderItem
-      v-for="folder in currentFoldersTree"
-      :key="folder.fullName"
-      :folder="folder"
-      :selected="currentFolderFullName === folder.fullName"
-    />
+    <FolderItem v-for="folder in currentFoldersTree" :key="folder.fullName" :folder="folder" />
   </div>
 </template>
 
@@ -79,10 +74,6 @@ export default {
       return (
         (this.currentAccount && this.currentAccount.friendlyName) || this.$t('MAILMOBILEWEBCLIENT.HEADING_ACCOUNTS')
       )
-    },
-
-    currentFolderFullName() {
-      return (this.currentFolder && this.currentFolder.fullName) || ''
     },
   },
 

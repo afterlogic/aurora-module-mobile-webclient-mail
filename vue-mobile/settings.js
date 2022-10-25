@@ -5,11 +5,11 @@ import types from 'src/utils/types'
 class MailSettings {
   constructor(appData) {
     const mailWebclientData = types.pObject(appData.MailWebclient)
-    this.MessageBodyTruncationThreshold = types.pNonNegativeInt(mailWebclientData?.MessageBodyTruncationThreshold)
+    this.messageBodyTruncationThreshold = types.pNonNegativeInt(mailWebclientData.MessageBodyTruncationThreshold)
 
     const mailData = types.pObject(appData.Mail)
-    this.AllowUnifiedInbox = !!mailData?.AllowUnifiedInbox
-    store.dispatch('mailmobile/parseAccounts', types.pArray(mailData?.Accounts))
+    this.allowUnifiedInbox = !!mailData.AllowUnifiedInbox
+    store.dispatch('mailmobile/parseAccounts', types.pArray(mailData.Accounts))
   }
 }
 

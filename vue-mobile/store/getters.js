@@ -4,7 +4,7 @@ export default {
   accountList: (state) => state.accountList,
 
   isAllowedUnifiedInbox: (state) => {
-    if (settings.get('AllowUnifiedInbox')) {
+    if (settings.get('allowUnifiedInbox')) {
       const includedAccounts = state.accountList.filter((account) => account.includeInUnifiedMailbox)
       return includedAccounts.length > 1
     }
@@ -17,6 +17,10 @@ export default {
 
   currentAccount: (state) => {
     return (state.accountList && state.accountList.find((account) => account.id === state.currentAccountId)) || null
+  },
+
+  getAccount: (state) => {
+    return (accountId) => (state.accountList && state.accountList.find((account) => account.id === accountId)) || null
   },
 
   isFolderListLoading: (state) => {

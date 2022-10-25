@@ -2,9 +2,8 @@ import types from 'src/utils/types'
 
 function parseAccounts(accountsData) {
   let currentAccountId = 0
-  const accountList = accountsData.map(accountData => {
-    const
-      serverData = types.pObject(accountData.Server),
+  const accountList = accountsData.map((accountData) => {
+    const serverData = types.pObject(accountData.Server),
       server = {
         id: types.pInt(serverData.Id),
         name: types.pInt(serverData.Name),
@@ -26,6 +25,7 @@ function parseAccounts(accountsData) {
       showUnifiedMailboxLabel: types.pBool(accountData.ShowUnifiedMailboxLabel),
       signature: types.pString(accountData.Signature),
       unifiedMailboxLabelColor: types.pString(accountData.UnifiedMailboxLabelColor),
+      unifiedMailboxLabelText: types.pString(accountData.UnifiedMailboxLabelText),
       useSignature: types.pBool(accountData.UseSignature),
       useThreading: types.pBool(accountData.UseThreading),
       useToAuthorize: types.pBool(accountData.UseToAuthorize),
@@ -33,10 +33,10 @@ function parseAccounts(accountsData) {
   })
   return {
     currentAccountId,
-    accountList
+    accountList,
   }
 }
 
 export default {
-  parseAccounts
+  parseAccounts,
 }

@@ -105,9 +105,9 @@ export default {
       (messageIdentifiers &&
         state.currentMessageList.find(
           (messageListItem) =>
-            messageListItem.AccountId === messageIdentifiers.accountId &&
-            messageListItem.Folder === messageIdentifiers.folder &&
-            messageListItem.Uid === messageIdentifiers.uid
+            messageListItem.accountId === messageIdentifiers.accountId &&
+            messageListItem.folder === messageIdentifiers.folder &&
+            messageListItem.uid === messageIdentifiers.uid
         )) ||
       null
   },

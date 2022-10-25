@@ -4,7 +4,7 @@
   <q-scroll-area v-else :thumb-style="{ width: '5px' }" class="contacts__list">
     <AppPullRefresh :refresh-action="asyncGetMessages">
       <q-list>
-        <MessageItem v-for="message in currentMessageList" :key="message.Uid" :message="message" class="mail" />
+        <MessageItem v-for="message in currentMessageList" :key="message.uid" :message="message" class="mail" />
       </q-list>
     </AppPullRefresh>
   </q-scroll-area>

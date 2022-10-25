@@ -114,7 +114,7 @@ export default {
         AccountID: messageIdentifiers.accountId,
         Folder: messageIdentifiers.folder,
         Uid: messageIdentifiers.uid,
-        MessageBodyTruncationThreshold: settings.get('MessageBodyTruncationThreshold'),
+        MessageBodyTruncationThreshold: settings.get('messageBodyTruncationThreshold'),
       }
       commit('setCurrentMessageLoading', true)
       const messageFromServer = await mailWebApi.getMessage(parameters)

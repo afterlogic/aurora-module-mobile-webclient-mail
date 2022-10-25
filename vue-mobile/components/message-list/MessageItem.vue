@@ -12,21 +12,24 @@
     <q-item-section class="list-item__text">
       <q-item-label class="list-item__text_secondary message__name">
         {{ recipients }}
+        <span v-if="showUnifiedMailboxLabel" class="message__marker" :style="{ background: unifiedMailboxLabelColor }">
+          {{ unifiedMailboxLabelText }}
+        </span>
       </q-item-label>
       <q-item-label class="list-item__text_primary message__subject">
-        {{ message.Subject }}
+        {{ message.subject }}
       </q-item-label>
     </q-item-section>
 
     <q-item-section side class="list-item__side">
       <q-item-label class="list-item__text_secondary message__info">
-        <AttachmentIcon v-if="message.HasAttachments" class="list-item__icon message__icon-attachment" />
+        <AttachmentIcon v-if="message.hasAttachments" class="list-item__icon message__icon-attachment" />
         <span class="message__date">{{ messageDate }}</span>
       </q-item-label>
       <q-item-label class="message__status">
-        <RepliedIcon v-if="message.IsAnswered" class="list-item__icon message__status-replied" />
-        <ForwardedIcon v-if="message.IsForwarded" color="#949496" class="list-item__icon message__status-forwarded" />
-        <q-icon v-if="message.IsFlagged" name="star" class="color-flagged message__status-flagged" size="18px" />
+        <RepliedIcon v-if="message.isAnswered" class="list-item__icon message__status-replied" />
+        <ForwardedIcon v-if="message.isForwarded" color="#949496" class="list-item__icon message__status-forwarded" />
+        <q-icon v-if="message.isFlagged" name="star" class="color-flagged message__status-flagged" size="18px" />
         <q-icon v-else name="star_border" color="primary" size="18px" />
       </q-item-label>
     </q-item-section>
@@ -60,14 +63,42 @@ export default {
   },
 
   computed: {
-    ...mapGetters('mailmobile', ['currentAccountId', 'getFoldersDelimiter', 'currentFolder', 'isSelectMode']),
+    ...mapGetters('mailmobile', [
+      'currentAccountId',
+      'isUnifiedInbox',
+      'getAccount',
+      'getFoldersDelimiter',
+      'currentFolder',
+      'isSelectMode',
+    ]),
 
     recipients() {
-      return addressUtils.getDisplayNamesFromMailsoAddresses(this.message.From).join(', ')
+      return addressUtils.getDisplayNamesFromMailsoAddresses(this.message.from).join(', ')
     },
 
     messageDate() {
-      return dateUtils.getShortDate(this.message.TimeStampInUTC, true)
+      return dateUtils.getShortDate(this.message.timeStampInUTC, true)
+    },
+
+    messageAccount() {
+      return this.getAccount(this.message.accountId)
+    },
+
+    unifiedMailboxLabelText() {
+      return this.messageAccount.unifiedMailboxLabelText
+    },
+
+    unifiedMailboxLabelColor() {
+      return this.messageAccount.unifiedMailboxLabelColor
+    },
+
+    showUnifiedMailboxLabel() {
+      return (
+        this.isUnifiedInbox &&
+        this.messageAccount.includeInUnifiedMailbox &&
+        this.messageAccount.showUnifiedMailboxLabel &&
+        this.unifiedMailboxLabelText !== ''
+      )
     },
   },
 
@@ -81,9 +112,9 @@ export default {
         this.$router.push({
           name: 'message-view',
           params: {
-            accountId: this.message.AccountId,
-            folderPath: this.message.Folder.split(this.getFoldersDelimiter(this.message.AccountId)),
-            messageUid: this.message.Uid,
+            accountId: this.message.accountId,
+            folderPath: this.message.folder.split(this.getFoldersDelimiter(this.message.accountId)),
+            messageUid: this.message.uid,
           },
         })
       }
@@ -98,6 +129,14 @@ export default {
   // width: 100vw;
   &__date {
     // font-size: 80%;
+  }
+  &__marker {
+    border-radius: 10px;
+    color: white;
+    display: inline-block;
+    font-size: 10px;
+    font-weight: normal;
+    padding: 0px 6px;
   }
   &__info {
     display: flex;
