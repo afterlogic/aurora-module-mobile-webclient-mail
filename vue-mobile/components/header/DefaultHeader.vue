@@ -20,26 +20,19 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
-
 export default {
-  name: 'MailHeader',
+  name: 'DefaultHeader',
 
-  computed: {
-    ...mapGetters('mailmobile', ['isUnifiedInbox', 'currentFolder']),
-
-    folderName() {
-      if (this.isUnifiedInbox) {
-        return this.$t('MAILWEBCLIENT.LABEL_FOLDER_ALL_INBOXES')
-      }
-      return this.currentFolder?.displayName || ''
+  props: {
+    folderName: {
+      type: String,
+      default: '',
     },
   },
 
   methods: {
-    ...mapActions('mailmobile', ['changeCurrentHeader']),
     showSearchHeader() {
-      this.changeCurrentHeader('SearchHeader')
+      this.$emit('openSearch')
     },
   },
 }

@@ -97,6 +97,10 @@ export default {
     }
   },
 
+  setCurrentSearchText: (state, currentSearchText) => {
+    state.currentSearchText = currentSearchText
+  },
+
   setCurrentFilter: (state, currentFilter) => {
     state.currentFilter = currentFilter
   },
@@ -110,7 +114,7 @@ export default {
       state.isUnifiedInbox ||
       (accountId === state.currentFolder.accountId && folderFullName === state.currentFolder.fullName)
     ) {
-      state.currentMessageList = list
+      state.currentMessageList = Array.isArray(list) ? list : []
     }
   },
 

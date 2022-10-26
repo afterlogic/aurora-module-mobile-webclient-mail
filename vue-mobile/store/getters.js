@@ -78,6 +78,10 @@ export default {
     return state.currentFolder
   },
 
+  currentSearchText: (state) => {
+    return state.currentSearchText
+  },
+
   currentFilter: (state) => {
     return state.currentFilter
   },

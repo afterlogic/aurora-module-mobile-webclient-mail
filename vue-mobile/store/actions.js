@@ -95,6 +95,10 @@ export default {
     commit('setCurrentFolder', folderFullName)
   },
 
+  changeCurrentSearchText: ({ commit }, currentSearchText) => {
+    commit('setCurrentSearchText', currentSearchText)
+  },
+
   changeCurrentFilter: ({ commit }, currentFilter) => {
     commit('setCurrentFilter', currentFilter)
   },
@@ -103,7 +107,7 @@ export default {
     const parameters = {
       Offset: 0,
       Limit: 20,
-      Search: '',
+      Search: getters['currentSearchText'],
       Filters: getters['currentFilter'],
       SortBy: 'arrival',
       SortOrder: 1,

@@ -15,6 +15,7 @@ export default function () {
     },
 
     isMessageListLoading: false,
+    currentSearchText: '',
     currentFilter: '',
     currentMessageList: [],
 

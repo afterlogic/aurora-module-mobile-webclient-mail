@@ -2,21 +2,21 @@
   <div>
     <q-toolbar class="app-header search-toolbar">
       <div class="col app-header__left">
-        <q-btn icon="close" @click="onCloseSearch" color="black" round flat dense />
+        <q-btn icon="close" @click="closeSearch" color="black" round flat dense />
       </div>
       <div class="col app-header__title">
         <span class="app-header__title-main">
           {{ $t('CONTACTSMOBILEWEBCLIENT.LABEL_SEARCH') }}
         </span>
         <span class="app-header__title-secondary">
-          {{ storageName }}
+          {{ folderName }}
         </span>
       </div>
       <div class="col app-header__right"></div>
     </q-toolbar>
     <q-toolbar class="search-toolbar__field">
       <q-input
-        v-model="text"
+        v-model="searchText"
         :placeholder="$t('CONTACTSMOBILEWEBCLIENT.LABEL_SEARCH')"
         autofocus
         borderless
@@ -30,50 +30,35 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
-
 export default {
   name: 'SearchHeader',
 
-  data() {
-    return {
-      text: '',
-    }
-  },
-
-  computed: {
-    ...mapGetters('mailmobile', [
-      'currentFolder',
-      'searchText'
-    ]),
-    storageName() {
-      return this.currentFolder.name || ''
+  props: {
+    folderName: {
+      type: String,
+      default: '',
+    },
+    defaultSearchText: {
+      type: String,
+      default: '',
     },
   },
-  mounted() {
-    this.text = this.searchText
+
+  data() {
+    return {
+      searchText: this.defaultSearchText,
+    }
   },
 
   watch: {
-    text() {
-      this.search()
-    }
+    searchText() {
+      this.$emit('updateSearchText', this.searchText)
+    },
   },
 
   methods: {
-    ...mapActions('contactsmobile', [
-      'asyncGetContacts',
-      'changeCurrentHeader',
-      'changeSearchText'
-    ]),
-    async search() {
-      this.changeSearchText(this.text)
-      await this.asyncGetContacts()
-    },
-    async onCloseSearch() {
-      this.changeSearchText('')
-      this.changeCurrentHeader('')
-      await this.asyncGetContacts()
+    async closeSearch() {
+      this.$emit('closeSearch')
     },
   },
 }
