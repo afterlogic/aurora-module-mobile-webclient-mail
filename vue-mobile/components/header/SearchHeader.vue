@@ -26,10 +26,30 @@
         debounce="400"
       />
     </q-toolbar>
+    <q-toolbar>
+      <q-btn
+        class="q-mx-auto"
+        size="12px"
+        flat
+        no-caps
+        text-color="blue"
+        :label="$t('MAILWEBCLIENT.ACTION_OPEN_ADVANCED_SEARCH')"
+        @click="openAdvancedSearch"
+      >
+      </q-btn>
+      <AdvancedSearchDialog
+        v-model="showAdvancedSearch"
+        :defaultSearchText="searchText"
+        @close="closeAdvancedSearch"
+        @search="setSearchText"
+      />
+    </q-toolbar>
   </div>
 </template>
 
 <script>
+import AdvancedSearchDialog from '../dialogs/AdvancedSearchDialog'
+
 export default {
   name: 'SearchHeader',
 
@@ -44,9 +64,14 @@ export default {
     },
   },
 
+  components: {
+    AdvancedSearchDialog,
+  },
+
   data() {
     return {
       searchText: this.defaultSearchText,
+      showAdvancedSearch: false,
     }
   },
 
@@ -57,8 +82,27 @@ export default {
   },
 
   methods: {
-    async closeSearch() {
+    closeSearch() {
       this.$emit('closeSearch')
+    },
+
+    openAdvancedSearch() {
+      this.showAdvancedSearch = true
+    },
+
+    closeAdvancedSearch() {
+      this.showAdvancedSearch = false
+    },
+
+    setSearchText(searchText) {
+      if (typeof searchText === 'string' && searchText !== this.searchText) {
+        if (searchText === '') {
+          this.closeSearch()
+        } else {
+          this.searchText = searchText
+        }
+      }
+      this.showAdvancedSearch = false
     },
   },
 }
