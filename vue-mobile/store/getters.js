@@ -69,6 +69,14 @@ export default {
     }
   },
 
+  getFolderDisplayName: (state) => {
+    return (accountId, folderFullName) => {
+      const folderList = state.folderLists.get(accountId)
+      const folder = folderList && folderList.flatList.find((folder) => folder.fullName === folderFullName)
+      return folder ? folder.displayName : folderFullName
+    }
+  },
+
   currentFoldersCount: (state) => {
     const currentFolderList = state.folderLists.get(state.currentAccountId)
     return currentFolderList ? currentFolderList.count : 0
@@ -80,6 +88,12 @@ export default {
 
   currentSearchText: (state) => {
     return state.currentSearchText
+  },
+
+  isCurrentSearchInMultiFolders: (state) => {
+    return (
+      state.currentSearchText.indexOf('folders:sub') !== -1 || state.currentSearchText.indexOf('folders:all') !== -1
+    )
   },
 
   currentFilter: (state) => {

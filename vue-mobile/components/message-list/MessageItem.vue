@@ -16,6 +16,9 @@
         <span v-if="showUnifiedMailboxLabel" class="message__marker" :style="{ background: unifiedMailboxLabelColor }">
           {{ unifiedMailboxLabelText }}
         </span>
+        <span v-if="isCurrentSearchInMultiFolders" class="message__contour_marker">
+          {{ folderDisplayName }}
+        </span>
       </q-item-label>
       <q-item-label class="list-item__text_primary message__subject">
         {{ message.subject }}
@@ -67,9 +70,11 @@ export default {
     ...mapGetters('mailmobile', [
       'currentAccountId',
       'isUnifiedInbox',
+      'isCurrentSearchInMultiFolders',
       'getAccount',
       'getFoldersDelimiter',
       'currentFolder',
+      'getFolderDisplayName',
       'isSelectMode',
     ]),
 
@@ -83,6 +88,10 @@ export default {
 
     messageAccount() {
       return this.getAccount(this.message.accountId)
+    },
+
+    folderDisplayName() {
+      return this.getFolderDisplayName(this.message.accountId, this.message.folder)
     },
 
     unifiedMailboxLabelText() {
@@ -137,6 +146,17 @@ export default {
     display: inline-block;
     font-size: 10px;
     font-weight: normal;
+    padding: 0px 6px;
+  }
+  &__contour_marker {
+    background: inherit;
+    border: solid 1px #a1a3ab;
+    border-radius: 10px;
+    color: #a1a3ab;
+    display: inline-block;
+    font-size: 10px;
+    font-weight: normal;
+    margin-left: 4px;
     padding: 0px 6px;
   }
   &__info {

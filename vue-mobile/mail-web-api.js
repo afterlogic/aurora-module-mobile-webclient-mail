@@ -35,13 +35,19 @@ export default {
       .catch((error) => null)
   },
 
-  getMessages: async (parameters, isUnifiedInbox = false) => {
+  getMessages: async (parameters, isUnifiedInbox, isCurrentSearchInMultiFolders) => {
     getMessagesСontroller.abort()
     getMessagesСontroller = new AbortController()
+
+    let methodName = isCurrentSearchInMultiFolders ? 'GetMessagesByFolders' : 'GetMessages'
+    if (isUnifiedInbox) {
+      methodName = 'GetUnifiedMailboxMessages'
+    }
+
     return webApi
       .sendRequest({
         moduleName: 'Mail',
-        methodName: isUnifiedInbox ? 'GetUnifiedMailboxMessages' : 'GetMessages',
+        methodName,
         parameters,
         signal: getMessagesСontroller.signal,
       })
