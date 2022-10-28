@@ -5,9 +5,7 @@
         <q-btn icon="close" @click="closeSearch" color="black" round flat dense />
       </div>
       <div class="col app-header__title">
-        <span class="app-header__title-main">
-          {{ $t('CONTACTSMOBILEWEBCLIENT.LABEL_SEARCH') }}
-        </span>
+        <span class="app-header__title-main" v-t="'COREMOBILEWEBCLIENT.LABEL_SEARCH'" />
         <span class="app-header__title-secondary">
           {{ folderName }}
         </span>
@@ -17,7 +15,7 @@
     <q-toolbar class="search-toolbar__field">
       <q-input
         v-model="searchText"
-        :placeholder="$t('CONTACTSMOBILEWEBCLIENT.LABEL_SEARCH')"
+        :placeholder="$t('COREMOBILEWEBCLIENT.LABEL_SEARCH')"
         autofocus
         borderless
         outlined

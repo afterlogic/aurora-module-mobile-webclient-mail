@@ -1,5 +1,9 @@
 <template>
   <MainLayout>
+    <template v-slot:header>
+      <MailHeader @executeAction="executeAction" />
+    </template>
+
     <template v-slot:drawer>
       <DrawerContent />
     </template>
@@ -11,7 +15,7 @@
       track-color="grey-1"
       color="primary"
     />
-    <router-view v-else></router-view>
+    <router-view @interface="getRouterViewInterface" v-else></router-view>
 
     <AppCreateButton @click="showCreateButtonsDialog" v-if="!isSelectMode">
       <ComposeIcon color="#fff" />
@@ -22,11 +26,10 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 
-import notification from 'src/utils/notification'
-
 import MainLayout from 'src/layouts/MainLayout'
 import AppCreateButton from 'src/components/common/AppCreateButton'
 
+import MailHeader from '../components/header/MailHeader'
 import DrawerContent from '../components/DrawerContent'
 import ComposeIcon from '../components/icons/ComposeIcon'
 
@@ -36,13 +39,14 @@ export default {
   components: {
     MainLayout,
     AppCreateButton,
+    MailHeader,
     DrawerContent,
     ComposeIcon,
   },
 
   data() {
     return {
-      appButtonPressed: false,
+      routerViewInterface: {},
     }
   },
 
@@ -87,7 +91,7 @@ export default {
           if (filter !== this.currentFilter) {
             this.$router.replace({ name: 'message-list-unified' })
           }
-        } else if (routeName !== 'message-view') {
+        } else if (routeName !== 'message-view' && routeName !== 'message-compose') {
           this.showUnifiedInbox(false)
 
           if (this.accountIdFromRoute !== this.currentAccountId) {
@@ -171,8 +175,17 @@ export default {
     },
 
     showCreateButtonsDialog() {
-      this.appButtonPressed = !this.appButtonPressed
-      notification.showReport('Comming soon')
+      this.$router.push({ name: 'message-compose' })
+    },
+
+    executeAction(actionName, ...args) {
+      if (this.routerViewInterface[actionName]) {
+        this.routerViewInterface[actionName](...args)
+      }
+    },
+
+    getRouterViewInterface(routerViewInterface) {
+      this.routerViewInterface = routerViewInterface
     },
   },
 }

@@ -72,4 +72,17 @@ export default {
       })
       .catch((error) => null)
   },
+
+  sendMessage: async (parameters) => {
+    return webApi
+      .sendRequest({
+        moduleName: 'Mail',
+        methodName: 'SendMessage',
+        parameters,
+      })
+      .then((result) => {
+        return result
+      })
+      .catch((error) => null)
+  },
 }

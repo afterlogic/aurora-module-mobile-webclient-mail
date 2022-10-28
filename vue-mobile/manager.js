@@ -18,7 +18,6 @@ export default {
         pagePath: '/mail',
         pageComponent: () => import('./pages/Mail'),
         pageStrict: true,
-        pageHeaderComponent: () => import('./components/header/MailHeader'),
         pageChildren: [
           {
             name: 'message-list',
@@ -48,6 +47,12 @@ export default {
             name: 'message-view',
             path: ':accountId(\\d+)/:folderPath*/:messageUid(\\d+)',
             component: () => import('./pages/MessageView'),
+            strict: true,
+          },
+          {
+            name: 'message-compose',
+            path: 'compose',
+            component: () => import('./pages/MessageCompose'),
             strict: true,
           },
         ],
