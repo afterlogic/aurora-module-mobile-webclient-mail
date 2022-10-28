@@ -95,12 +95,13 @@ export default {
         }
         return `${name}:${value}`
       }
+      const hasDatePart = this.sinceDate !== '' || this.tillDate !== ''
       const searchParts = [
         getSearchPart('from', this.fromInput),
         getSearchPart('to', this.toInput),
         getSearchPart('subject', this.subjectInput),
         getSearchPart('text', this.textInput),
-        this.sinceDate !== '' || this.tillDate !== '' ? `date:${this.sinceDate}/${this.tillDate}` : '',
+        hasDatePart ? `date:${this.sinceDate}/${this.tillDate}` : '',
         this.hasAttachments ? 'has:attachments' : '',
         this.searchIn,
       ].filter((searchPart) => searchPart)

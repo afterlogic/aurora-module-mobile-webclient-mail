@@ -1,7 +1,7 @@
 <template>
   <q-input v-model="date" mask="####.##.##" :label="label">
     <q-popup-proxy v-model="showDatePopup">
-      <q-date v-model="dateInPopup" :options="dateOptions">
+      <q-date v-model="dateInPopup" mask="YYYY.MM.DD" :options="dateOptions">
         <div class="row items-center justify-end">
           <q-btn
             v-close-popup
