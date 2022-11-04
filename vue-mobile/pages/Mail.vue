@@ -17,7 +17,7 @@
     />
     <router-view @interface="getRouterViewInterface" v-else></router-view>
 
-    <AppCreateButton @click="showCreateButtonsDialog" v-if="!isSelectMode">
+    <AppCreateButton @click="showCreateButtonsDialog" v-if="isShowCreateButtons">
       <ComposeIcon color="#fff" />
     </AppCreateButton>
   </MainLayout>
@@ -71,6 +71,18 @@ export default {
     folderFullNameFromRoute() {
       const folderPath = Array.isArray(this.$route.params.folderPath) ? this.$route.params.folderPath : []
       return folderPath.join(this.currentFoldersDelimiter)
+    },
+
+    isShowCreateButtons() {
+      return (
+        !this.isSelectMode
+        && (
+          this.$route.name === 'message-list'
+          || this.$route.name === 'message-list-filter'
+          || this.$route.name === 'message-list-unified'
+          || this.$route.name === 'message-list-unified-filter'
+        )
+      )
     },
   },
 
