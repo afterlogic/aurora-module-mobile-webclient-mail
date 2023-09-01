@@ -39,10 +39,10 @@
           <AttachmentIcon class="message-flags__flag-attachment" v-if="currentMessage?.hasAttachments" />
         </div>
         <div class="message-header__subject">{{ currentMessageHeaders.subject }}</div>
-        <div class="message-body" style="white-space: pre;">
-          <!-- {{currentMessageHeaders}} -->
-          <!-- {{currentMessage}} -->
+        <div class="message-body" style="white-space: pre;" v-html="currentMessage.html">
         </div>
+        <!-- {{currentMessageHeaders}} -->
+        <div class="message-attachments"></div>
       </div>
     </div>
   </q-scroll-area>
@@ -189,12 +189,11 @@ export default {
       color: #000;
     }
   }
+
   .recipients-list {
     padding: 0 16px;
     display: table;
     width: 100vw;
-
-
     .recipient-row {
       display: table-row;
 
@@ -210,7 +209,12 @@ export default {
   }
 }
 
-
+.message-body {
+  padding: 0px 16px;
+  overflow-x: auto;
+  overflow-y: visible;
+  width: 100vw;
+}
 
 .message-flags {
   display: flex;
