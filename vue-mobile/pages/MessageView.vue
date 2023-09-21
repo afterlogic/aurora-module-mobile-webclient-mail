@@ -41,8 +41,13 @@
         <div class="message-header__subject">{{ currentMessageHeaders.subject }}</div>
         <div class="message-body" style="white-space: pre;" v-html="currentMessage.html">
         </div>
-        <!-- {{currentMessageHeaders}} -->
-        <div class="message-attachments"></div>
+        <div class="message-attachments">
+          <AttachmentListItem
+            v-for="attachment in attachmentList"
+            :key="attachment.MimePartIndex"
+            :attachment="attachment"
+          />
+        </div>
       </div>
     </div>
   </q-scroll-area>
@@ -56,12 +61,14 @@ import dateUtils from 'src/utils/date'
 import types from 'src/utils/types'
 
 import AttachmentIcon from '../components/icons/message-list/AttachmentIcon'
+import AttachmentListItem from '../components/AttachmentListItem'
 
 export default {
   name: 'MessageView',
 
   components: {
-    AttachmentIcon
+    AttachmentIcon,
+    AttachmentListItem
   },
 
   data() {
@@ -100,6 +107,11 @@ export default {
       }
       return dateUtils.getShortDate(this.currentMessage.timeStampInUTC, true)
     },
+
+    attachmentList() {
+      return this.currentMessage?.attachments['@Collection'] ? 
+        this.currentMessage?.attachments['@Collection'].filter(item => item.IsInline === false) : []
+    }
   },
 
   watch: {
@@ -132,7 +144,10 @@ export default {
   },
 
   methods: {
-    ...mapActions('mailmobile', ['changeCurrentMessageIdentifiers', 'asyncGetCurrentMessage']),
+    ...mapActions('mailmobile', [
+      'changeCurrentMessageIdentifiers',
+      'asyncGetCurrentMessage'
+    ]),
 
     setMessageFromRoute() {
       const accountId = types.pInt(this.$route.params.accountId)
