@@ -104,9 +104,12 @@ export default {
   },
 
   asyncGetMessages: async ({ getters, commit }) => {
+    const page = getters['messageListPage']
+    const itemsPerPage = 20
+
     const parameters = {
-      Offset: 0,
-      Limit: 20,
+      Offset: ((page || 1) - 1) * itemsPerPage,
+      Limit: itemsPerPage,
       Search: getters['currentSearchText'],
       Filters: getters['currentFilter'],
       SortBy: 'arrival',
@@ -132,7 +135,12 @@ export default {
       accountId: parameters.AccountID,
       folderFullName: parameters.Folder,
       list: messages,
+      page: page
     })
+  },
+
+  changeMessageListPage: ({ commit }, page) => {
+    commit('setMessagesListPage', page)
   },
 
   changeSelectStatus: ({ commit }, message) => {

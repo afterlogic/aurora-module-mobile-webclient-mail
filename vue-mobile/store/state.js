@@ -17,6 +17,7 @@ export default function () {
     isMessageListLoading: false,
     currentSearchText: '',
     currentFilter: '',
+    messageListPage: 1,
     currentMessageList: [],
 
     isCurrentMessageLoading: false,

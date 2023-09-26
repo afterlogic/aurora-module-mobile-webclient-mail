@@ -93,9 +93,9 @@ export default {
     return state.currentFolder
   },
 
-  currentSearchText: (state) => {
-    return state.currentSearchText
-  },
+  currentSearchText: (state) => state.currentSearchText,
+
+  messageListPage: (state) => state.messageListPage,
 
   isCurrentSearchInMultiFolders: (state) => {
     return (

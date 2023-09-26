@@ -109,13 +109,21 @@ export default {
     state.isMessageListLoading = isMessageListLoading
   },
 
-  setMessageList: (state, { accountId, folderFullName, list }) => {
+  setMessageList: (state, { accountId, folderFullName, list, page }) => {
     if (
       state.isUnifiedInbox ||
       (accountId === state.currentFolder.accountId && folderFullName === state.currentFolder.fullName)
     ) {
+      if (page > 1) {
+        list = state.currentMessageList.concat(list)
+      }
+
       state.currentMessageList = Array.isArray(list) ? list : []
     }
+  },
+
+  setMessagesListPage: (state, page) => {
+    state.messageListPage = page
   },
 
   setSelectStatus: (state, message) => {
