@@ -1,6 +1,8 @@
 <template>
   <q-scroll-area :thumb-style="{ width: '5px' }" style="height: 100%;">
-    <div v-if="isCurrentMessageLoading">Loading...</div>
+    <div class="messages__loader" v-if="isCurrentMessageLoading">
+      <q-spinner-dots color="primary" size="40px" />
+    </div>
     <div v-else-if="currentMessage">
       <div v-if="currentMessageHeaders" class="message-header">
         <div class="message-header__recipients">
@@ -54,7 +56,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'pinia'
+import { useMailStore } from '../store/index-pinia'
 
 import addressUtils from 'src/utils/address'
 import dateUtils from 'src/utils/date'
@@ -78,7 +81,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('mailmobile', [
+    ...mapGetters(useMailStore, [
       'currentAccountId',
       'isUnifiedInbox',
       'currentFoldersDelimiter',
@@ -144,7 +147,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('mailmobile', [
+    ...mapActions(useMailStore, [
       'changeCurrentMessageIdentifiers',
       'asyncGetCurrentMessage'
     ]),

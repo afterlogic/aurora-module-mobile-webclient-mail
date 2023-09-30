@@ -23,7 +23,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'pinia'
+import { useMailStore } from '../../store/index-pinia'
 
 import DefaultHeader from './DefaultHeader'
 import SelectHeader from './SelectHeader'
@@ -50,7 +51,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('mailmobile', ['isUnifiedInbox', 'currentFolder', 'currentSearchText', 'selectedMessages']),
+    ...mapGetters(useMailStore, ['isUnifiedInbox', 'currentFolder', 'currentSearchText', 'selectedMessages']),
 
     folderName() {
       if (this.isUnifiedInbox) {
@@ -73,7 +74,11 @@ export default {
   },
 
   methods: {
-    ...mapActions('mailmobile', ['changeCurrentSearchText', 'asyncGetMessages']),
+    ...mapActions(useMailStore, [
+      'changeCurrentSearchText',
+      'changeMessageListPage',
+      'asyncGetMessages',
+    ]),
 
     openSearch() {
       this.isSearchHeader = true
@@ -83,6 +88,7 @@ export default {
     updateSearchText(text) {
       this.searchText = text
       this.changeCurrentSearchText(this.searchText)
+      this.changeMessageListPage(1)
       this.asyncGetMessages()
     },
 

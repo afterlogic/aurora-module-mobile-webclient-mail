@@ -36,7 +36,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapGetters } from 'pinia'
+import { useMailStore } from '../store/index-pinia'
 
 import settings from '../settings'
 
@@ -58,7 +59,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('mailmobile', [
+    ...mapGetters(useMailStore, [
       'accountList',
       'isAllowedUnifiedInbox',
       'currentAccount',

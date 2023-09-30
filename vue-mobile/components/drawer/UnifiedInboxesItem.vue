@@ -14,7 +14,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'pinia'
+import { useMailStore } from '../../store/index-pinia'
 
 import eventBus from 'src/event-bus'
 
@@ -42,7 +43,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('mailmobile', ['currentAccountId', 'isUnifiedInbox', 'unifiedInboxUnseenCount']),
+    ...mapGetters(useMailStore, ['currentAccountId', 'isUnifiedInbox', 'unifiedInboxUnseenCount']),
 
     indent() {
       return { width: `${this.level * 16}px` }

@@ -9,7 +9,7 @@
     </template>
 
     <q-linear-progress
-      v-if="isFolderListLoading || isMessageListLoading"
+      v-if="isFolderListLoading"
       class="full-width"
       indeterminate
       track-color="grey-1"
@@ -24,7 +24,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'pinia'
+import { useMailStore } from '../store/index-pinia'
 
 import MainLayout from 'src/layouts/MainLayout'
 import AppCreateButton from 'src/components/common/AppCreateButton'
@@ -51,7 +52,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('mailmobile', [
+    ...mapGetters(useMailStore, [
       'currentAccountId',
       'isUnifiedInbox',
       'isAllowedUnifiedInbox',
@@ -143,14 +144,17 @@ export default {
     },
 
     isUnifiedInbox() {
+      this.changeMessageListPage(1)
       this.asyncGetMessages()
     },
 
     currentFolder() {
+      this.changeMessageListPage(1)
       this.asyncGetMessages()
     },
 
     currentFilter() {
+      this.changeMessageListPage(1)
       this.asyncGetMessages()
     },
   },
@@ -160,11 +164,12 @@ export default {
   },
 
   methods: {
-    ...mapActions('mailmobile', [
+    ...mapActions(useMailStore, [
       'showUnifiedInbox',
       'changeCurrentAccount',
       'changeCurrentFolder',
       'changeCurrentFilter',
+      'changeMessageListPage',
       'asyncGetFolders',
       'asyncGetMessages',
     ]),
@@ -203,4 +208,22 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style lang="scss">
+.messages {
+  &__list {
+    height: 100%;
+  }
+
+  &__loader {
+    display: flex;
+    justify-content: center;
+  }
+}
+.list {
+  &__info {
+    text-align: center;
+    color: #969494;
+    padding: 16px 32px 32px 32px;
+  }
+}
+</style>

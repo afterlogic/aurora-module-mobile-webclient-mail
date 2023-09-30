@@ -15,7 +15,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'pinia'
+import { useMailStore } from '../../store/index-pinia'
 
 import eventBus from 'src/event-bus'
 
@@ -34,7 +35,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('mailmobile', ['currentAccountId', 'isUnifiedInbox', 'currentFoldersDelimiter', 'currentFolder']),
+    ...mapGetters(useMailStore, ['currentAccountId', 'isUnifiedInbox', 'currentFoldersDelimiter', 'currentFolder']),
 
     isFolderSelected() {
       const currentFolderFullName = (this.currentFolder && this.currentFolder.fullName) || ''

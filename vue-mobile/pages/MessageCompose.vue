@@ -5,7 +5,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'pinia'
+import { useMailStore } from '../store/index-pinia'
 
 import { FOLDER_TYPES } from '../enums'
 import mailWebApi from '../mail-web-api'
@@ -24,7 +25,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('mailmobile', [
+    ...mapGetters(useMailStore, [
       'currentAccountId',
       'getFolderByType',
       'currentFoldersDelimiter',
@@ -42,7 +43,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('mailmobile', ['changeCurrentMessageIdentifiers', 'asyncGetCurrentMessage']),
+    ...mapActions(useMailStore, ['changeCurrentMessageIdentifiers', 'asyncGetCurrentMessage']),
 
     /**
      * Emitting an interface with callable methods from outside

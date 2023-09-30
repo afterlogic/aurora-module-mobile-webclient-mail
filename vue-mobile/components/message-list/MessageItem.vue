@@ -6,9 +6,8 @@
     clickable
     :active="message.isSelected"
     @click="onMessageClick"
-    v-touch-hold.mouse="() => changeSelectStatus(message)"
     class="list-item"
-    :style="{ background: message.isSeen ? '' : '#f1dcf3' }"
+    :class="{'message__unseen': !message.isSeen}"
   >
     <q-item-section class="list-item__text">
       <q-item-label class="list-item__text_secondary message__name">
@@ -41,7 +40,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapGetters } from 'pinia'
+import { useMailStore } from '../../store/index-pinia'
 
 import addressUtils from 'src/utils/address'
 import dateUtils from 'src/utils/date'
@@ -57,6 +57,7 @@ export default {
 
   props: {
     message: { type: Object, default: null },
+    selectItemHandler: { type: Function, default: null, require: true },
   },
 
   components: {
@@ -67,13 +68,11 @@ export default {
   },
 
   computed: {
-    ...mapGetters('mailmobile', [
-      'currentAccountId',
+    ...mapGetters(useMailStore, [
       'isUnifiedInbox',
       'isCurrentSearchInMultiFolders',
       'getAccount',
       'getFoldersDelimiter',
-      'currentFolder',
       'getFolderDisplayName',
       'isSelectMode',
     ]),
@@ -113,11 +112,9 @@ export default {
   },
 
   methods: {
-    ...mapActions('mailmobile', ['changeSelectStatus']),
-
     onMessageClick() {
       if (this.isSelectMode) {
-        this.changeSelectStatus(this.message)
+        this.selectItemHandler(this.message)
       } else {
         this.$router.push({
           name: 'message-view',
@@ -137,6 +134,10 @@ export default {
 .message {
   // padding: 0;
   // width: 100vw;
+  &__unseen {
+    background-color: #f4f6f7;
+    font-weight: 600;
+  }
   &__date {
     // font-size: 80%;
   }

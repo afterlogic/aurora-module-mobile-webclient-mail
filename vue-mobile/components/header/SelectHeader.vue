@@ -38,8 +38,10 @@
 </template>
 
 <script>
-import {mapActions, mapGetters} from 'vuex'
-import store from 'src/store'
+import {mapActions, mapGetters} from 'pinia'
+import { useContactsStore } from '../../../../ContactsMobileWebclient/vue-mobile/store/index-pinia'
+const contactsStore = useContactsStore()
+
 import notification from 'src/utils/notification'
 // import ActionIcon from '../common/ActionIcon'
 // import { contactActions } from '../../utils/contact-actions'
@@ -59,7 +61,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contactsmobile', [
+    ...mapGetters(useContactsStore, [
       'currentStorage',
       'currentGroup',
       'selectedContacts'
@@ -70,7 +72,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('contactsmobile', [
+    ...mapActions(useContactsStore, [
       'resetSelectedItems',
       'changeDialogComponent',
     ]),
@@ -89,7 +91,7 @@ export default {
     async removeFromGroup(action) {
       const result = await action.method(this.currentGroup, this.selectedContacts)
       if (result) {
-        await store.dispatch('contactsmobile/asyncGetContacts')
+        await contactsStore.asyncGetContacts()
       }
     },
     isShowAction(action) {
