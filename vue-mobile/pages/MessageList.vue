@@ -1,18 +1,14 @@
 <template>
-  <div v-if="currentFilter" class="list__info" style="position: absolute; z-index: 1; background: #a6dbed">
+  <div v-if="currentFilter" class="list__info">
     currentFilter: {{ currentFilter }}
   </div>
   <div v-if="currentSearchText" class="list__info">
     currentSearchText: {{ currentSearchText }}
   </div>
 
-  <div class="messages__loader" v-if="isMessageListLoading && messageListPage <= 1">
-    <q-spinner-dots color="primary" size="40px" />
-  </div>
-
-  <EmptyFolder v-else-if="this.currentMessageList.length === 0" />
+  <EmptyFolder v-if="isListEmpty" />
   
-  <q-scroll-area v-else :thumb-style="{ width: '5px' }" class="messages__list">
+  <q-scroll-area :thumb-style="{ width: '5px' }" class="messages__list">
     <AppPullRefresh :refresh-action="reloadList">
       <q-virtual-scroll
         v-if="!isListEmpty"
@@ -77,7 +73,7 @@ export default {
       return this.currentMessageList.length == 0 && !this.isMessageListLoading
     },
     isListEndReached() {
-      return this.currentMessageList.length === 100
+      return this.currentMessageList.length === this.currentFolder.count
     },
   },
 

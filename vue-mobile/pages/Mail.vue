@@ -144,16 +144,19 @@ export default {
     },
 
     isUnifiedInbox() {
+      this.resetMessageList()
       this.changeMessageListPage(1)
       this.asyncGetMessages()
     },
 
     currentFolder() {
+      this.resetMessageList()
       this.changeMessageListPage(1)
       this.asyncGetMessages()
     },
 
     currentFilter() {
+      this.resetMessageList()
       this.changeMessageListPage(1)
       this.asyncGetMessages()
     },
@@ -170,6 +173,7 @@ export default {
       'changeCurrentFolder',
       'changeCurrentFilter',
       'changeMessageListPage',
+      'resetMessageList',
       'asyncGetFolders',
       'asyncGetMessages',
     ]),

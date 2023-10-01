@@ -231,6 +231,16 @@ export default {
     this.messageListPage = page
   },
 
+  resetMessageList() {
+    this.currentMessageList = []
+  },
+
+  resetSelectedItems() {
+    this.selectedMessages.forEach((message) => {
+      message.isSelected = false
+    })
+  },
+
   changeCurrentMessageIdentifiers(messageIdentifiers) {
     this.currentMessageIdentifiers = messageIdentifiers
     this.currentMessageHeaders =
