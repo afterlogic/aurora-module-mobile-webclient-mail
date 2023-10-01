@@ -9,48 +9,28 @@
     </div>
     
     <div class="col app-header__right">
-    <!--   <div v-if="isShowAction(actions.emailTo)">
-        <action-icon
-            class="q-mr-md"
-            color="black"
-            :icon="actions.emailTo.icon"
-            @click="emailToItems"
-        />
-      </div>
-      <div v-if="isShowAction(actions.removeFromGroup)">
-        <action-icon
-            class="q-mr-md"
-            color="black"
-            :icon="actions.removeFromGroup.icon"
-            @click="removeFromGroup(actions.removeFromGroup)"
-        />
-      </div>
-      <div v-if="isShowAction(actions.delete)">
-        <action-icon
-            class="q-mr-md"
-            color="black"
-            :icon="actions.delete.icon"
-            @click="deleteItems"
-        />
-      </div> -->
+      <ActionIcon
+          class="q-mr-md"
+          color="black"
+          icon="DeleteIcon"
+          @click="deleteItems"
+      />
     </div>
   </q-toolbar>
 </template>
 
 <script>
 import {mapActions, mapGetters} from 'pinia'
-import { useContactsStore } from '../../../../ContactsMobileWebclient/vue-mobile/store/index-pinia'
-const contactsStore = useContactsStore()
+import { useMailStore } from '../../store/index-pinia'
 
 import notification from 'src/utils/notification'
-// import ActionIcon from '../common/ActionIcon'
-// import { contactActions } from '../../utils/contact-actions'
+import ActionIcon from '../common/ActionIcon'
 
 export default {
   name: 'SelectHeader',
 
   components: {
-    // ActionIcon,
+    ActionIcon,
   },
 
   props: {
@@ -60,53 +40,17 @@ export default {
     },
   },
 
-  computed: {
-    ...mapGetters(useContactsStore, [
-      'currentStorage',
-      'currentGroup',
-      'selectedContacts'
-    ]),
-    actions() {
-      // return contactActions
-    },
-  },
-
   methods: {
-    ...mapActions(useContactsStore, [
+    ...mapActions(useMailStore, [
       'resetSelectedItems',
       'changeDialogComponent',
     ]),
     resetSelection() {
       this.resetSelectedItems({ items: this.items })
     },
-    emailToItems() {
+    deleteItems() {
       notification.showReport('Comming soon')
     },
-    deleteItems() {
-      const deleteAction = contactActions.delete
-      if (deleteAction.component) {
-        this.changeDialogComponent({ component: deleteAction.component })
-      }
-    },
-    async removeFromGroup(action) {
-      const result = await action.method(this.currentGroup, this.selectedContacts)
-      if (result) {
-        await contactsStore.asyncGetContacts()
-      }
-    },
-    isShowAction(action) {
-      return action.isShowAction(
-          action.name,
-          this.items,
-          this.currentStorage,
-          this.currentGroup
-      )
-    },
-    onPerformAction(action) {
-      if (action.component) {
-        this.changeDialogComponent({ component: action.component })
-      }
-    }
   },
 }
 </script>

@@ -21,7 +21,7 @@
 import moment from 'moment'
 
 export default {
-  name: 'AdvancedSearchDialog',
+  name: 'SearchDate',
 
   props: {
     label: {

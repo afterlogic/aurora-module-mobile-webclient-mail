@@ -51,10 +51,7 @@ export default {
   },
 
   props: {
-    defaultSearchText: {
-      type: String,
-      default: '',
-    },
+    defaultSearchText: { type: String, default: '' },
   },
 
   data() {
