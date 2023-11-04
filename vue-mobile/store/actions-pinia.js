@@ -3,6 +3,7 @@ import _ from 'lodash'
 import accountsUtils from '../utils/accounts'
 import mailWebApi from '../mail-web-api'
 import settings from '../settings'
+import { FOLDER_TYPES } from '../enums'
 import { addMessageToCache, getMessageFromCache } from '../cache'
 
 export default {

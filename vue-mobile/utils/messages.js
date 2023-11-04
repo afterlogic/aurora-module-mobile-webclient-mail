@@ -74,3 +74,15 @@ export function parseMessage(messageData, accountIdFromParameters) {
   message.sensitivity = types.pInt(messageData.Sensitivity) // TODO: use pEnum
   return message
 }
+
+export function getRecipientsString(aRecipients) {
+  aRecipients = types.pArray(aRecipients)
+  
+  aRecipients = aRecipients.map((recipient) => {
+    if (recipient.value) {
+      return recipient.value
+    }
+  })
+
+  return aRecipients.join(', ')
+}

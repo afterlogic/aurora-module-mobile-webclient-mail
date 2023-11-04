@@ -12,7 +12,7 @@
     </div>
 
     <div class="col app-header__right">
-      <AppActionIconContainer @click="$emit('executeAction', 'sendMessage')">
+      <AppActionIconContainer @click="$emit('executeAction', 'sendMessage')" class="q-mr-md">
         <SendActionIcon />
       </AppActionIconContainer>
       <div class="dropdown-more flex justify-center items-center">
