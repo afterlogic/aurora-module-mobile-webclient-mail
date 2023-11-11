@@ -20,5 +20,3 @@ export default {
   name: 'FolderIcon',
 }
 </script>
-
-<style scoped></style>

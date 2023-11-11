@@ -41,8 +41,7 @@
           <AttachmentIcon class="message-flags__flag-attachment" v-if="currentMessage?.hasAttachments" />
         </div>
         <div class="message-header__subject">{{ currentMessageHeaders.subject }}</div>
-        <div class="message-body" style="white-space: pre;" v-html="currentMessage.html">
-        </div>
+        <div class="message-body" style="white-space: pre;" v-html="currentMessage.html"></div>
         <div class="message-attachments">
           <AttachmentListItem
             v-for="attachment in attachmentList"

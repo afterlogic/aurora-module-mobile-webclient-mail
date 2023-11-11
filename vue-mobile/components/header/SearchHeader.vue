@@ -51,6 +51,10 @@ import AdvancedSearchDialog from '../dialogs/AdvancedSearchDialog'
 export default {
   name: 'SearchHeader',
 
+  components: {
+    AdvancedSearchDialog,
+  },
+
   props: {
     folderName: {
       type: String,
@@ -60,10 +64,6 @@ export default {
       type: String,
       default: '',
     },
-  },
-
-  components: {
-    AdvancedSearchDialog,
   },
 
   data() {

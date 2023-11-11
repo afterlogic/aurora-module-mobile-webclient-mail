@@ -39,8 +39,6 @@
 import { mapGetters } from 'pinia'
 import { useMailStore } from '../store/index-pinia'
 
-import settings from '../settings'
-
 import AccountItem from './drawer/AccountItem'
 import FolderItem from './drawer/FolderItem'
 import UnifiedInboxesItem from './drawer/UnifiedInboxesItem'
@@ -79,5 +77,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped></style>

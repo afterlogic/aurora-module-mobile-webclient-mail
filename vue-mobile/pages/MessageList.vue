@@ -48,16 +48,16 @@ import EmptyFolder from '../components/message-list/EmptyFolder'
 export default {
   name: 'MessageList',
 
-  data() {
-    return {
-      isSelectMode: false,
-    }
-  },
-
   components: {
     AppPullRefresh,
     MessageItem,
     EmptyFolder,
+  },
+
+  data() {
+    return {
+      isSelectMode: false,
+    }
   },
 
   computed: {

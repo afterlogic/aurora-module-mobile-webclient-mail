@@ -2,7 +2,7 @@
   <div class="flex items-center justify-center caption full-height">
     <div class="caption__box">
       <div class="q-mb-md">
-        <empty-folder-icon />
+        <EmptyFolderIcon />
       </div>
       <div>
         {{ $t('MAILMOBILEWEBCLIENT.LABEL_EMPTY_FOLDER') }}

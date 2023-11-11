@@ -4,11 +4,7 @@
     <ComposeHeader
       v-else-if="isComposeHeader"
       :folderName="folderName"
-      @executeAction="
-        (...args) => {
-          $emit('executeAction', ...args)
-        }
-      "
+      @executeAction="(...args) => { $emit('executeAction', ...args) }"
     />
     <ViewHeader v-else-if="isViewHeader" :folderName="folderName" />
     <SearchHeader

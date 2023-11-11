@@ -23,10 +23,10 @@ import _ from 'lodash'
 export default {
   name: 'DialogsList',
 
-  components: {
-    // FileUploader, 
-    // CreateFolderDialog,
-  },
+  // components: {
+  //   FileUploader, 
+  //   CreateFolderDialog,
+  // },
 
   data() {
     return {
@@ -41,7 +41,6 @@ export default {
 
   watch: {
     dialogComponent(value) {
-      console.log('dialogComponent', value);
       if (value && value?.component !== 'FileUploader') {
         if (value?.getComponent) {
           this.currentComponent = value.getComponent()
