@@ -21,12 +21,18 @@
         :label="$t('COREWEBCLIENT.LABEL_CC')" />
       <RecipientsInput v-model="bccInput" :getOptions="getOptions" v-if="isBCC" :label="$t('COREWEBCLIENT.LABEL_BCC')" />
       
-      <q-input v-model="subjectInput" dense autocomplete="nope" :placeholder="$t('MAILWEBCLIENT.LABEL_SUBJECT')" class="q-mb-xs contact__form-input" />
+      <q-input v-model="subjectInput" dense autocomplete="nope" :placeholder="$t('MAILWEBCLIENT.LABEL_SUBJECT')" class="q-mb-xs contact__form-input">
+        <template v-slot:append>
+          <AppActionIconContainer @click="selectFiles">
+            <AttachmentIcon />
+          </AppActionIconContainer>
+        </template>
+      </q-input>
+      
+      <AttachmentsUploader ref="attachmentsUploader" />
+
       <div style="display: flex; justify-content: space-between;">
         <span>{{ $t('MAILWEBCLIENT.LABEL_TEXT') }}</span>
-        <AppActionIconContainer @click="$emit('executeAction', 'sendMessage')">
-          <AttachmentIcon />
-        </AppActionIconContainer>
       </div>
       <q-editor v-model="bodyInput" dense flat content_class="message__body" min-height="10rem" />
     </q-form>
@@ -45,6 +51,8 @@ import AppActionIconContainer from 'src/components/common/AppActionIconContainer
 import AttachmentIcon from '../components/icons/message-list/AttachmentIcon'
 import RecipientsInput from '../components/RecipientsInput'
 
+import AttachmentsUploader from '../components/AttachmentsUploader'
+
 import notification from 'src/utils/notification'
 
 import { getRecipientsString } from '../utils/messages'
@@ -56,6 +64,7 @@ export default {
     AppActionIconContainer,
     AttachmentIcon,
     RecipientsInput,
+    AttachmentsUploader,
   },
 
   data() {
@@ -96,6 +105,14 @@ export default {
       'asyncGetCurrentMessage',
     ]),
 
+    selectFiles() {
+      this.$refs.attachmentsUploader.selectFiles()
+    },
+
+    getUploadedAttachments() {
+      return this.$refs.attachmentsUploader.getAttachments()
+    },
+
     showCC() {
       this.isCC = true
     },
@@ -132,6 +149,13 @@ export default {
     emitInterface() {
       this.$emit('interface', {
         sendMessage: async () => {
+          console.log('interface', 'sendMessage')
+          const attachmentsParam = {}
+          this.getUploadedAttachments().forEach(item => {            
+            const data = { sFileName: item.filename, sCID: '', isInline: '0', isLinked: '0', sContentLocation: '' }
+            attachmentsParam[item.tempName] = [ data.sFileName, data.sCID, data.isInline, data.isLinked, data.sContentLocation, ]
+          })
+
           const sentFolder = this.getFolderByType(this.currentAccountId, FOLDER_TYPES.SENT)
           const parameters = {
             AccountID: this.currentAccountId,
@@ -148,7 +172,7 @@ export default {
             IsHtml: true,
             Importance: 3,
             SendReadingConfirmation: false,
-            Attachments: {},
+            Attachments: attachmentsParam,
             InReplyTo: '',
             References: '',
             SentFolder: sentFolder ? sentFolder.fullName : '',
@@ -169,5 +193,3 @@ export default {
   },
 }
 </script>
-
-<style scoped></style>

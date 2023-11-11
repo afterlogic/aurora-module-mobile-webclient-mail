@@ -9,15 +9,21 @@
 
     <q-item-section class="list-item__text">
       <q-item-label class="list-item__text_primary file__name">
-        {{ attachment.FileName }}
+        {{ attachment.filename }}
       </q-item-label>
       <q-item-label class="list-item__text_secondary">
         {{ size }}
       </q-item-label>
     </q-item-section>
     <q-item-section class="list-item__side">
+      <div v-if="viewLink">
+        <a :href="viewLink">View</a>
+      </div>
       <div v-if="downloadLink">
         <a :href="downloadLink"><DownloadIcon /></a>
+      </div>
+      <div>
+        <span @click="remove"><CancelCrossIcon /></span>
       </div>
     </q-item-section>
   </q-item>
@@ -28,13 +34,15 @@ import { getApiHost } from 'src/api/helpers'
 import text from 'src/utils/text'
 import DownloadIcon from './icons/DownloadIcon'
 import FileIcon from './icons/FileIcon'
+import CancelCrossIcon from '/src/components/common/icons/CancelCrossIcon'
 
 export default {
   name: 'AttachmentListItem',
 
   components: {
     DownloadIcon,
-    FileIcon
+    FileIcon,
+    CancelCrossIcon,
   },
 
   props: {
@@ -43,13 +51,22 @@ export default {
 
   computed: {
     thumbnail() {
-      return this.attachment?.ThumbnailUrl ? (getApiHost() + this.attachment?.ThumbnailUrl) : ''
+      return this.attachment?.thumbnailUrl ? (getApiHost() + this.attachment?.thumbnailUrl) : ''
     },
     size() {
-      return text.getFriendlySize(this.attachment?.EstimatedSize)
+      return this.attachment?.size ? text.getFriendlySize(this.attachment?.size) : ''
     },
     downloadLink() {
-      return this.attachment?.Actions?.download ? (getApiHost() + this.attachment?.Actions?.download.url) : ''
+      return this.attachment?.actions?.download ? (getApiHost() + this.attachment?.actions?.download.url) : ''
+    },
+    viewLink() {
+      return this.attachment?.actions?.view ? (getApiHost() + this.attachment?.actions?.view.url) : ''
+    },
+  },
+  
+  methods: {
+    remove() {
+      this.$emit('remove', this.attachment)
     }
   },
 }

@@ -65,6 +65,7 @@ import types from 'src/utils/types'
 
 import AttachmentIcon from '../components/icons/message-list/AttachmentIcon'
 import AttachmentListItem from '../components/AttachmentListItem'
+import CAttachment from '../classes/CAttachment'
 
 export default {
   name: 'MessageView',
@@ -112,8 +113,30 @@ export default {
     },
 
     attachmentList() {
-      return this.currentMessage?.attachments['@Collection'] ? 
-        this.currentMessage?.attachments['@Collection'].filter(item => item.IsInline === false) : []
+      const attachments = [];
+
+      if (this.currentMessage?.attachments['@Collection']) {
+        
+        const filteredItemsData = this.currentMessage?.attachments['@Collection'].filter(item => item.IsInline === false);
+        console.log(filteredItemsData)
+        filteredItemsData.forEach((item) => {
+          const attachment = new CAttachment()
+          
+          attachment.polulate({
+            id: item.Hash,
+            filename: item.FileName,
+            size: item.EstimatedSize,
+            thumbnailUrl: item.ThumbnailUrl,
+            actions: item?.Actions
+          })
+
+          console.log(attachment)
+
+          attachments.push(attachment)
+        })
+      }
+
+      return attachments
     }
   },
 
