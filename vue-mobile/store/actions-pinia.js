@@ -7,6 +7,10 @@ import { FOLDER_TYPES } from '../enums'
 import { addMessageToCache, getMessageFromCache } from '../cache'
 
 export default {
+  changeDialogComponent(dialogComponent) {
+    console.log('changeDialogComponent store');
+    this.dialogComponent = dialogComponent
+  },
   parseAccounts(accountsData) {
     const parsedAccountsData = accountsUtils.parseAccounts(accountsData)
     // commit('setAccountList', parsedAccountsData.accountList)

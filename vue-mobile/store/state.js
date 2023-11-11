@@ -1,5 +1,6 @@
 export default function () {
   return {
+    dialogComponent: null,
     accountList: [],
     isUnifiedInbox: false,
     currentAccountId: 0,

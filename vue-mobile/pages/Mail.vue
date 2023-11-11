@@ -20,6 +20,8 @@
     <AppCreateButton @click="showCreateButtonsDialog" v-if="isShowCreateButtons">
       <ComposeIcon color="#fff" />
     </AppCreateButton>
+    
+    <DialogsList />
   </MainLayout>
 </template>
 
@@ -32,6 +34,8 @@ import AppCreateButton from 'src/components/common/AppCreateButton'
 
 import MailHeader from '../components/header/MailHeader'
 import DrawerContent from '../components/DrawerContent'
+import DialogsList from '../components/DialogsList'
+
 import ComposeIcon from '../components/icons/ComposeIcon'
 
 export default {
@@ -42,6 +46,7 @@ export default {
     AppCreateButton,
     MailHeader,
     DrawerContent,
+    DialogsList,
     ComposeIcon,
   },
 
