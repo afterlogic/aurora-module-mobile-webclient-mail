@@ -1,25 +1,31 @@
 <template>
   <q-scroll-area :thumb-style="{width: '5px'}" class="full-height contacts__list">
     <q-form class="q-px-md">      
-      <q-input v-model="fromInput" dense autocomplete="nope" :placeholder="$t('MAILWEBCLIENT.LABEL_FROM')" class="q-mb-xs contact__form-input" />
+      <!-- <q-input v-model="fromInput" dense autocomplete="nope" :placeholder="$t('MAILWEBCLIENT.LABEL_FROM')" class="q-mb-xs contact__form-input" /> -->
 
       <RecipientsInput 
         v-model="toInput"
         :getOptions="getOptions"
-        extraLink="Show CC"
+        :extraLink="$t('COREWEBCLIENT.LABEL_CC')"
         :extraLinkAction="showCC"
-        :showLink="isCC"
+        :showLink="!isCCShown"
         :label="$t('MAILWEBCLIENT.LABEL_TO')" 
       />
       <RecipientsInput
         v-model="ccInput"
         :getOptions="getOptions"
-        v-if="isCC"
-        extraLink="Show BCC"
+        v-if="isCCShown"
+        :extraLink="$t('COREWEBCLIENT.LABEL_BCC')"
         :extraLinkAction="showBCC"
-        :showLink="isBCC"
-        :label="$t('COREWEBCLIENT.LABEL_CC')" />
-      <RecipientsInput v-model="bccInput" :getOptions="getOptions" v-if="isBCC" :label="$t('COREWEBCLIENT.LABEL_BCC')" />
+        :showLink="!isBCCShown"
+        :label="$t('COREWEBCLIENT.LABEL_CC')"
+      />
+      <RecipientsInput
+        v-model="bccInput"
+        :getOptions="getOptions"
+        v-if="isBCCShown"
+        :label="$t('COREWEBCLIENT.LABEL_BCC')"
+      />
       
       <q-input v-model="subjectInput" dense autocomplete="nope" :placeholder="$t('MAILWEBCLIENT.LABEL_SUBJECT')" class="q-mb-xs contact__form-input">
         <template v-slot:append>
@@ -75,8 +81,8 @@ export default {
       subjectInput: '',
       bodyInput: '',
       options: [],
-      isCC: false,
-      isBCC: false,
+      isCCShown: false,
+      isBCCShown: false,
     }
   },
 
@@ -114,10 +120,10 @@ export default {
     },
 
     showCC() {
-      this.isCC = true
+      this.isCCShown = true
     },
     showBCC() {
-      this.isBCC = true
+      this.isBCCShown = true
     },
 
     async getOptions(searchPhrase, currentValue) {
