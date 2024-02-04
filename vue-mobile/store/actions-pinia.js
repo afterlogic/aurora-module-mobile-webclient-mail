@@ -265,30 +265,30 @@ export default {
       return
     }
 
-    const messageFromCache = getMessageFromCache(
+    this.isCurrentMessageLoading = true
+    const message = await this.asyncGetMessage(
       messageIdentifiers.accountId,
       messageIdentifiers.folder,
       messageIdentifiers.uid
     )
-    if (messageFromCache) {
-      this.currentMessage = messageFromCache
-    } else {
+    this.currentMessage = message
+    this.isCurrentMessageLoading = false
+  },
+
+  async asyncGetMessage(accountId, folder, uid) {
+    let message = getMessageFromCache(accountId, folder, uid)
+
+    if (!message) {
       const parameters = {
-        AccountID: messageIdentifiers.accountId,
-        Folder: messageIdentifiers.folder,
-        Uid: messageIdentifiers.uid,
+        AccountID: accountId,
+        Folder: folder,
+        Uid: uid,
         MessageBodyTruncationThreshold: settings.get('messageBodyTruncationThreshold'),
       }
-      this.isCurrentMessageLoading = true
-      const messageFromServer = await mailWebApi.getMessage(parameters)
-      this.currentMessage = messageFromServer
-      this.isCurrentMessageLoading = false
-      addMessageToCache(
-        messageIdentifiers.accountId,
-        messageIdentifiers.folder,
-        messageIdentifiers.uid,
-        messageFromServer
-      )
+      message = await mailWebApi.getMessage(parameters)
+      addMessageToCache(accountId, folder, uid, message)
     }
-  },
+
+    return message || null
+  }
 }

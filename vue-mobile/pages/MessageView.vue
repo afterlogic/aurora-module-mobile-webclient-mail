@@ -47,6 +47,7 @@
             v-for="attachment in attachmentList"
             :key="attachment.MimePartIndex"
             :attachment="attachment"
+            :hideRemove="true"
           />
         </div>
       </div>
@@ -115,9 +116,8 @@ export default {
       const attachments = [];
 
       if (this.currentMessage?.attachments['@Collection']) {
+        const filteredItemsData = this.currentMessage?.attachments['@Collection'].filter(item => item.IsInline === false)
         
-        const filteredItemsData = this.currentMessage?.attachments['@Collection'].filter(item => item.IsInline === false);
-        console.log(filteredItemsData)
         filteredItemsData.forEach((item) => {
           const attachment = new CAttachment()
           
@@ -128,8 +128,6 @@ export default {
             thumbnailUrl: item.ThumbnailUrl,
             actions: item?.Actions
           })
-
-          console.log(attachment)
 
           attachments.push(attachment)
         })

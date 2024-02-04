@@ -62,6 +62,9 @@ import AttachmentsUploader from '../components/AttachmentsUploader'
 import notification from 'src/utils/notification'
 
 import { getRecipientsString } from '../utils/messages'
+import types from 'src/utils/types'
+import SendingUtils from '../utils/sending'
+
 
 export default {
   name: 'MessageCompose',
@@ -91,24 +94,26 @@ export default {
       'currentAccountId',
       'getFolderByType',
       'currentFoldersDelimiter',
-      'currentFolder',
-      'currentMessageList',
-      'isCurrentMessageLoading',
-      'currentMessageIdentifiers',
-      'currentMessageHeaders',
-      'currentMessage',
+      'currentAccount',
+      // 'currentFolder',
+      // 'currentMessageList',
+      // 'isCurrentMessageLoading',
+      // 'currentMessageIdentifiers',
+      // 'currentMessageHeaders',
+      // 'currentMessage',
     ]),  
   },
 
   mounted() {
     this.emitInterface()
+    this.setMessageFromRoute()
   },
 
   methods: {
     ...mapActions(useContactsStore, ['asyncGetContactsSuggestions']),
     ...mapActions(useMailStore, [
       'changeCurrentMessageIdentifiers',
-      'asyncGetCurrentMessage',
+      'asyncGetMessage',
     ]),
 
     selectFiles() {
@@ -147,6 +152,66 @@ export default {
         'label': item.FullName ? (item.FullName + ' ' + item.ViewEmail) : item.ViewEmail,
         'value': item.FullName ? item.FullName + ' <' + item.ViewEmail + '>' : item.ViewEmail 
       } })
+    },
+
+    async setMessageFromRoute() {
+      const accountId = types.pInt(this.$route.params.accountId)
+      const folderPath = Array.isArray(this.$route.params.folderPath) ? this.$route.params.folderPath : []
+      const uid = types.pInt(this.$route.params.messageUid)
+      const replyType = types.pString(this.$route.params.replyType)
+      const folder = folderPath.join(this.currentFoldersDelimiter)
+
+      if (uid !== 0) {
+        const message = await this.asyncGetMessage(accountId, folder, uid)
+
+        if (message) {
+          this.populateReplyFields(message, replyType)
+        } else {
+          this.$router.back()
+        }
+      }
+    },
+    
+    populateReplyFields(message, replyType) {
+      const isReplyAll = replyType === 'reply-all'
+      const isForward = replyType === 'forward'
+      
+      this.subjectInput = SendingUtils.getReplySubject(message.subject, isForward)
+
+      this.bodyInput = isForward ? SendingUtils.getForwardMessageBody(message) : SendingUtils.getReplyMessageBody(message)
+
+      if (!isForward) {
+        if (message.from['@Count'] > 0) {
+          message.from['@Collection'].forEach(item => {
+            this.populateRecipientField(this.toInput, item)
+          })
+        }
+  
+        if (isReplyAll) {
+          const currentAccountEmail = this.currentAccount?.email
+  
+          if (message.cc['@Count'] > 0) {
+            this.isCCShown = true
+            message.cc['@Collection'].forEach(item => {
+              this.populateRecipientField(this.ccInput, item)
+            })
+          }
+          if (message.to['@Count'] > 0) {
+            message.to['@Collection'].forEach(item => {
+              if (item.Email !== currentAccountEmail) {
+                this.populateRecipientField(this.toInput, item)
+              }
+            })
+          }
+        }
+      }
+    },
+
+    populateRecipientField(field, sourceData) {
+      field.push({ 
+        'label': sourceData.DislpayName ? (sourceData.DislpayName + ' ' + sourceData.Email) : sourceData.Email,
+        'value': sourceData.DislpayName ? sourceData.DislpayName + ' <' + sourceData.Email + '>' : sourceData.Email 
+      })
     },
 
     /**

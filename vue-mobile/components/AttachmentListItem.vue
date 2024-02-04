@@ -16,14 +16,14 @@
       </q-item-label>
     </q-item-section>
     <q-item-section class="list-item__side">
-      <div v-if="viewLink">
-        <a :href="viewLink">View</a>
-      </div>
-      <div v-if="downloadLink">
-        <a :href="downloadLink"><DownloadIcon /></a>
-      </div>
-      <div>
-        <span @click="remove"><CancelCrossIcon /></span>
+      <div class="text-grey-8 q-gutter-xs row">
+        <a v-if="viewLink" :href="viewLink">
+          <q-btn color="black" flat round dense >View</q-btn>
+        </a>
+        <a v-if="downloadLink" :href="downloadLink">
+          <q-btn color="black" flat round dense ><DownloadIcon /></q-btn>
+        </a>
+        <q-btn v-if="!hideRemove" @click="remove" color="black" flat round dense ><CancelCrossIcon /></q-btn>
       </div>
     </q-item-section>
   </q-item>
@@ -38,17 +38,15 @@ import CancelCrossIcon from '/src/components/common/icons/CancelCrossIcon'
 
 export default {
   name: 'AttachmentListItem',
-
   components: {
     DownloadIcon,
     FileIcon,
     CancelCrossIcon,
   },
-
   props: {
     attachment: { type: Object, default: null },
+    hideRemove: { type: Boolean, default: false },
   },
-
   computed: {
     thumbnail() {
       return this.attachment?.thumbnailUrl ? (getApiHost() + this.attachment?.thumbnailUrl) : ''
@@ -63,7 +61,6 @@ export default {
       return this.attachment?.actions?.view ? (getApiHost() + this.attachment?.actions?.view.url) : ''
     },
   },
-  
   methods: {
     remove() {
       this.$emit('remove', this.attachment)

@@ -61,7 +61,7 @@ export default {
     },
 
     isComposeHeader() {
-      return this.$route.name === 'message-compose'
+      return ['message-compose', 'message-reply'].indexOf(this.$route.name) >= 0
     },
 
     isSelectHeader() {
