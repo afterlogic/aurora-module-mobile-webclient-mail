@@ -63,7 +63,7 @@ export default {
     extraLinkAction: { type: Function, default: () => {} },
   },
 
-  // emits: ['update:modelValue'],
+  emits: ['update:modelValue'],
 
   data() {
     return {

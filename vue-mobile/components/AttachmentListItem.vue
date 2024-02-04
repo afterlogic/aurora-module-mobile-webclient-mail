@@ -43,6 +43,7 @@ export default {
     FileIcon,
     CancelCrossIcon,
   },
+  emits: ['remove'],
   props: {
     attachment: { type: Object, default: null },
     hideRemove: { type: Boolean, default: false },

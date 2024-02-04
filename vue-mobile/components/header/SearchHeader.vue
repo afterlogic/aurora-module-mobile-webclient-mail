@@ -51,6 +51,8 @@ import AdvancedSearchDialog from '../dialogs/AdvancedSearchDialog'
 export default {
   name: 'SearchHeader',
 
+  emits: ['updateSearchText', 'closeSearch'],
+
   components: {
     AdvancedSearchDialog,
   },

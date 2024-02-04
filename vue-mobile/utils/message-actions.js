@@ -6,17 +6,7 @@ const isShowAction = (action, message) => {
   let result = true
   if (contact) {
     switch (action) {
-      case 'findInEmail':
-        break
-      case 'share':
-        if (contact.Storage !== 'personal') result = false
-        break
-      case 'unshare':
-        if (contact.Storage !== 'shared') result = false
-        break
-      case 'send':
-        break
-      case 'emailTo':
+      case 'delete':
         break
       // case 'delete':
       //   if (Array.isArray(contact)) {
@@ -60,6 +50,14 @@ export const messageActions = {
     // component: 'SendDialog',
     routeMethod: (currentRoute) => { return currentRoute.path + '/forward' },
   },
+  delete: {
+    name: 'delete',
+    displayName: 'Delete',
+    icon: 'DeleteIcon',
+    isShowAction: isShowAction,
+    // method: null,
+    component: 'DeleteMessageDialog',
+  },
   // send: {
   //   method: () => { notification.showReport('Comming soon') },
   //   name: 'send',
@@ -74,14 +72,6 @@ export const messageActions = {
   //   component: 'EditDialog',
   //   displayName: 'Edit',
   //   icon: 'EditIcon',
-  //   isShowAction: isShowAction,
-  // },
-  // delete: {
-  //   method: null,
-  //   name: 'delete',
-  //   component: 'DeleteContactDialog',
-  //   displayName: 'Delete',
-  //   icon: 'DeleteIcon',
   //   isShowAction: isShowAction,
   // },
   // removeFromGroup: {

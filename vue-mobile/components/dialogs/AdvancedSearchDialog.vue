@@ -50,6 +50,8 @@ export default {
     SearchDate,
   },
 
+  emits: ['close', 'search'],
+
   props: {
     defaultSearchText: { type: String, default: '' },
   },

@@ -85,4 +85,17 @@ export default {
       })
       .catch((error) => null)
   },
+
+  moveMessages: async (parameters) => {
+    return webApi
+      .sendRequest({
+        moduleName: 'Mail',
+        methodName: 'MoveMessages',
+        parameters,
+      })
+      .then((result) => {
+        return result
+      })
+      .catch((error) => null)
+  },
 }

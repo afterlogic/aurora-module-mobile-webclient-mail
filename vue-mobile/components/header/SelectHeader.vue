@@ -10,10 +10,10 @@
     
     <div class="col app-header__right">
       <ActionIcon
-          class="q-mr-md"
-          color="black"
-          icon="DeleteIcon"
-          @click="deleteItems"
+        class="q-mr-md"
+        color="black"
+        icon="DeleteIcon"
+        @click="onPerformAction(actions.delete)"
       />
     </div>
   </q-toolbar>
@@ -22,6 +22,8 @@
 <script>
 import {mapActions, mapGetters} from 'pinia'
 import { useMailStore } from '../../store/index-pinia'
+
+import { messageActions } from '../../utils/message-actions'
 
 import notification from 'src/utils/notification'
 import ActionIcon from '../common/ActionIcon'
@@ -40,16 +42,37 @@ export default {
     },
   },
 
+  data() {
+    return {
+      actions: messageActions
+    }
+  },
+
   methods: {
     ...mapActions(useMailStore, [
       'resetSelectedItems',
       'changeDialogComponent',
     ]),
     resetSelection() {
-      this.resetSelectedItems({ items: this.items })
+      // this.resetSelectedItems({ items: this.items })
     },
-    deleteItems() {
-      notification.showReport('Comming soon')
+    // deleteItems() {
+    //   notification.showReport('Comming soon')
+    // },
+
+    async onPerformAction(action) {
+      // console.log('onPerformAction')
+      if (action.routeMethod) {
+        this.$router.push(action.routeMethod(this.$route))
+      }
+      if (action.method) {
+        console.log('this.$router', this.$route.path)
+        const result = await action.method()
+        console.log('action result', result)
+      }
+      if (action.component) {
+        this.changeDialogComponent({ component: action.component })
+      }
     },
   },
 }

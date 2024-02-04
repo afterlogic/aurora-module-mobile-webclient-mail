@@ -23,6 +23,8 @@ import moment from 'moment'
 export default {
   name: 'SearchDate',
 
+  emits: ['setDate'],
+
   props: {
     label: {
       type: String,

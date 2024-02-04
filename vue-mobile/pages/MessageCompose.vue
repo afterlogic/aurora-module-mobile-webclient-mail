@@ -76,6 +76,8 @@ export default {
     AttachmentsUploader,
   },
 
+  emits: ['interface'],
+
   data() {
     return {
       toInput: [],

@@ -23,6 +23,8 @@ import eventBus from 'src/event-bus'
 export default {
   name: 'DefaultHeader',
 
+  emits: ['openSearch'],
+
   props: {
     folderName: {
       type: String,

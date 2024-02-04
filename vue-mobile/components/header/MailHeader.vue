@@ -31,6 +31,8 @@ import ComposeHeader from './ComposeHeader'
 export default {
   name: 'MailHeader',
 
+  emits: ['executeAction'],
+
   components: {
     DefaultHeader,
     SelectHeader,

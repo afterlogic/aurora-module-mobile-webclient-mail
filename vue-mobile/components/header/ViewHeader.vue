@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import ActionIcon from '../common/ActionIcon'
 import MoreIcon from 'src/components/common/icons/actions/MoreIcon'
 
 import { messageActions } from '../../utils/message-actions'
@@ -46,6 +47,7 @@ export default {
   name: 'ViewHeader',
 
   components: {
+    ActionIcon,
     MoreIcon,
   },
 
@@ -71,9 +73,7 @@ export default {
         this.$router.push(action.routeMethod(this.$route))
       }
       if (action.method) {
-        console.log('this.$router', this.$route.path)
         const result = await action.method()
-        console.log('action result', result)
       }
       if (action.component) {
         this.changeDialogComponent({ component: action.component })

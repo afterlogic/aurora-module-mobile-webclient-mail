@@ -4,7 +4,7 @@ import accountsUtils from '../utils/accounts'
 import mailWebApi from '../mail-web-api'
 import settings from '../settings'
 import { FOLDER_TYPES } from '../enums'
-import { addMessageToCache, getMessageFromCache } from '../cache'
+import { addMessageToCache, getMessageFromCache, deleteMessageFromCache } from '../cache'
 
 export default {
   changeDialogComponent(dialogComponent) {
@@ -290,5 +290,31 @@ export default {
     }
 
     return message || null
-  }
+  },
+
+  async asyncMoveMessages(params) {
+    const sUids = params?.uids ? params?.uids.join(',') : ''
+    const parameters = {
+      AccountID: this.currentAccountId,
+      Folder: params?.sourceFolder,
+      ToFolder: params?.destinationFolder,
+      Uids: sUids,
+    }
+
+    const result = await mailWebApi.moveMessages(parameters)
+
+    return result
+  },
+
+  removeMessagesFromList(messages) {
+    messages.forEach((message) => {
+      deleteMessageFromCache(message.AccountID, message.Folder, message.uid)
+
+      const itemIndex = this.currentMessageList.findIndex((item) => item.uid === message.uid)
+
+      if (itemIndex !== -1) {
+        this.currentMessageList.splice(itemIndex, 1)
+      }
+    })
+  },
 }

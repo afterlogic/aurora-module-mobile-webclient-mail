@@ -9,3 +9,8 @@ export function getMessageFromCache(accountId, folder, uid) {
   const key = JSON.stringify({ accountId, folder, uid })
   return messagesCache.get(key)
 }
+
+export function deleteMessageFromCache(accountId, folder, uid) {
+  const key = JSON.stringify({ accountId, folder, uid })
+  return messagesCache.delete(key)
+}

@@ -54,6 +54,8 @@ export default {
     SaveActionIcon,
   },
 
+  emits: ['executeAction'],
+
   props: {
     folderName: {
       type: String,

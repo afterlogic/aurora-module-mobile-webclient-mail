@@ -19,14 +19,16 @@ import _ from 'lodash'
 
 // import FileUploader from './dialogs/FileUploader'
 // import CreateFolderDialog from './dialogs/CreateFolderDialog'
+import DeleteMessageDialog from './dialogs/DeleteMessageDialog'
 
 export default {
   name: 'DialogsList',
 
-  // components: {
+  components: {
+    DeleteMessageDialog,
   //   FileUploader, 
   //   CreateFolderDialog,
-  // },
+  },
 
   data() {
     return {
