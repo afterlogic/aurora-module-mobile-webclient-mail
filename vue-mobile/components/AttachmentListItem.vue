@@ -17,11 +17,11 @@
     </q-item-section>
     <q-item-section class="list-item__side">
       <div class="text-grey-8 q-gutter-xs row">
-        <a v-if="viewLink" :href="viewLink">
-          <q-btn color="black" flat round dense >View</q-btn>
+        <a v-if="viewLink" :href="viewLink" target="_blank">
+          <q-btn flat no-caps color="primary">View</q-btn>
         </a>
-        <a v-if="downloadLink" :href="downloadLink">
-          <q-btn color="black" flat round dense ><DownloadIcon /></q-btn>
+        <a v-if="downloadLink" :href="downloadLink" target="_blank">
+          <q-btn flat><DownloadIcon :color="iconColor" /></q-btn>
         </a>
         <q-btn v-if="!hideRemove" @click="remove" color="black" flat round dense ><CancelCrossIcon /></q-btn>
       </div>
@@ -30,6 +30,9 @@
 </template>
 
 <script>
+import { colors } from 'quasar'
+const { getPaletteColor } = colors
+
 import { getApiHost } from 'src/api/helpers'
 import text from 'src/utils/text'
 import DownloadIcon from './icons/DownloadIcon'
@@ -47,6 +50,7 @@ export default {
   props: {
     attachment: { type: Object, default: null },
     hideRemove: { type: Boolean, default: false },
+    iconColor: { type: String, default: getPaletteColor('primary') },
   },
   computed: {
     thumbnail() {
