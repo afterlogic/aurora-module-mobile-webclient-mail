@@ -1,7 +1,7 @@
 <template>
   <q-toolbar class="app-header">
     <div class="col app-header__left">
-      <q-btn @click="resetSelection" icon="close" color="black" flat round dense />
+      <q-btn @click="resetSelectedItems" icon="close" color="black" flat round dense />
     </div>
 
     <div class="col app-header__title">
@@ -25,7 +25,6 @@ import { useMailStore } from '../../store/index-pinia'
 
 import { messageActions } from '../../utils/message-actions'
 
-import notification from 'src/utils/notification'
 import ActionIcon from '../common/ActionIcon'
 
 export default {
@@ -36,10 +35,7 @@ export default {
   },
 
   props: {
-    items: {
-      type: Array,
-      default: () => [],
-    },
+    items: { type: Array, default: () => [], },
   },
 
   data() {
@@ -53,13 +49,6 @@ export default {
       'resetSelectedItems',
       'changeDialogComponent',
     ]),
-    resetSelection() {
-      // this.resetSelectedItems({ items: this.items })
-    },
-    // deleteItems() {
-    //   notification.showReport('Comming soon')
-    // },
-
     async onPerformAction(action) {
       // console.log('onPerformAction')
       if (action.routeMethod) {
