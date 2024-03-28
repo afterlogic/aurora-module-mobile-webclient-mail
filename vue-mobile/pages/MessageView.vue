@@ -5,13 +5,13 @@
     </div>
     <div v-else-if="currentMessage">
       <div v-if="currentMessageHeaders" class="message-header">
-        <div class="message-header__recipients">
-          <div class="message-header__recipients-sender">{{ sender }}</div>
-          <div class="message-header__recipient" v-for="recipient in currentMessage?.to['@Collection']">{{ recipient?.Email }}</div>
-        </div>
-        <div class="message-header__date">{{ messageDate }}</div>
-        <div class="message-header__switcher" @click="toggleDetails">Show details</div>
-        
+        <div class="message-header__basic" v-show="!isDetailVisible">
+          <div class="message-header__recipients">
+            <div class="message-header__recipients-sender">{{ sender }}</div>
+            <div class="message-header__recipient" v-for="recipient in currentMessage?.to['@Collection']">{{ recipient?.Email }}</div>
+          </div>
+          <div class="message-header__date">{{ messageDate }}</div>
+        </div>     
         <div class="message-header__details" v-show="isDetailVisible">
           <div class="recipients-list">
             <div class="recipient-row">
@@ -20,7 +20,7 @@
                 <div v-for="recipient in currentMessage?.from['@Collection']">{{ recipient?.Email }}</div>
               </div>
             </div>
-            <div class="recipient-row">
+            <div class="recipient-row" v-if="currentMessage?.to['@Collection']?.length > 0">
               <div class="recipient-row__label">To:</div>
               <div class="recipient-row__value" v-for="recipient in currentMessage?.to['@Collection']">{{ recipient?.Email }}</div>
             </div>
@@ -35,6 +35,10 @@
           </div>
           <div class="message-header__date">{{ messageDate }}</div>
         </div>
+        <div class="message-header__switcher" @click="toggleDetails">
+          {{ isDetailVisible ? $t('COREWEBCLIENT.ACTION_HIDE_DETAILS') : $t('COREWEBCLIENT.ACTION_SHOW_DETAILS') }}
+        </div>
+
         <div class="message-flags">
           <div class="message-flags__flag-folder">{{ currentMessage?.folder }}</div>
           <AttachmentIcon class="message-flags__flag-starred" v-if="currentMessage?.isFlagged" />
@@ -195,7 +199,6 @@ export default {
 <style lang="scss" scoped>
 .message-header {
   font-size: 12px;
-  padding-top: 24px;
   
   &__subject {
     padding: 0px 16px;
@@ -218,6 +221,10 @@ export default {
   &__switcher {
     padding: 0px 16px;
     color: #469CF8;
+  }
+
+  &__basic {
+    padding-top: 24px;
   }
 
   &__details {
