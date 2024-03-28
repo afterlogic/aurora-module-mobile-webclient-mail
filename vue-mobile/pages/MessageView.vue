@@ -41,8 +41,8 @@
 
         <div class="message-flags">
           <div class="message-flags__flag-folder">{{ currentMessage?.folder }}</div>
-          <AttachmentIcon class="message-flags__flag-starred" v-if="currentMessage?.isFlagged" />
-          <AttachmentIcon class="message-flags__flag-attachment" v-if="currentMessage?.hasAttachments" />
+          <AttachmentIcon class="message-flags__flag-attachment" :color="primaryColor" v-if="currentMessage?.hasAttachments" />
+          <StarIcon class="message-flags__flag-starred" v-if="currentMessage?.isFlagged" :color="goldColor" :strokeColor="goldColor" />
         </div>
         <div class="message-header__subject">{{ currentMessageHeaders.subject }}</div>
         <div class="message-body" v-html="currentMessage.html"></div>
@@ -60,6 +60,9 @@
 </template>
 
 <script>
+import { colors } from 'quasar'
+const { getPaletteColor } = colors
+
 import { mapActions, mapGetters } from 'pinia'
 import { useMailStore } from '../store/index-pinia'
 
@@ -67,14 +70,21 @@ import addressUtils from 'src/utils/address'
 import dateUtils from 'src/utils/date'
 import types from 'src/utils/types'
 
+import StarIcon from '../components/icons/message-list/StarIcon'
 import AttachmentIcon from '../components/icons/message-list/AttachmentIcon'
 import AttachmentListItem from '../components/AttachmentListItem'
 import CAttachment from '../classes/CAttachment'
 
 export default {
   name: 'MessageView',
+  
+  props: {
+    primaryColor: { type: String, default: getPaletteColor('primary') },
+    goldColor: { type: String, default: '#febb0f' },
+  },
 
   components: {
+    StarIcon,
     AttachmentIcon,
     AttachmentListItem
   },
@@ -201,8 +211,10 @@ export default {
   font-size: 12px;
   
   &__subject {
-    padding: 0px 16px;
-    font-size: 16px;
+    font-size: 18px;
+    padding-bottom: 14px;
+    margin: 6px 16px 24px;
+    border-bottom: 1px solid #f6f6f6;
   }
   
   &__recipients {
@@ -265,6 +277,10 @@ export default {
   display: flex;
   margin-top: 24px;
   padding: 0 16px;
+
+  & > * {
+    margin-right: 16px;
+  }
 
   &__flag-folder {
     background-color: #B6B5B5;

@@ -32,14 +32,19 @@
       <q-item-label class="message__status">
         <RepliedIcon v-if="message.isAnswered" class="list-item__icon message__status-replied" />
         <ForwardedIcon v-if="message.isForwarded" color="#949496" class="list-item__icon message__status-forwarded" />
-        <q-icon v-if="message.isFlagged" name="star" class="color-flagged message__status-flagged" size="18px" />
-        <q-icon v-else name="star_border" color="primary" size="18px" />
+        <!-- <q-icon v-if="message.isFlagged" name="star" class="color-flagged message__status-flagged" size="18px" /> -->
+        <!-- <q-icon v-else name="star_border" color="primary" size="18px" /> -->
+        <StarIcon v-if="message.isFlagged" color="#febb0f" strokeColor="#febb0f" class="color-flagged message__status-flagged" />
+        <StarIcon v-else :strokeColor="primaryColor" />
       </q-item-label>
     </q-item-section>
   </AppItem>
 </template>
 
 <script>
+import { colors } from 'quasar'
+const { getPaletteColor } = colors
+
 import { mapGetters } from 'pinia'
 import { useMailStore } from '../../store/index-pinia'
 
@@ -48,6 +53,7 @@ import dateUtils from 'src/utils/date'
 
 import AppItem from 'src/components/common/AppItem'
 
+import StarIcon from '../icons/message-list/StarIcon'
 import AttachmentIcon from '../icons/message-list/AttachmentIcon'
 import RepliedIcon from '../icons/message-list/RepliedIcon'
 import ForwardedIcon from '../icons/message-list/ForwardedIcon'
@@ -58,10 +64,12 @@ export default {
   props: {
     message: { type: Object, default: null },
     selectItemHandler: { type: Function, default: null, require: true },
+    primaryColor: { type: String, default: getPaletteColor('primary') },
   },
 
   components: {
     AppItem,
+    StarIcon,
     AttachmentIcon,
     RepliedIcon,
     ForwardedIcon,
