@@ -306,6 +306,19 @@ export default {
     return result
   },
 
+  async asyncSetMessageFlagged(uid, flag) {
+    const parameters = {
+      AccountID: this.currentAccountId,
+      Folder: this.currentFolder?.fullName,
+      Uids: uid,
+      SetAction: flag,
+    }
+
+    const result = await mailWebApi.setMessageFlagged(parameters)
+
+    return result
+  },
+
   removeMessagesFromList(messages) {
     messages.forEach((message) => {
       deleteMessageFromCache(message.AccountID, message.Folder, message.uid)

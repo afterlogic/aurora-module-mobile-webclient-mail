@@ -98,4 +98,17 @@ export default {
       })
       .catch((error) => null)
   },
+
+  setMessageFlagged: async (parameters) => {
+    return webApi
+      .sendRequest({
+        moduleName: 'Mail',
+        methodName: 'SetMessageFlagged',
+        parameters,
+      })
+      .then((result) => {
+        return result
+      })
+      .catch((error) => null)
+  },
 }

@@ -32,10 +32,13 @@
       <q-item-label class="message__status">
         <RepliedIcon v-if="message.isAnswered" class="list-item__icon message__status-replied" />
         <ForwardedIcon v-if="message.isForwarded" color="#949496" class="list-item__icon message__status-forwarded" />
-        <!-- <q-icon v-if="message.isFlagged" name="star" class="color-flagged message__status-flagged" size="18px" /> -->
-        <!-- <q-icon v-else name="star_border" color="primary" size="18px" /> -->
-        <StarIcon v-if="message.isFlagged" color="#febb0f" strokeColor="#febb0f" class="color-flagged message__status-flagged" />
-        <StarIcon v-else :strokeColor="primaryColor" />
+        <StarIcon class="color-flagged message__status-flagged"
+          v-if="message.isFlagged"
+          :color="goldColor"
+          :strokeColor="goldColor"
+          @click="onStarredClick($event, false)"
+        />
+        <StarIcon v-else :strokeColor="primaryColor" @click="onStarredClick($event, true)" />
       </q-item-label>
     </q-item-section>
   </AppItem>
@@ -45,7 +48,7 @@
 import { colors } from 'quasar'
 const { getPaletteColor } = colors
 
-import { mapGetters } from 'pinia'
+import { mapGetters, mapActions } from 'pinia'
 import { useMailStore } from '../../store/index-pinia'
 
 import addressUtils from 'src/utils/address'
@@ -65,6 +68,7 @@ export default {
     message: { type: Object, default: null },
     selectItemHandler: { type: Function, default: null, require: true },
     primaryColor: { type: String, default: getPaletteColor('primary') },
+    goldColor: { type: String, default: '#febb0f' },
   },
 
   components: {
@@ -120,6 +124,10 @@ export default {
   },
 
   methods: {
+    ...mapActions(useMailStore, [
+      'asyncSetMessageFlagged',
+      'updateMessageOnList',
+    ]),
     onMessageClick() {
       if (this.isSelectMode) {
         this.selectItemHandler(this.message)
@@ -132,6 +140,17 @@ export default {
             messageUid: this.message.uid,
           },
         })
+      }
+    },
+    async onStarredClick(e, flag) {
+      e.stopPropagation()
+      const prevFlag = this.message.isFlagged
+      const uid = this.message.uid
+      
+      this.message.isFlagged = flag
+      const result = await this.asyncSetMessageFlagged(uid, flag)
+      if (!result) {
+        this.message.isFlagged = prevFlag
       }
     },
   },

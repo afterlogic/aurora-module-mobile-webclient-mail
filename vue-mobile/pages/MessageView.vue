@@ -42,7 +42,13 @@
         <div class="message-flags">
           <div class="message-flags__flag-folder">{{ currentMessage?.folder }}</div>
           <AttachmentIcon class="message-flags__flag-attachment" :color="primaryColor" v-if="currentMessage?.hasAttachments" />
-          <StarIcon class="message-flags__flag-starred" v-if="currentMessage?.isFlagged" :color="goldColor" :strokeColor="goldColor" />
+          <StarIcon class="message-flags__flag-starred"
+            v-if="currentMessage?.isFlagged"
+            :color="goldColor"
+            :strokeColor="goldColor"
+            @click="onStarredClick(false)"
+          />
+          <StarIcon v-else :strokeColor="primaryColor" @click="onStarredClick(true)" />
         </div>
         <div class="message-header__subject">{{ currentMessageHeaders.subject }}</div>
         <div class="message-body" v-html="currentMessage.html"></div>
@@ -183,7 +189,8 @@ export default {
   methods: {
     ...mapActions(useMailStore, [
       'changeCurrentMessageIdentifiers',
-      'asyncGetCurrentMessage'
+      'asyncGetCurrentMessage',
+      'asyncSetMessageFlagged',
     ]),
 
     setMessageFromRoute() {
@@ -201,6 +208,17 @@ export default {
 
     toggleDetails() {
       this.isDetailVisible = !this.isDetailVisible
+    },
+
+    async onStarredClick(flag) {
+      const prevFlag = this.currentMessage.isFlagged
+      const uid = this.currentMessage.uid
+
+      this.currentMessage.isFlagged = flag
+      const result = await this.asyncSetMessageFlagged(uid, flag)
+      if (!result) {
+        this.currentMessage.isFlagged = prevFlag
+      }
     },
   },
 }
