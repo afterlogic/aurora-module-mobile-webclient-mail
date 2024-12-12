@@ -33,7 +33,7 @@
 		<ul data-bind="template: {name: '%ModuleName%_FolderView', foreach: folderList().collection}"></ul>
 	</div>
 	<span class="volumer" data-bind="visible: -1 < quotaProc(), click: $parent.onVolumerClick">
-		<span class="volumer_conteiner" data-bind="customTooltip: bShowQuotaBarTextAsTooltip ? quotaDesc() : false">
+		<span class="volumer_container" data-bind="customTooltip: bShowQuotaBarTextAsTooltip ? quotaDesc() : false">
 			<span class="used" data-bind="style: {'width': '' + (-1 < quotaProc() ? quotaProc() : 0) + '%' }"></span>
 		</span>
 		<span data-bind="visible: !bShowQuotaBarTextAsTooltip, text: quotaDesc"></span>
