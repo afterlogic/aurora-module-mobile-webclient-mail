@@ -1,9 +1,12 @@
 <template>
   <div v-if="currentFilter" class="list__info">
-    currentFilter: {{ currentFilter }}
-  </div>
-  <div v-if="currentSearchText" class="list__info">
-    currentSearchText: {{ currentSearchText }}
+    {{ currentSearchText 
+      ? `${$t('FILESWEBCLIENT.LABEL_SEARCH_RESULTS')}: ${currentSearchText}`
+      : $t('MAILWEBCLIENT.MOBILE_INFO_UNREAD_MESSAGES')
+    }}
+    <div @click="clearUnreadMessage" style="color: #469CF8; margin-top:12px">
+      {{ $t('MAILWEBCLIENT.ACTION_CLEAR_FILTER') }}
+    </div>
   </div>
 
   <EmptyFolder v-if="isListEmpty" />
@@ -44,6 +47,7 @@ import { useMailStore } from '../store/index-pinia'
 import AppPullRefresh from 'src/components/common/AppPullRefresh'
 import MessageItem from '../components/message-list/MessageItem'
 import EmptyFolder from '../components/message-list/EmptyFolder'
+import eventBus from 'src/event-bus'
 
 export default {
   name: 'MessageList',
@@ -82,6 +86,15 @@ export default {
       'asyncGetMessages',
       'changeMessageListPage',
     ]),
+
+    clearUnreadMessage() {
+      this.$router.push({
+        name: 'message-list',
+        params: {},
+      });
+      eventBus.$emit('closeDrawer')
+    },
+
     async reloadList() {
       this.changeMessageListPage(1)
       await this.asyncGetMessages()
