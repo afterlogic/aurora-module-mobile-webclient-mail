@@ -4,7 +4,7 @@
       ? `${$t('FILESWEBCLIENT.LABEL_SEARCH_RESULTS')}: ${currentSearchText}`
       : $t('MAILWEBCLIENT.MOBILE_INFO_UNREAD_MESSAGES')
     }}
-    <div @click="clearUnreadMessage" style="color: #469CF8; margin-top:12px">
+    <div @click="clearUnreadMessage" class="list__button">
       {{ $t('MAILWEBCLIENT.ACTION_CLEAR_FILTER') }}
     </div>
   </div>

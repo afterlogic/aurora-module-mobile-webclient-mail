@@ -234,5 +234,10 @@ export default {
     color: #969494;
     padding: 16px 32px 32px 32px;
   }
+
+  &__button {
+      color: #469CF8;
+      margin-top: 12px;
+    }
 }
 </style>
