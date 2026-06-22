@@ -7,6 +7,7 @@ import Types from 'src/utils/types'
 
 import { FOLDER_TYPES } from '../enums'
 import { getRecipientsString } from './messages'
+import htmlForEditor from './html-for-editor'
 
 
 function getFullAddr(sourceData) {
@@ -37,59 +38,127 @@ function getReplySubject(sSubject, bForward) {
     return sReSubject
 }
 
-/**
- * @param {Object} oMessage
- * @param {number} iAccountId
- * @param {Object} oFetcherOrIdentity
- * @param {boolean} bPasteSignatureAnchor
- * 
- * @return {string}
- */
-function getReplyMessageBody(oMessage, iAccountId, oFetcherOrIdentity, bPasteSignatureAnchor)
-{
-	const
-		sReplyTitle = i18n.global.tc('MAILWEBCLIENT.TEXT_REPLY_MESSAGE', {
-			'DATE': DateUtils.getDate(oMessage.timeStampInUTC, true), //oMessage.oDateModel.getDate(),
-			'TIME': DateUtils.getTime(oMessage.timeStampInUTC, true), //oMessage.oDateModel.getTime(),
-			'SENDER': TextUtils.encodeHtml(getFullAddr(oMessage.from)),
-		}),
-		sReplyBody = '<br /><br />'
-            // + this.getSignatureText(iAccountId, oFetcherOrIdentity, bPasteSignatureAnchor)
-            + '<br /><br />'
-			+ '<div data-anchor="reply-title">' + sReplyTitle + '</div>'
-            + '<blockquote>' + oMessage.html /*oMessage.getConvertedHtml()*/ + '</blockquote>'
-	;
+function unwrapFontWrapper(html) {
+    let body = Types.pString(html)
+    const wrapperMatch = body.match(/<div[^>]*data-crea="font-wrapper"[^>]*>([\s\S]*?)<\/div>\s*$/i)
+    if (wrapperMatch) {
+        body = wrapperMatch[1].replace(/^<br>/i, '').replace(/<br>\s*$/i, '')
+    }
+    return body
+}
 
-	return sReplyBody;
+function getClearSignature(account) {
+    if (!account?.useSignature) {
+        return ''
+    }
+
+    let signature = Types.pString(account.signature)
+    if (signature && signature.indexOf('<') !== 0) {
+        signature = '<div>' + signature + '</div>'
+    }
+
+    return signature
+}
+
+function getSignatureText(account, withAnchor = true) {
+    const signature = getClearSignature(account)
+    if (!signature) {
+        return ''
+    }
+
+    return withAnchor
+        ? '<div data-anchor="signature">' + signature + '</div>'
+        : '<div>' + signature + '</div>'
+}
+
+function isComposeBodyEmpty(body) {
+    const normalized = Types.pString(body)
+        .replace(/<br\s*\/?>/gi, '')
+        .replace(/<\/?div[^>]*>/gi, '')
+        .replace(/<\/?p[^>]*>/gi, '')
+        .replace(/&nbsp;/gi, '')
+        .replace(/\s+/g, '')
+        .trim()
+
+    return normalized === ''
+}
+
+function composeBodyHasSignature(body) {
+    return Types.pString(body).includes('data-anchor="signature"')
+}
+
+function getDefaultComposeBody(account) {
+    const signature = getSignatureText(account)
+    if (!signature) {
+        return ''
+    }
+
+    return htmlForEditor.prepareHtmlForEditor('<br /><br />' + signature + '<br />', {
+        sourceHtml: Types.pString(account?.signature),
+    })
 }
 
 /**
  * @param {Object} oMessage
- * @param {number} iAccountId
- * @param {Object} oFetcherOrIdentity
- * 
+ * @param {Object} account
+ * @param {boolean} bPasteSignatureAnchor
+ *
  * @return {string}
  */
-function getForwardMessageBody(oMessage, iAccountId, oFetcherOrIdentity) {
-    const
-        sCcAddr = TextUtils.encodeHtml(getFullAddr(oMessage.cc)),
-        sCcPart = (sCcAddr !== '') ? i18n.global.tc('MAILWEBCLIENT.TEXT_FORWARD_MESSAGE_CCPART', { 'CCADDR': sCcAddr }) : '',
-        sForwardTitle = i18n.global.tc('MAILWEBCLIENT.TEXT_FORWARD_MESSAGE', {
-            'FROMADDR': TextUtils.encodeHtml(getFullAddr(oMessage.from)),
-            'TOADDR': TextUtils.encodeHtml(getFullAddr(oMessage.to)),
-            'CCPART': sCcPart,
-            'FULLDATE': DateUtils.getFullDate(oMessage.timeStampInUTC, true),//oMessage.oDateModel.getFullDate(),
-            'SUBJECT': TextUtils.encodeHtml(oMessage.subject)
-        }),
-        sForwardBody = '<br /><br />'
-            // + this.getSignatureText(iAccountId, oFetcherOrIdentity, true)
-            + '<br /><br />'
-            + '<div data-anchor="reply-title">' + sForwardTitle + '</div><br /><br />'
-            + oMessage.html //oMessage.getConvertedHtml()
-        ;
+function getReplyMessageBody(oMessage, account, bPasteSignatureAnchor = true) {
+    const quotedHtml = htmlForEditor.prepareHtmlForEditor(oMessage.html, {
+        attachments: oMessage.attachments,
+        foundCids: oMessage.foundedCIDs,
+    })
+    const signatureHtml = htmlForEditor.prepareHtmlForEditor(
+        getSignatureText(account, bPasteSignatureAnchor),
+        { sourceHtml: Types.pString(account?.signature) }
+    )
 
-    return sForwardBody;
-};
+    const sReplyTitle = i18n.global.tc('MAILWEBCLIENT.TEXT_REPLY_MESSAGE', {
+        'DATE': DateUtils.getDate(oMessage.timeStampInUTC, true),
+        'TIME': DateUtils.getTime(oMessage.timeStampInUTC, true),
+        'SENDER': TextUtils.encodeHtml(getFullAddr(oMessage.from)),
+    })
+
+    return '<br /><br />'
+        + signatureHtml
+        + '<br /><br />'
+        + '<div data-anchor="reply-title">' + sReplyTitle + '</div>'
+        + '<blockquote>' + quotedHtml + '</blockquote>'
+}
+
+/**
+ * @param {Object} oMessage
+ * @param {Object} account
+ *
+ * @return {string}
+ */
+function getForwardMessageBody(oMessage, account) {
+    const quotedHtml = htmlForEditor.prepareHtmlForEditor(oMessage.html, {
+        attachments: oMessage.attachments,
+        foundCids: oMessage.foundedCIDs,
+    })
+    const signatureHtml = htmlForEditor.prepareHtmlForEditor(getSignatureText(account, true), {
+        sourceHtml: Types.pString(account?.signature),
+    })
+
+    const sCcAddr = TextUtils.encodeHtml(getFullAddr(oMessage.cc))
+    const sCcPart = (sCcAddr !== '') ? i18n.global.tc('MAILWEBCLIENT.TEXT_FORWARD_MESSAGE_CCPART', { 'CCADDR': sCcAddr }) : ''
+    const sForwardTitle = i18n.global.tc('MAILWEBCLIENT.TEXT_FORWARD_MESSAGE', {
+        'FROMADDR': TextUtils.encodeHtml(getFullAddr(oMessage.from)),
+        'TOADDR': TextUtils.encodeHtml(getFullAddr(oMessage.to)),
+        'CCPART': sCcPart,
+        'FULLDATE': DateUtils.getFullDate(oMessage.timeStampInUTC, true),
+        'SUBJECT': TextUtils.encodeHtml(oMessage.subject),
+    })
+
+    return '<br /><br />'
+        + signatureHtml
+        + '<br /><br />'
+        + '<div data-anchor="reply-title">' + sForwardTitle + '</div><br /><br />'
+        + quotedHtml
+}
 
 function getDraftFolder(getFolderByType, accountId) {
     return getFolderByType(accountId, FOLDER_TYPES.DRAFTS)
@@ -191,6 +260,11 @@ function buildComposeParameters({
 
 export default {
     getReplySubject,
+    getClearSignature,
+    getSignatureText,
+    isComposeBodyEmpty,
+    composeBodyHasSignature,
+    getDefaultComposeBody,
     getReplyMessageBody,
     getForwardMessageBody,
     getDraftFolder,

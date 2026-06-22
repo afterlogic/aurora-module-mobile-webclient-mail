@@ -40,7 +40,16 @@
       <div style="display: flex; justify-content: space-between;">
         <span>{{ $t('MAILWEBCLIENT.LABEL_TEXT') }}</span>
       </div>
-      <q-editor v-model="bodyInput" dense flat content_class="message__body" min-height="10rem" />
+      <q-editor
+        v-if="shouldShowBodyEditor"
+        ref="messageBodyEditor"
+        v-model="bodyInput"
+        dense
+        flat
+        :toolbar="[]"
+        content_class="message__body"
+        min-height="10rem"
+      />
     </q-form>
   </q-scroll-area>
 </template>
@@ -64,6 +73,7 @@ import notification from 'src/utils/notification'
 
 import types from 'src/utils/types'
 import SendingUtils from '../utils/sending'
+import htmlForEditor from '../utils/html-for-editor'
 
 
 export default {
@@ -103,11 +113,52 @@ export default {
     isDraftFolderAvailable() {
       return !!this.draftFolder()
     },
+
+    isNewComposeRoute() {
+      return this.$route.name === 'message-compose'
+    },
+
+    shouldShowBodyEditor() {
+      if (!this.isNewComposeRoute) {
+        return true
+      }
+
+      const account = this.currentAccount
+      if (!account?.useSignature || !account?.signature) {
+        return true
+      }
+
+      return SendingUtils.composeBodyHasSignature(this.bodyInput)
+    },
+  },
+
+  watch: {
+    currentAccount: {
+      immediate: true,
+      handler(account) {
+        if (account && this.isNewComposeRoute) {
+          this.initNewComposeBody()
+        }
+      },
+    },
+    '$route.name'(routeName) {
+      if (routeName === 'message-compose' && this.currentAccount) {
+        this.initNewComposeBody()
+      }
+    },
+  },
+
+  created() {
+    this.initNewComposeBody()
   },
 
   async mounted() {
     this.emitInterface()
     await this.setMessageFromRoute()
+    if (this.isNewComposeRoute && !SendingUtils.composeBodyHasSignature(this.bodyInput)) {
+      this.initNewComposeBody()
+    }
+    this.patchComposeImages()
     this.commit()
     this.startAutosaveInterval()
   },
@@ -349,7 +400,49 @@ export default {
         } else {
           this.$router.back()
         }
+      } else {
+        this.applyDefaultComposeBody()
       }
+    },
+
+    initNewComposeBody() {
+      if (!this.isNewComposeRoute || SendingUtils.composeBodyHasSignature(this.bodyInput)) {
+        return
+      }
+
+      const body = SendingUtils.getDefaultComposeBody(this.currentAccount)
+      if (!body) {
+        return
+      }
+
+      this.setEditorHtml(body)
+    },
+
+    setEditorHtml(html) {
+      this.bodyInput = html
+
+      this.$nextTick(() => {
+        const editorEl = this.$refs.messageBodyEditor?.getContentEl?.()
+        if (editorEl && editorEl.innerHTML !== html) {
+          editorEl.innerHTML = html
+        }
+
+        this.patchComposeImages()
+      })
+    },
+
+    applyDefaultComposeBody() {
+      this.initNewComposeBody()
+    },
+
+    patchComposeImages(attachments = null) {
+      this.$nextTick(() => {
+        const editorContent = this.$el?.querySelector('.q-editor__content')
+        htmlForEditor.patchEditorImages(editorContent, {
+          attachments,
+          sourceHtml: this.currentAccount?.signature,
+        })
+      })
     },
 
     populateDraftFields(message) {
@@ -360,7 +453,13 @@ export default {
       if (wrapperMatch) {
         body = wrapperMatch[1].replace(/^<br>/i, '').replace(/<br>\s*$/i, '')
       }
-      this.bodyInput = body
+      const rawBody = body
+      this.bodyInput = htmlForEditor.prepareHtmlForEditor(body, {
+        attachments: message.attachments,
+        foundCids: message.foundedCIDs,
+        sourceHtml: rawBody,
+      })
+      this.patchComposeImages(message.attachments)
 
       this.populateRecipientsFromCollection(this.toInput, message.to)
 
@@ -389,7 +488,10 @@ export default {
       
       this.subjectInput = SendingUtils.getReplySubject(message.subject, isForward)
 
-      this.bodyInput = isForward ? SendingUtils.getForwardMessageBody(message) : SendingUtils.getReplyMessageBody(message)
+      this.bodyInput = isForward
+        ? SendingUtils.getForwardMessageBody(message, this.currentAccount)
+        : SendingUtils.getReplyMessageBody(message, this.currentAccount)
+      this.patchComposeImages(message.attachments)
 
       if (!isForward) {
         if (message.from['@Count'] > 0) {
@@ -455,3 +557,23 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.q-editor__content.message__body {
+  table {
+    max-width: 100%;
+    width: auto !important;
+  }
+
+  td,
+  th {
+    width: auto !important;
+  }
+
+  img {
+    max-width: 100%;
+    width: auto !important;
+    height: auto;
+  }
+}
+</style>

@@ -14,10 +14,17 @@ export default {
   },
   parseAccounts(accountsData) {
     const parsedAccountsData = accountsUtils.parseAccounts(accountsData)
-    // commit('setAccountList', parsedAccountsData.accountList)
-    // commit('setCurrentAccountId', parsedAccountsData.currentAccountId)
     this.accountList = parsedAccountsData.accountList
-    this.changeCurrentAccount(parsedAccountsData.currentAccountId)
+
+    if (this.accountList.length === 0) {
+      this.currentAccountId = 0
+      return
+    }
+
+    const hasCurrentAccount = this.accountList.some((account) => account.id === this.currentAccountId)
+    this.currentAccountId = hasCurrentAccount
+      ? this.currentAccountId
+      : parsedAccountsData.currentAccountId
   },
 
   showUnifiedInbox(isUnifiedInbox) {

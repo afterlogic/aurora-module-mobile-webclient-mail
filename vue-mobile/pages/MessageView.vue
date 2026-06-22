@@ -51,7 +51,7 @@
           <StarIcon v-else :strokeColor="primaryColor" @click="onStarredClick(true)" />
         </div>
         <div class="message-header__subject">{{ currentMessageHeaders.subject }}</div>
-        <div class="message-body" v-html="currentMessage.html"></div>
+        <div class="message-body" v-html="messageBodyHtml"></div>
         <div class="message-attachments">
           <AttachmentListItem
             v-for="attachment in attachmentList"
@@ -80,6 +80,7 @@ import StarIcon from '../components/icons/message-list/StarIcon'
 import AttachmentIcon from '../components/icons/message-list/AttachmentIcon'
 import AttachmentListItem from '../components/AttachmentListItem'
 import CAttachment from '../classes/CAttachment'
+import htmlForEditor from '../utils/html-for-editor'
 
 export default {
   name: 'MessageView',
@@ -121,6 +122,18 @@ export default {
         return ''
       }
       return dateUtils.getShortDate(this.currentMessage.timeStampInUTC, true)
+    },
+
+    messageBodyHtml() {
+      if (!this.currentMessage) {
+        return ''
+      }
+
+      return htmlForEditor.prepareHtmlForEditor(this.currentMessage.html, {
+        attachments: this.currentMessage.attachments,
+        foundCids: this.currentMessage.foundedCIDs,
+        sourceHtml: this.currentMessage.html,
+      })
     },
 
     attachmentList() {
@@ -280,6 +293,22 @@ export default {
   overflow-x: auto;
   overflow-y: visible;
   width: 100vw;
+
+  :deep(table) {
+    max-width: 100%;
+    width: auto !important;
+  }
+
+  :deep(td),
+  :deep(th) {
+    width: auto !important;
+  }
+
+  :deep(img) {
+    max-width: 100%;
+    width: auto !important;
+    height: auto;
+  }
 }
 
 .message-flags {

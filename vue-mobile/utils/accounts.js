@@ -10,7 +10,7 @@ function parseAccounts(accountsData) {
       },
       foldersOrderData = types.pString(accountData.FoldersOrder),
       foldersOrder = foldersOrderData ? JSON.parse(foldersOrderData) : [],
-      id = types.pInt(accountData.Id)
+      id = types.pInt(accountData.AccountID || accountData.Id)
     if (currentAccountId === 0) {
       currentAccountId = id
     }
@@ -26,7 +26,7 @@ function parseAccounts(accountsData) {
       signature: types.pString(accountData.Signature),
       unifiedMailboxLabelColor: types.pString(accountData.UnifiedMailboxLabelColor),
       unifiedMailboxLabelText: types.pString(accountData.UnifiedMailboxLabelText),
-      useSignature: types.pBool(accountData.UseSignature),
+      useSignature: !!accountData.UseSignature,
       useThreading: types.pBool(accountData.UseThreading),
       useToAuthorize: types.pBool(accountData.UseToAuthorize),
     }
