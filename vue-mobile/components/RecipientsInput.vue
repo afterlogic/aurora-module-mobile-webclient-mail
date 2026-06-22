@@ -2,6 +2,7 @@
   <div class="recipients-input">
     <span class="recipients-input__label">{{ label }}</span>
     <q-select
+      ref="selectRef"
       dense
       options-dense
       v-model="value"
@@ -20,6 +21,7 @@
       @filter="filterFn"
       @filter-abort="abortFilterFn"
       @new-value="createValue"
+      @add="onRecipientAdded"
     >
       <template v-slot:append v-if="showLink">
         <span style="font-size: 14px;" @click="extraLinkAction">{{ extraLink }}</span>
@@ -40,7 +42,11 @@
         </q-chip>
       </template>
       <template v-slot:option="scope">
-        <q-item v-bind="scope.itemProps">
+        <q-item
+          v-close-popup
+          v-bind="scope.itemProps"
+          v-on="scope.itemEvents"
+        >
           <q-item-section>
             <q-item-label class="recipients-input__option-label">{{ scope.opt.label }}</q-item-label>
           </q-item-section>
@@ -107,6 +113,18 @@ export default {
 
     abortFilterFn () {
       // console.log('delayed filter aborted')
+    },
+
+    onRecipientAdded() {
+      this.$nextTick(() => {
+        const select = this.$refs.selectRef
+        if (!select) {
+          return
+        }
+
+        select.updateInputValue('')
+        select.hidePopup()
+      })
     },
 
     createValue (val, done) {
