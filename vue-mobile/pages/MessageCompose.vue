@@ -1,6 +1,6 @@
 <template>
-  <q-scroll-area :thumb-style="{width: '5px'}" class="full-height contacts__list">
-    <q-form class="q-px-md">      
+  <q-scroll-area :thumb-style="{width: '5px'}" class="full-height contacts__list message-compose__scroll">
+    <q-form class="q-px-md message-compose__form">      
       <!-- <q-input v-model="fromInput" dense autocomplete="nope" :placeholder="$t('MAILWEBCLIENT.LABEL_FROM')" class="q-mb-xs contact__form-input" /> -->
 
       <RecipientsInput 
@@ -559,7 +559,36 @@ export default {
 </script>
 
 <style lang="scss">
+.message-compose__scroll {
+  .q-scrollarea__container {
+    overflow-x: hidden;
+  }
+
+  .q-scrollarea__content {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+.message-compose__form {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  box-sizing: border-box;
+
+  .q-editor {
+    max-width: 100%;
+    min-width: 0;
+  }
+}
+
 .q-editor__content.message__body {
+  max-width: 100%;
+  overflow-x: hidden;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+
   table {
     max-width: 100%;
     width: auto !important;
@@ -574,6 +603,11 @@ export default {
     max-width: 100%;
     width: auto !important;
     height: auto;
+  }
+
+  [data-anchor='signature'] {
+    max-width: 100%;
+    overflow: hidden;
   }
 }
 </style>
