@@ -1,51 +1,60 @@
 <template>
-  <q-select
-    dense
-    options-dense
-    v-model="value"
-    multiple
+  <div class="recipients-input">
+    <span class="recipients-input__label">{{ label }}</span>
+    <q-select
+      dense
+      options-dense
+      v-model="value"
+      multiple
+      class="recipients-input__field"
+      popup-content-class="recipients-input__popup"
 
-    :options="options"
-    hide-dropdown-icon
-    :behavior="$q.platform.is.ios === true ? 'dialog' : 'menu'"
-    :loading="true"
-    
-    use-input
-    input-debounce="100"
+      :options="options"
+      hide-dropdown-icon
+      :behavior="$q.platform.is.ios === true ? 'dialog' : 'menu'"
+      :loading="true"
+      
+      use-input
+      input-debounce="100"
 
-    @filter="filterFn"
-    @filter-abort="abortFilterFn"
-    @new-value="createValue"
-  >
-    <template v-slot:prepend>
-      <span style="font-size: 14px;">{{ label }}</span>
-    </template>
-    <template v-slot:append v-if="showLink">
-      <span style="font-size: 14px;" @click="extraLinkAction">{{ extraLink }}</span>
-    </template>
-    <template v-slot:loading />
-    <template v-slot:selected-item="scope">
-      <q-chip 
-        dense
-        rounded
-        removable
-        @remove="scope.removeAtIndex(scope.index)"
-        :tabindex="scope.tabindex"
-        color="#f5f5f5"
-        text-color="#000"
-        class="q-my-none q-ml-xs q-mr-none"
-      >
-        {{ scope.opt.label }}
-      </q-chip>
-    </template>
-    <template v-slot:no-option>
-      <q-item>
-        <q-item-section class="text-grey">
-          No contacts found
-        </q-item-section>
-      </q-item>
-    </template>
-  </q-select>
+      @filter="filterFn"
+      @filter-abort="abortFilterFn"
+      @new-value="createValue"
+    >
+      <template v-slot:append v-if="showLink">
+        <span style="font-size: 14px;" @click="extraLinkAction">{{ extraLink }}</span>
+      </template>
+      <template v-slot:loading />
+      <template v-slot:selected-item="scope">
+        <q-chip 
+          dense
+          rounded
+          removable
+          @remove="scope.removeAtIndex(scope.index)"
+          :tabindex="scope.tabindex"
+          color="#f5f5f5"
+          text-color="#000"
+          class="recipients-input__chip q-my-none q-ml-xs q-mr-none"
+        >
+          <span class="recipients-input__chip-label ellipsis">{{ scope.opt.label }}</span>
+        </q-chip>
+      </template>
+      <template v-slot:option="scope">
+        <q-item v-bind="scope.itemProps">
+          <q-item-section>
+            <q-item-label class="recipients-input__option-label">{{ scope.opt.label }}</q-item-label>
+          </q-item-section>
+        </q-item>
+      </template>
+      <template v-slot:no-option>
+        <q-item>
+          <q-item-section class="text-grey">
+            No contacts found
+          </q-item-section>
+        </q-item>
+      </template>
+    </q-select>
+  </div>
 </template>
 
 <script>
@@ -122,3 +131,99 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.recipients-input {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.recipients-input__label {
+  flex: 0 0 4.5rem;
+  width: 4.5rem;
+  font-size: 14px;
+  line-height: 40px;
+  padding-right: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recipients-input__field {
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+
+  :deep(.q-field__inner),
+  :deep(.q-field__control),
+  :deep(.q-field__control-container),
+  :deep(.q-field__native) {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  :deep(.q-field__control),
+  :deep(.q-field__control-container) {
+    overflow: hidden;
+  }
+
+  :deep(.q-field__native) {
+    flex-wrap: wrap;
+    overflow: hidden;
+  }
+
+  :deep(.q-field__input) {
+    min-width: 0 !important;
+    flex: 1 1 24px !important;
+    width: 0 !important;
+    max-width: 100%;
+  }
+
+  :deep(.q-field__append) {
+    flex-shrink: 0;
+  }
+}
+
+.recipients-input__chip {
+  flex: 0 1 auto;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+
+  :deep(.q-chip__content) {
+    min-width: 0;
+    overflow: hidden;
+  }
+}
+
+.recipients-input__chip-label {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.recipients-input__option-label {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+  white-space: normal;
+}
+</style>
+
+<style lang="scss">
+.recipients-input__popup {
+  overflow-x: hidden;
+
+  .q-item__section--main {
+    min-width: 0;
+  }
+}
+</style>
