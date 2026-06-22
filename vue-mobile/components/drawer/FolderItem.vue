@@ -7,8 +7,11 @@
     <q-item-section class="folder-name">
       {{ folder.name }}
     </q-item-section>
-    <q-item-section side v-if="folder.unseenCount" clickable @click.stop="showUnseenMessages">
+    <q-item-section side v-if="showUnseenCount" clickable @click.stop="showUnseenMessages">
       <div class="folder-counter">{{ folder.unseenCount }}</div>
+    </q-item-section>
+    <q-item-section side v-else-if="showTotalCount">
+      <div class="folder-counter folder-counter_total">{{ folder.count }}</div>
     </q-item-section>
   </q-item>
   <FolderItem v-for="subFolder in folder.subFolders" :key="subFolder.fullName" :folder="subFolder" :level="level + 1" />
@@ -19,6 +22,8 @@ import { mapState, mapGetters } from 'pinia'
 import { useMailStore } from '../../store/index-pinia'
 
 import eventBus from 'src/event-bus'
+
+import { FOLDER_TYPES } from '../../enums'
 
 import FolderIcon from '../FolderIcon'
 
@@ -45,6 +50,14 @@ export default {
 
     indent() {
       return { width: `${this.level * 16}px` }
+    },
+
+    showUnseenCount() {
+      return this.folder.unseenCount > 0 && this.folder.type !== FOLDER_TYPES.DRAFTS
+    },
+
+    showTotalCount() {
+      return this.folder.count > 0 && this.folder.type === FOLDER_TYPES.DRAFTS
     },
   },
 

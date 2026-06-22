@@ -1,16 +1,13 @@
 <template>
   <div class="column fit">
-  <div v-if="currentFilter" class="list__info">
-    {{ currentSearchText 
-      ? `${$t('FILESWEBCLIENT.LABEL_SEARCH_RESULTS')}: ${currentSearchText}`
-      : $t('MAILWEBCLIENT.MOBILE_INFO_UNREAD_MESSAGES')
-    }}
+  <div v-if="isUnseenFilter" class="list__info">
+    <span v-html="unseenFilterBannerText"></span>
     <div @click="clearUnreadMessage" class="list__button">
       {{ $t('MAILWEBCLIENT.ACTION_CLEAR_FILTER') }}
     </div>
   </div>
 
-  <EmptyFolder v-if="isListEmpty" />
+  <EmptyFolder v-if="isListEmpty && !isUnseenFilter" />
   
   <q-scroll-area id="messages-list-scroll" :thumb-style="{ width: '5px' }" class="messages__list col full-height">
     <AppPullRefresh :refresh-action="reloadList">
@@ -46,13 +43,14 @@
 </template>
 
 <script>
-import { mapState, mapActions, mapGetters } from 'pinia'
+import { mapState, mapActions } from 'pinia'
 import { useMailStore } from '../store/index-pinia'
 
 import AppPullRefresh from 'src/components/common/AppPullRefresh'
 import MessageItem from '../components/message-list/MessageItem'
 import EmptyFolder from '../components/message-list/EmptyFolder'
 import eventBus from 'src/event-bus'
+import TextUtils from 'src/utils/text'
 
 export default {
   name: 'MessageList',
@@ -70,12 +68,53 @@ export default {
   },
 
   computed: {
-    ...mapState(useMailStore, ['currentFolder', 'currentSearchText', 'currentFilter', 'currentMessageList', 'messageListPage', 'isMessageListLoading']),
+    ...mapState(useMailStore, [
+      'currentFolder',
+      'currentSearchText',
+      'currentFilter',
+      'currentMessageList',
+      'messageListPage',
+      'isMessageListLoading',
+      'isUnifiedInbox',
+    ]),
+    isUnseenFilter() {
+      return this.currentFilter === 'unseen'
+    },
     isListEmpty() {
       return this.currentMessageList.length == 0 && !this.isMessageListLoading
     },
     isListEndReached() {
       return this.currentMessageList.length === (this.currentFolder?.count ?? 0)
+    },
+    folderDisplayName() {
+      if (this.isUnifiedInbox) {
+        return this.$t('MAILWEBCLIENT.LABEL_FOLDER_ALL_INBOXES')
+      }
+      return this.currentFolder?.displayName || ''
+    },
+    searchStringForDescription() {
+      return TextUtils.encodeHtml(
+        (this.currentSearchText || '').replace(/(^|\s)folders:(all|sub)(\s|$)/, '')
+      )
+    },
+    unseenFilterBannerText() {
+      const folder = TextUtils.encodeHtml(this.folderDisplayName)
+      const hasSearch = this.currentSearchText !== ''
+
+      if (this.isListEmpty) {
+        return hasSearch
+          ? this.$t('MAILWEBCLIENT.INFO_NO_UNREAD_MESSAGES_FOUND')
+          : this.$t('MAILWEBCLIENT.INFO_NO_UNREAD_MESSAGES')
+      }
+
+      if (hasSearch) {
+        return this.$t('MAILWEBCLIENT.INFO_UNREAD_MESSAGES_SEARCH_RESULT', {
+          SEARCH: this.searchStringForDescription,
+          FOLDER: folder,
+        })
+      }
+
+      return this.$t('MAILWEBCLIENT.INFO_UNREAD_MESSAGES', { FOLDER: folder })
     },
   },
 
