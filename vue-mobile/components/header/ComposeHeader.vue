@@ -15,7 +15,7 @@
       <AppActionIconContainer @click="$emit('executeAction', 'sendMessage')" class="q-mr-md">
         <SendActionIcon />
       </AppActionIconContainer>
-      <div class="dropdown-more flex justify-center items-center">
+      <div v-if="showSaveButton" class="dropdown-more flex justify-center items-center">
         <q-btn-dropdown :menu-offset="[12, -41]" flat unelevated dense>
           <template v-slot:label>
             <AppActionIconContainer>
@@ -24,6 +24,7 @@
           </template>
           <q-list>
             <AppMoreActionContainer
+              v-if="showSaveButton"
               :actionLabel="$t('MAILWEBCLIENT.ACTION_SAVE')"
               @click="$emit('executeAction', 'saveMessage')"
             >
@@ -60,6 +61,10 @@ export default {
     folderName: {
       type: String,
       default: '',
+    },
+    showSaveButton: {
+      type: Boolean,
+      default: false,
     },
   },
 

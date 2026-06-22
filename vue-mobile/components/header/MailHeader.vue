@@ -4,6 +4,7 @@
     <ComposeHeader
       v-else-if="isComposeHeader"
       :folderName="folderName"
+      :showSaveButton="showSaveButton"
       @executeAction="(...args) => { $emit('executeAction', ...args) }"
     />
     <ViewHeader v-else-if="isViewHeader" :folderName="folderName" />
@@ -21,6 +22,8 @@
 <script>
 import { mapState, mapActions, mapGetters } from 'pinia'
 import { useMailStore } from '../../store/index-pinia'
+
+import { FOLDER_TYPES } from '../../enums'
 
 import DefaultHeader from './DefaultHeader'
 import SelectHeader from './SelectHeader'
@@ -49,8 +52,8 @@ export default {
   },
 
   computed: {
-    ...mapState(useMailStore, ['isUnifiedInbox', 'currentFolder', 'currentSearchText']),
-    ...mapGetters(useMailStore, ['selectedMessages']),
+    ...mapState(useMailStore, ['isUnifiedInbox', 'currentFolder', 'currentSearchText', 'currentAccountId']),
+    ...mapGetters(useMailStore, ['selectedMessages', 'getFolderByType']),
 
     folderName() {
       if (this.isUnifiedInbox) {
@@ -69,6 +72,10 @@ export default {
 
     isSelectHeader() {
       return this.selectedMessages.length > 0
+    },
+
+    showSaveButton() {
+      return !!this.getFolderByType(this.currentAccountId, FOLDER_TYPES.DRAFTS)
     },
   },
 

@@ -5,6 +5,7 @@ import mailWebApi from '../mail-web-api'
 import settings from '../settings'
 import { FOLDER_TYPES } from '../enums'
 import { addMessageToCache, getMessageFromCache, deleteMessageFromCache } from '../cache'
+import SendingUtils from '../utils/sending'
 
 export default {
   changeDialogComponent(dialogComponent) {
@@ -335,6 +336,74 @@ export default {
 
       if (itemIndex !== -1) {
         this.currentMessageList.splice(itemIndex, 1)
+      }
+    })
+  },
+
+  isDraftsFolderCurrent(accountId, draftFolderFullName) {
+    return (
+      this.currentFolder &&
+      this.currentFolder.accountId === accountId &&
+      this.currentFolder.fullName === draftFolderFullName
+    )
+  },
+
+  removeOldDraftFromList(accountId, draftFolderFullName, oldDraftUid) {
+    const parsedOldDraftUid = parseInt(oldDraftUid, 10)
+
+    if (!parsedOldDraftUid) {
+      return
+    }
+
+    deleteMessageFromCache(accountId, draftFolderFullName, parsedOldDraftUid)
+
+    const itemIndex = this.currentMessageList.findIndex(
+      (item) =>
+        item.accountId === accountId &&
+        item.folder === draftFolderFullName &&
+        item.uid === parsedOldDraftUid
+    )
+
+    if (itemIndex !== -1) {
+      this.currentMessageList.splice(itemIndex, 1)
+    }
+  },
+
+  async refreshAfterDraftSave({ accountId, draftFolderFullName, oldDraftUid }) {
+    this.removeOldDraftFromList(accountId, draftFolderFullName, oldDraftUid)
+
+    await this.asyncGetRelevantFoldersInformation([draftFolderFullName])
+
+    if (this.isDraftsFolderCurrent(accountId, draftFolderFullName)) {
+      this.changeMessageListPage(1)
+      await this.asyncGetMessages()
+    }
+  },
+
+  saveDraftOnNavigateBack(parameters) {
+    if (!SendingUtils.hasSaveableContent(parameters)) {
+      return
+    }
+
+    const accountId = parameters.AccountID
+    const draftFolderFullName = parameters.DraftFolder
+    const oldDraftUid = parameters.DraftUid
+    const isDraftsFolderCurrent = this.isDraftsFolderCurrent(accountId, draftFolderFullName)
+
+    if (isDraftsFolderCurrent) {
+      this.resetMessageList()
+      this.changeMessageListPage(1)
+      this.isMessageListLoading = true
+    }
+
+    mailWebApi.saveMessage(parameters).then(async (result) => {
+      if (result?.NewUid) {
+        this.removeOldDraftFromList(accountId, draftFolderFullName, oldDraftUid)
+        await this.asyncGetRelevantFoldersInformation([draftFolderFullName])
+      }
+
+      if (isDraftsFolderCurrent) {
+        await this.asyncGetMessages()
       }
     })
   },

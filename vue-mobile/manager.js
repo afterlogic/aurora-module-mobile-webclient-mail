@@ -51,7 +51,7 @@ export default {
           },
           {
             name: 'message-reply',
-            path: ':accountId(\\d+)/:folderPath*/:messageUid(\\d+)/:replyType(reply|reply-all|forward)',
+            path: ':accountId(\\d+)/:folderPath*/:messageUid(\\d+)/:replyType(reply|reply-all|forward|draft)',
             component: () => import('./pages/MessageCompose'),
             strict: true,
           },

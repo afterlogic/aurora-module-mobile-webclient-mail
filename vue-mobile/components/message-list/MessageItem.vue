@@ -51,6 +51,8 @@ const { getPaletteColor } = colors
 import { mapState, mapGetters, mapActions } from 'pinia'
 import { useMailStore } from '../../store/index-pinia'
 
+import { FOLDER_TYPES } from '../../enums'
+
 import addressUtils from 'src/utils/address'
 import dateUtils from 'src/utils/date'
 
@@ -81,7 +83,7 @@ export default {
 
   computed: {
     ...mapState(useMailStore, ['isUnifiedInbox']),
-    ...mapGetters(useMailStore, ['isCurrentSearchInMultiFolders', 'getAccount', 'getFoldersDelimiter', 'getFolderDisplayName', 'isSelectMode']),
+    ...mapGetters(useMailStore, ['isCurrentSearchInMultiFolders', 'getAccount', 'getFoldersDelimiter', 'getFolderDisplayName', 'isSelectMode', 'getFolderByType']),
 
     recipients() {
       return addressUtils.getDisplayNamesFromMailsoAddresses(this.message.from).join(', ')
@@ -126,14 +128,29 @@ export default {
       if (this.isSelectMode) {
         this.selectItemHandler(this.message)
       } else {
-        this.$router.push({
-          name: 'message-view',
-          params: {
-            accountId: this.message.accountId,
-            folderPath: this.message.folder.split(this.getFoldersDelimiter(this.message.accountId)),
-            messageUid: this.message.uid,
-          },
-        })
+        const draftsFolder = this.getFolderByType(this.message.accountId, FOLDER_TYPES.DRAFTS)
+        const folderPath = this.message.folder.split(this.getFoldersDelimiter(this.message.accountId))
+
+        if (draftsFolder && this.message.folder === draftsFolder.fullName) {
+          this.$router.push({
+            name: 'message-reply',
+            params: {
+              accountId: this.message.accountId,
+              folderPath,
+              messageUid: this.message.uid,
+              replyType: 'draft',
+            },
+          })
+        } else {
+          this.$router.push({
+            name: 'message-view',
+            params: {
+              accountId: this.message.accountId,
+              folderPath,
+              messageUid: this.message.uid,
+            },
+          })
+        }
       }
     },
     async onStarredClick(e, flag) {

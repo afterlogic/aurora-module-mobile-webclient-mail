@@ -14,8 +14,11 @@
   
   <q-scroll-area id="messages-list-scroll" :thumb-style="{ width: '5px' }" class="messages__list col full-height">
     <AppPullRefresh :refresh-action="reloadList">
+      <div class="messages__loader messages__loader_initial" v-if="isMessageListLoading && currentMessageList.length === 0">
+        <q-spinner-dots color="primary" size="40px" />
+      </div>
       <q-virtual-scroll
-        v-if="!isListEmpty"
+        v-else-if="currentMessageList.length > 0"
         ref="messagesVirtualScroll"
         :virtual-scroll-item-size="64"
         :items="currentMessageList"

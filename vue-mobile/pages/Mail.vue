@@ -99,7 +99,7 @@ export default {
           if (filter !== this.currentFilter) {
             this.$router.replace({ name: 'message-list-unified' })
           }
-        } else if (routeName !== 'message-view' && routeName !== 'message-compose') {
+        } else if (['message-view', 'message-compose', 'message-reply'].indexOf(routeName) < 0) {
           this.showUnifiedInbox(false)
 
           if (this.accountIdFromRoute !== this.currentAccountId) {
@@ -216,6 +216,12 @@ export default {
   &__loader {
     display: flex;
     justify-content: center;
+    align-items: center;
+    width: 100%;
+
+    &_initial {
+      min-height: 50vh;
+    }
   }
 }
 .list {

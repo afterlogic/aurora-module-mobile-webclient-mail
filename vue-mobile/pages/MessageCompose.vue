@@ -18,13 +18,13 @@
         :extraLink="$t('COREWEBCLIENT.LABEL_BCC')"
         :extraLinkAction="showBCC"
         :showLink="!isBCCShown"
-        :label="$t('COREWEBCLIENT.LABEL_CC')"
+        :label="$t('MAILWEBCLIENT.LABEL_CC')"
       />
       <RecipientsInput
         v-model="bccInput"
         :getOptions="getOptions"
         v-if="isBCCShown"
-        :label="$t('COREWEBCLIENT.LABEL_BCC')"
+        :label="$t('MAILWEBCLIENT.LABEL_BCC')"
       />
       
       <q-input v-model="subjectInput" dense autocomplete="nope" :placeholder="$t('MAILWEBCLIENT.LABEL_SUBJECT')" class="q-mb-xs contact__form-input">
@@ -52,6 +52,7 @@ import { useContactsStore } from '../../../ContactsMobileWebclient/vue-mobile/st
 
 import { FOLDER_TYPES } from '../enums'
 import mailWebApi from '../mail-web-api'
+import settings from '../settings'
 
 import AppActionIconContainer from 'src/components/common/AppActionIconContainer'
 import AttachmentIcon from '../components/icons/message-list/AttachmentIcon'
@@ -61,7 +62,6 @@ import AttachmentsUploader from '../components/AttachmentsUploader'
 
 import notification from 'src/utils/notification'
 
-import { getRecipientsString } from '../utils/messages'
 import types from 'src/utils/types'
 import SendingUtils from '../utils/sending'
 
@@ -88,17 +88,42 @@ export default {
       options: [],
       isCCShown: false,
       isBCCShown: false,
+      draftUid: '',
+      isSaving: false,
+      disableAutosave: false,
+      initialSnapshot: null,
+      autosaveInterval: null,
     }
   },
 
   computed: {
     ...mapState(useMailStore, ['currentAccountId', 'currentFolder', 'currentMessageList', 'isCurrentMessageLoading', 'currentMessageIdentifiers', 'currentMessageHeaders', 'currentMessage']),
-    ...mapGetters(useMailStore, ['getFolderByType', 'currentFoldersDelimiter', 'currentAccount']),  
+    ...mapGetters(useMailStore, ['getFolderByType', 'currentFoldersDelimiter', 'currentAccount']),
+
+    isDraftFolderAvailable() {
+      return !!this.draftFolder()
+    },
   },
 
-  mounted() {
+  async mounted() {
     this.emitInterface()
-    this.setMessageFromRoute()
+    await this.setMessageFromRoute()
+    this.commit()
+    this.startAutosaveInterval()
+  },
+
+  beforeUnmount() {
+    this.stopAutosaveInterval()
+  },
+
+  beforeRouteLeave(to, from, next) {
+    const needsSave = this.isDraftFolderAvailable && this.isChanged() && this.hasSaveableContent()
+
+    next()
+
+    if (needsSave) {
+      this.saveDraftOnNavigateBack(this.buildComposeParameters())
+    }
   },
 
   methods: {
@@ -106,14 +131,172 @@ export default {
     ...mapActions(useMailStore, [
       'changeCurrentMessageIdentifiers',
       'asyncGetMessage',
+      'refreshAfterDraftSave',
+      'saveDraftOnNavigateBack',
     ]),
+
+    draftFolder() {
+      return SendingUtils.getDraftFolder(this.getFolderByType, this.currentAccountId)
+    },
+
+    hasSaveableContent() {
+      return SendingUtils.hasSaveableContent({
+        toInput: this.toInput,
+        ccInput: this.ccInput,
+        bccInput: this.bccInput,
+        subjectInput: this.subjectInput,
+        bodyInput: this.bodyInput,
+      })
+    },
+
+    takeSnapshot() {
+      const attachments = this.getUploadedAttachments().map((item) => ({
+        tempName: item.tempName,
+        filename: item.filename,
+      }))
+      return JSON.stringify({
+        to: this.toInput,
+        cc: this.ccInput,
+        bcc: this.bccInput,
+        subject: this.subjectInput,
+        body: this.bodyInput,
+        isCCShown: this.isCCShown,
+        isBCCShown: this.isBCCShown,
+        attachments,
+      })
+    },
+
+    isChanged() {
+      if (!this.initialSnapshot) {
+        return false
+      }
+      return this.takeSnapshot() !== this.initialSnapshot
+    },
+
+    commit() {
+      this.initialSnapshot = this.takeSnapshot()
+    },
+
+    startAutosaveInterval() {
+      this.stopAutosaveInterval()
+
+      if (
+        !settings.get('allowAutosaveInDrafts') ||
+        !settings.get('autoSaveIntervalSeconds') ||
+        !this.isDraftFolderAvailable ||
+        this.disableAutosave
+      ) {
+        return
+      }
+
+      this.autosaveInterval = setInterval(
+        () => this.executeSave({ autosave: true }),
+        settings.get('autoSaveIntervalSeconds') * 1000
+      )
+    },
+
+    stopAutosaveInterval() {
+      if (this.autosaveInterval) {
+        clearInterval(this.autosaveInterval)
+        this.autosaveInterval = null
+      }
+    },
+
+    buildComposeParameters() {
+      const draftFolder = this.draftFolder()
+      const sentFolder = this.getFolderByType(this.currentAccountId, FOLDER_TYPES.SENT)
+
+      return SendingUtils.buildComposeParameters({
+        accountId: this.currentAccountId,
+        toInput: this.toInput,
+        ccInput: this.ccInput,
+        bccInput: this.bccInput,
+        subjectInput: this.subjectInput,
+        bodyInput: this.bodyInput,
+        attachments: this.getUploadedAttachments(),
+        draftUid: this.draftUid,
+        draftFolder: draftFolder ? draftFolder.fullName : '',
+        sentFolder: sentFolder ? sentFolder.fullName : '',
+      })
+    },
+
+    async executeSave({ autosave = false, refreshList = !autosave } = {}) {
+      if (!this.isDraftFolderAvailable) {
+        if (!autosave) {
+          notification.showReport(this.$t('MAILWEBCLIENT.ERROR_MESSAGE_SAVING'))
+        }
+        return false
+      }
+
+      if (autosave && !this.isChanged()) {
+        return true
+      }
+
+      if (!this.hasSaveableContent()) {
+        if (!autosave) {
+          notification.showReport(this.$t('MAILWEBCLIENT.WARNING_EMPTY_DRAFT'))
+        }
+        return false
+      }
+
+      if (this.isSaving) {
+        return false
+      }
+
+      this.isSaving = true
+
+      if (!autosave) {
+        notification.showLoading(this.$t('MAILWEBCLIENT.INFO_SAVING'))
+      }
+
+      const parameters = this.buildComposeParameters()
+      const oldDraftUid = parameters.DraftUid
+      const draftFolderFullName = parameters.DraftFolder
+      const result = await mailWebApi.saveMessage(parameters)
+
+      if (!autosave) {
+        notification.hideLoading()
+      }
+
+      this.isSaving = false
+
+      if (!result) {
+        if (!autosave) {
+          notification.showReport(this.$t('MAILWEBCLIENT.ERROR_MESSAGE_SAVING'))
+        }
+        return false
+      }
+
+      if (result.NewUid) {
+        this.draftUid = types.pString(result.NewUid)
+        this.commit()
+
+        if (refreshList) {
+          await this.refreshAfterDraftSave({
+            accountId: this.currentAccountId,
+            draftFolderFullName,
+            oldDraftUid,
+          })
+        }
+      } else if (autosave) {
+        this.disableAutosave = true
+        this.stopAutosaveInterval()
+        return false
+      }
+
+      if (!autosave) {
+        notification.showReport(this.$t('MAILWEBCLIENT.REPORT_MESSAGE_SAVED'))
+      }
+
+      return true
+    },
 
     selectFiles() {
       this.$refs.attachmentsUploader.selectFiles()
     },
 
     getUploadedAttachments() {
-      return this.$refs.attachmentsUploader.getAttachments()
+      return this.$refs.attachmentsUploader ? this.$refs.attachmentsUploader.getAttachments() : []
     },
 
     showCC() {
@@ -124,11 +307,6 @@ export default {
     },
 
     async getOptions(searchPhrase, currentValue) {
-      // const allRecipients = [...this.toInput, ...this.ccInput, ...this.bccInput]
-      // let filtered = emails.filter(v => !allRecipients.find(r => r.value === v.value))
-      // const needle = searchPhrase.toLowerCase()
-      // return filtered.filter(v => v.value.toLowerCase().indexOf(needle) > -1)
-
       const parameters = {
         Search: searchPhrase.toLowerCase(),
         Storage: 'all',
@@ -157,10 +335,51 @@ export default {
         const message = await this.asyncGetMessage(accountId, folder, uid)
 
         if (message) {
-          this.populateReplyFields(message, replyType)
+          const draftsFolder = this.draftFolder()
+          const isDraftMessage =
+            replyType === 'draft' ||
+            (draftsFolder && folder === draftsFolder.fullName)
+
+          if (isDraftMessage) {
+            this.draftUid = types.pString(uid)
+            this.populateDraftFields(message)
+          } else {
+            this.populateReplyFields(message, replyType)
+          }
         } else {
           this.$router.back()
         }
+      }
+    },
+
+    populateDraftFields(message) {
+      this.subjectInput = message.subject
+
+      let body = message.html || message.plain || ''
+      const wrapperMatch = body.match(/<div[^>]*data-crea="font-wrapper"[^>]*>([\s\S]*?)<\/div>\s*$/i)
+      if (wrapperMatch) {
+        body = wrapperMatch[1].replace(/^<br>/i, '').replace(/<br>\s*$/i, '')
+      }
+      this.bodyInput = body
+
+      this.populateRecipientsFromCollection(this.toInput, message.to)
+
+      if (message.cc?.['@Count'] > 0) {
+        this.isCCShown = true
+        this.populateRecipientsFromCollection(this.ccInput, message.cc)
+      }
+
+      if (message.bcc?.['@Count'] > 0) {
+        this.isBCCShown = true
+        this.populateRecipientsFromCollection(this.bccInput, message.bcc)
+      }
+    },
+
+    populateRecipientsFromCollection(field, collection) {
+      if (collection?.['@Collection']) {
+        collection['@Collection'].forEach((item) => {
+          this.populateRecipientField(field, item)
+        })
       }
     },
     
@@ -212,34 +431,14 @@ export default {
     emitInterface() {
       this.$emit('interface', {
         sendMessage: async () => {
-          console.log('interface', 'sendMessage')
-          const attachmentsParam = {}
-          this.getUploadedAttachments().forEach(item => {            
-            const data = { sFileName: item.filename, sCID: '', isInline: '0', isLinked: '0', sContentLocation: '' }
-            attachmentsParam[item.tempName] = [ data.sFileName, data.sCID, data.isInline, data.isLinked, data.sContentLocation, ]
-          })
+          const parameters = this.buildComposeParameters()
+          const draftFolder = this.draftFolder()
 
-          const sentFolder = this.getFolderByType(this.currentAccountId, FOLDER_TYPES.SENT)
-          const parameters = {
-            AccountID: this.currentAccountId,
-            // IdentityID: 1,
-            // AliasID: '',
-            // FetcherID: '',
-            DraftInfo: [],
-            DraftUid: '',
-            To: getRecipientsString(this.toInput),
-            Cc: getRecipientsString(this.ccInput),
-            Bcc: getRecipientsString(this.bccInput),
-            Subject: this.subjectInput,
-            Text: `<div data-crea="font-wrapper" style="font-family: Tahoma, sans-serif; font-size: 16px; direction: ltr"><br>${this.bodyInput}<br></div>`,
-            IsHtml: true,
-            Importance: 3,
-            SendReadingConfirmation: false,
-            Attachments: attachmentsParam,
-            InReplyTo: '',
-            References: '',
-            SentFolder: sentFolder ? sentFolder.fullName : '',
+          if (this.draftUid && draftFolder) {
+            parameters.DraftUid = this.draftUid
+            parameters.DraftFolder = draftFolder.fullName
           }
+
           notification.showLoading(this.$t('COREWEBCLIENT.INFO_SENDING'))
           const res = await mailWebApi.sendMessage(parameters)
           notification.hideLoading()
@@ -249,7 +448,7 @@ export default {
           this.$router.back()
         },
         saveMessage: () => {
-          notification.showReport(this.$t('Comming soon'))
+          this.executeSave({ autosave: false })
         },
       })
     },
