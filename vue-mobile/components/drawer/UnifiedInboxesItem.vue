@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'pinia'
+import { mapState, mapGetters } from 'pinia'
 import { useMailStore } from '../../store/index-pinia'
 
 import eventBus from 'src/event-bus'
@@ -43,7 +43,8 @@ export default {
   },
 
   computed: {
-    ...mapGetters(useMailStore, ['currentAccountId', 'isUnifiedInbox', 'unifiedInboxUnseenCount']),
+    ...mapState(useMailStore, ['currentAccountId', 'isUnifiedInbox']),
+    ...mapGetters(useMailStore, ['unifiedInboxUnseenCount']),
 
     indent() {
       return { width: `${this.level * 16}px` }

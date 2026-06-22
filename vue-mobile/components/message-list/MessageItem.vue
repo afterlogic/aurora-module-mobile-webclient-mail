@@ -48,7 +48,7 @@
 import { colors } from 'quasar'
 const { getPaletteColor } = colors
 
-import { mapGetters, mapActions } from 'pinia'
+import { mapState, mapGetters, mapActions } from 'pinia'
 import { useMailStore } from '../../store/index-pinia'
 
 import addressUtils from 'src/utils/address'
@@ -80,14 +80,8 @@ export default {
   },
 
   computed: {
-    ...mapGetters(useMailStore, [
-      'isUnifiedInbox',
-      'isCurrentSearchInMultiFolders',
-      'getAccount',
-      'getFoldersDelimiter',
-      'getFolderDisplayName',
-      'isSelectMode',
-    ]),
+    ...mapState(useMailStore, ['isUnifiedInbox']),
+    ...mapGetters(useMailStore, ['isCurrentSearchInMultiFolders', 'getAccount', 'getFoldersDelimiter', 'getFolderDisplayName', 'isSelectMode']),
 
     recipients() {
       return addressUtils.getDisplayNamesFromMailsoAddresses(this.message.from).join(', ')

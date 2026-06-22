@@ -1,4 +1,5 @@
 <template>
+  <div class="column fit">
   <div v-if="currentFilter" class="list__info">
     {{ currentSearchText 
       ? `${$t('FILESWEBCLIENT.LABEL_SEARCH_RESULTS')}: ${currentSearchText}`
@@ -11,14 +12,14 @@
 
   <EmptyFolder v-if="isListEmpty" />
   
-  <q-scroll-area :thumb-style="{ width: '5px' }" class="messages__list">
+  <q-scroll-area id="messages-list-scroll" :thumb-style="{ width: '5px' }" class="messages__list col full-height">
     <AppPullRefresh :refresh-action="reloadList">
       <q-virtual-scroll
         v-if="!isListEmpty"
         ref="messagesVirtualScroll"
         :virtual-scroll-item-size="64"
         :items="currentMessageList"
-        scroll-target="#contacts-list-scroll > .scroll"
+        scroll-target="#messages-list-scroll > .scroll"
       >
         <template v-slot="{ item, index }">
           <MessageItem 
@@ -38,10 +39,11 @@
       </q-virtual-scroll>
     </AppPullRefresh>
   </q-scroll-area>
+  </div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'pinia'
+import { mapState, mapActions, mapGetters } from 'pinia'
 import { useMailStore } from '../store/index-pinia'
 
 import AppPullRefresh from 'src/components/common/AppPullRefresh'
@@ -65,19 +67,12 @@ export default {
   },
 
   computed: {
-    ...mapGetters(useMailStore, [
-      'currentFolder',
-      'currentSearchText',
-      'currentFilter',
-      'currentMessageList',
-      'messageListPage',
-      'isMessageListLoading'
-    ]),
+    ...mapState(useMailStore, ['currentFolder', 'currentSearchText', 'currentFilter', 'currentMessageList', 'messageListPage', 'isMessageListLoading']),
     isListEmpty() {
       return this.currentMessageList.length == 0 && !this.isMessageListLoading
     },
     isListEndReached() {
-      return this.currentMessageList.length === this.currentFolder.count
+      return this.currentMessageList.length === (this.currentFolder?.count ?? 0)
     },
   },
 

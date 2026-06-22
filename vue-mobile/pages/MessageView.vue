@@ -69,7 +69,7 @@
 import { colors } from 'quasar'
 const { getPaletteColor } = colors
 
-import { mapActions, mapGetters } from 'pinia'
+import { mapState, mapActions, mapGetters } from 'pinia'
 import { useMailStore } from '../store/index-pinia'
 
 import addressUtils from 'src/utils/address'
@@ -102,17 +102,8 @@ export default {
   },
 
   computed: {
-    ...mapGetters(useMailStore, [
-      'currentAccountId',
-      'isUnifiedInbox',
-      'currentFoldersDelimiter',
-      'currentFolder',
-      'currentMessageList',
-      'isCurrentMessageLoading',
-      'currentMessageIdentifiers',
-      'currentMessageHeaders',
-      'currentMessage',
-    ]),
+    ...mapState(useMailStore, ['currentAccountId', 'isUnifiedInbox', 'currentFolder', 'currentMessageList', 'isCurrentMessageLoading', 'currentMessageIdentifiers', 'currentMessageHeaders', 'currentMessage']),
+    ...mapGetters(useMailStore, ['currentFoldersDelimiter']),
 
     isNoMessageOnServer() {
       return !this.isCurrentMessageLoading && !this.currentMessage

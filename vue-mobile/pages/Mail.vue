@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'pinia'
+import { mapState, mapActions, mapGetters } from 'pinia'
 import { useMailStore } from '../store/index-pinia'
 
 import MainLayout from 'src/layouts/MainLayout'
@@ -57,18 +57,8 @@ export default {
   },
 
   computed: {
-    ...mapGetters(useMailStore, [
-      'currentAccountId',
-      'isUnifiedInbox',
-      'isAllowedUnifiedInbox',
-      'isFolderListLoading',
-      'currentFoldersTree',
-      'currentFoldersDelimiter',
-      'currentFolder',
-      'currentFilter',
-      'isMessageListLoading',
-      'isSelectMode',
-    ]),
+    ...mapState(useMailStore, ['currentAccountId', 'isUnifiedInbox', 'isFolderListLoading', 'currentFolder', 'currentFilter', 'isMessageListLoading']),
+    ...mapGetters(useMailStore, ['isAllowedUnifiedInbox', 'currentFoldersTree', 'currentFoldersDelimiter', 'isSelectMode']),
 
     accountIdFromRoute() {
       return parseInt(this.$route.params.accountId, 10)

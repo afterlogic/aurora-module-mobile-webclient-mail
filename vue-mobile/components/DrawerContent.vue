@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'pinia'
+import { mapState, mapGetters } from 'pinia'
 import { useMailStore } from '../store/index-pinia'
 
 import AccountItem from './drawer/AccountItem'
@@ -57,13 +57,8 @@ export default {
   },
 
   computed: {
-    ...mapGetters(useMailStore, [
-      'accountList',
-      'isAllowedUnifiedInbox',
-      'currentAccount',
-      'currentFoldersTree',
-      'currentFolder',
-    ]),
+    ...mapState(useMailStore, ['accountList', 'currentFolder']),
+    ...mapGetters(useMailStore, ['isAllowedUnifiedInbox', 'currentAccount', 'currentFoldersTree']),
 
     currentAccountId() {
       return (this.currentAccount && this.currentAccount.id) || 0

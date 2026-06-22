@@ -1,44 +1,35 @@
 import settings from '../settings'
 
 export default {
-  // accountList: (state) => state.accountList,
-
-  isAllowedUnifiedInbox: (state) => {
-    if (settings.get('allowUnifiedInbox')) {
-      const includedAccounts = state.accountList.filter((account) => account.includeInUnifiedMailbox)
-      return includedAccounts.length > 1
+  isAllowedUnifiedInbox() {
+    if (!settings.get('allowUnifiedInbox')) {
+      return false
     }
-    return false
+    const accountList = this.$state.accountList || []
+    const includedAccounts = accountList.filter((account) => account.includeInUnifiedMailbox)
+    return includedAccounts.length > 1
   },
 
-  // isUnifiedInbox: (state) => state.isUnifiedInbox,
+  unifiedInboxUnseenCount: (state) => state.unifiedInboxInfo?.unseenCount ?? 0,
 
-  unifiedInboxUnseenCount: (state) => state.unifiedInboxInfo.unseenCount,
-
-  // currentAccountId: (state) => state.currentAccountId,
-
-  currentAccount: (state) => {
-    return (state.accountList && state.accountList.find((account) => account.id === state.currentAccountId)) || null
+  currentAccount() {
+    const accountList = this.$state.accountList || []
+    return accountList.find((account) => account.id === this.$state.currentAccountId) || null
   },
 
   getAccount: (state) => {
-    return (accountId) => state.accountList.find((account) => account.id === accountId) || null
+    return (accountId) => (state.accountList || []).find((account) => account.id === accountId) || null
   },
-
-  // isFolderListLoading: (state) => {
-  //   return state.isFolderListLoading
-  // },
 
   hasFolderList: (state) => {
-    return (accountId) => {
-      return state.folderLists.has(accountId)
-    }
+    return (accountId) => state.folderLists.has(accountId)
   },
 
-  newFoldersFullNames: (state) => {
-    return state.accountList
+  newFoldersFullNames() {
+    const accountList = this.$state.accountList || []
+    return accountList
       .map((account) => {
-        const folderList = state.folderLists.get(account.id)
+        const folderList = this.$state.folderLists.get(account.id)
         return folderList && Array.isArray(folderList.newFoldersFullNames) && folderList.newFoldersFullNames.length > 0
           ? {
               accountId: folderList.accountId,
@@ -57,7 +48,7 @@ export default {
 
   currentFoldersDelimiter: (state) => {
     const currentFolderList = state.folderLists.get(state.currentAccountId)
-    return currentFolderList && currentFolderList.tree && currentFolderList.tree.length > 0
+    return currentFolderList?.tree?.length > 0
       ? currentFolderList.tree[0].delimiter
       : '/'
   },
@@ -65,14 +56,14 @@ export default {
   getFoldersDelimiter: (state) => {
     return (accountId) => {
       const folderList = state.folderLists.get(accountId)
-      return folderList && folderList.tree && folderList.tree.length > 0 ? folderList.tree[0].delimiter : '/'
+      return folderList?.tree?.length > 0 ? folderList.tree[0].delimiter : '/'
     }
   },
 
   getFolderDisplayName: (state) => {
     return (accountId, folderFullName) => {
       const folderList = state.folderLists.get(accountId)
-      const folder = folderList && folderList.flatList.find((folder) => folder.fullName === folderFullName)
+      const folder = folderList?.flatList?.find((item) => item.fullName === folderFullName)
       return folder ? folder.displayName : folderFullName
     }
   },
@@ -80,7 +71,7 @@ export default {
   getFolderByType: (state) => {
     return (accountId, folderType) => {
       const folderList = state.folderLists.get(accountId)
-      return folderList && folderList.flatList.find((folder) => folder.type === folderType)
+      return folderList?.flatList?.find((folder) => folder.type === folderType)
     }
   },
 
@@ -89,53 +80,18 @@ export default {
     return currentFolderList ? currentFolderList.count : 0
   },
 
-  // currentFolder: (state) => {
-  //   return state.currentFolder
-  // },
+  selectedMessages() {
+    return (this.$state.currentMessageList || []).filter((messageListItem) => messageListItem.isSelected)
+  },
 
-  // currentSearchText: (state) => state.currentSearchText,
-
-  // messageListPage: (state) => state.messageListPage,
+  isSelectMode() {
+    return !!(this.$state.currentMessageList || []).find((messageListItem) => messageListItem.isSelected)
+  },
 
   isCurrentSearchInMultiFolders: (state) => {
+    const currentSearchText = state.currentSearchText || ''
     return (
-      state.currentSearchText.indexOf('folders:sub') !== -1 || state.currentSearchText.indexOf('folders:all') !== -1
+      currentSearchText.indexOf('folders:sub') !== -1 || currentSearchText.indexOf('folders:all') !== -1
     )
   },
-
-  // currentFilter: (state) => {
-  //   return state.currentFilter
-  // },
-
-  // isMessageListLoading: (state) => {
-  //   return state.isMessageListLoading
-  // },
-
-  // currentMessageList: (state) => {
-  //   return state.currentMessageList
-  // },
-
-  selectedMessages: (state) => {
-    return state.currentMessageList.filter((messageListItem) => messageListItem.isSelected)
-  },
-
-  isSelectMode: (state) => {
-    return !!state.currentMessageList.find((messageListItem) => messageListItem.isSelected)
-  },
-
-  // isCurrentMessageLoading: (state) => {
-  //   return state.isCurrentMessageLoading
-  // },
-
-  // currentMessageIdentifiers: (state) => {
-  //   return state.currentMessageIdentifiers
-  // },
-
-  // currentMessageHeaders: (state) => {
-  //   return state.currentMessageHeaders
-  // },
-
-  // currentMessage: (state) => {
-  //   return state.currentMessage
-  // },
 }

@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'pinia'
+import { mapState, mapActions, mapGetters } from 'pinia'
 import { useMailStore } from '../../store/index-pinia'
 
 import DefaultHeader from './DefaultHeader'
@@ -49,7 +49,8 @@ export default {
   },
 
   computed: {
-    ...mapGetters(useMailStore, ['isUnifiedInbox', 'currentFolder', 'currentSearchText', 'selectedMessages']),
+    ...mapState(useMailStore, ['isUnifiedInbox', 'currentFolder', 'currentSearchText']),
+    ...mapGetters(useMailStore, ['selectedMessages']),
 
     folderName() {
       if (this.isUnifiedInbox) {

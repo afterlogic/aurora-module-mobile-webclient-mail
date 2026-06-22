@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'pinia'
+import { mapGetters, mapState } from 'pinia'
 import { useMailStore } from '../store/index-pinia'
 
 import VueCookies from 'vue-cookies'
@@ -26,9 +26,7 @@ export default {
   },
   
   computed: {
-    ...mapGetters(useMailStore, [
-      'currentAccount',
-    ]),
+    ...mapGetters(useMailStore, ['currentAccount']),
   },
   
   methods: {

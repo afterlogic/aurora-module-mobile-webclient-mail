@@ -219,16 +219,24 @@ export default {
     }
 
     this.isMessageListLoading = true
-    let messages = await mailWebApi.getMessages(parameters, isUnifiedInbox, this.isCurrentSearchInMultiFolders)
+    const messages = await mailWebApi.getMessages(parameters, isUnifiedInbox, this.isCurrentSearchInMultiFolders)
     this.isMessageListLoading = false
-    if (this.isUnifiedInbox
-      || (parameters.AccountID === this.currentFolder.accountId && parameters.Folder === this.currentFolder.fullName)
-    ) {
-      if (page > 1) {
-        messages = this.currentMessageList.concat(messages)
-      }
 
-      this.currentMessageList = Array.isArray(messages) ? messages : []
+    // Aborted or failed requests return null — do not wipe the list.
+    if (messages === null) {
+      return
+    }
+
+    const isStillRelevant = isUnifiedInbox
+      ? this.isUnifiedInbox
+      : this.currentFolder
+        && parameters.AccountID === this.currentFolder.accountId
+        && parameters.Folder === this.currentFolder.fullName
+
+    if (isStillRelevant) {
+      this.currentMessageList = page > 1
+        ? this.currentMessageList.concat(messages)
+        : messages
     }
   },
 

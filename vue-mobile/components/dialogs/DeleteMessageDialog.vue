@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'pinia'
+import { mapState, mapActions, mapGetters } from 'pinia'
 import { useMailStore } from '../../store/index-pinia.js'
 
 import AppDialog from 'components/common/AppDialog'
@@ -43,7 +43,8 @@ export default {
   //   },
   // },
   computed: {
-    ...mapGetters(useMailStore, ['currentFolder', 'currentMessage', 'selectedMessages']),
+    ...mapState(useMailStore, ['currentFolder', 'currentMessage']),
+    ...mapGetters(useMailStore, ['selectedMessages']),
   },
   methods: {
     ...mapActions(useMailStore, ['asyncMoveMessages', 'removeMessagesFromList']),

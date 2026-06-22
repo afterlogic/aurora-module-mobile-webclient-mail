@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'pinia'
+import { mapState, mapGetters, mapActions } from 'pinia'
 import { useMailStore } from '../store/index-pinia'
 
 import _ from 'lodash'
@@ -38,7 +38,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(useMailStore, ['dialogComponent']),
+    ...mapState(useMailStore, ['dialogComponent']),
   },
 
   watch: {

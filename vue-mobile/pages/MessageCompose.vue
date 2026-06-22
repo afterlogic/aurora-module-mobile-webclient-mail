@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'pinia'
+import { mapState, mapActions, mapGetters } from 'pinia'
 import { useMailStore } from '../store/index-pinia'
 import { useContactsStore } from '../../../ContactsMobileWebclient/vue-mobile/store/index-pinia'
 
@@ -92,18 +92,8 @@ export default {
   },
 
   computed: {
-    ...mapGetters(useMailStore, [
-      'currentAccountId',
-      'getFolderByType',
-      'currentFoldersDelimiter',
-      'currentAccount',
-      // 'currentFolder',
-      // 'currentMessageList',
-      // 'isCurrentMessageLoading',
-      // 'currentMessageIdentifiers',
-      // 'currentMessageHeaders',
-      // 'currentMessage',
-    ]),  
+    ...mapState(useMailStore, ['currentAccountId', 'currentFolder', 'currentMessageList', 'isCurrentMessageLoading', 'currentMessageIdentifiers', 'currentMessageHeaders', 'currentMessage']),
+    ...mapGetters(useMailStore, ['getFolderByType', 'currentFoldersDelimiter', 'currentAccount']),  
   },
 
   mounted() {
