@@ -30,6 +30,7 @@ import SelectHeader from './SelectHeader'
 import SearchHeader from './SearchHeader'
 import ViewHeader from './ViewHeader'
 import ComposeHeader from './ComposeHeader'
+import eventBus from 'src/event-bus'
 
 export default {
   name: 'MailHeader',
@@ -88,22 +89,37 @@ export default {
 
     openSearch() {
       this.isSearchHeader = true
-      this.searchText = ''
+      this.searchText = this.currentSearchText || ''
     },
 
     updateSearchText(text) {
       this.searchText = text
-      this.changeCurrentSearchText(this.searchText)
+      this.changeCurrentSearchText(text)
       this.changeMessageListPage(1)
       this.asyncGetMessages()
     },
 
-    closeSearch() {
+    clearSearchAndReload() {
+      this.searchText = ''
       this.isSearchHeader = false
       if (this.currentSearchText !== '') {
-        this.updateSearchText('')
+        this.changeCurrentSearchText('')
+        this.changeMessageListPage(1)
+        this.asyncGetMessages()
       }
     },
+
+    closeSearch() {
+      this.clearSearchAndReload()
+    },
+  },
+
+  mounted() {
+    eventBus.$on('clearSearch', this.clearSearchAndReload)
+  },
+
+  beforeUnmount() {
+    eventBus.$off('clearSearch', this.clearSearchAndReload)
   },
 }
 </script>

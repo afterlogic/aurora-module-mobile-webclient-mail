@@ -19,6 +19,7 @@ export default function () {
     currentSearchText: '',
     currentFilter: '',
     messageListPage: 1,
+    messageListLastPageCount: 0,
     currentMessageList: [],
 
     isCurrentMessageLoading: false,

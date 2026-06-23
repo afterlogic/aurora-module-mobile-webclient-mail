@@ -95,10 +95,6 @@ export default {
           if (filter !== this.currentFilter) {
             this.changeCurrentFilter(filter)
           }
-
-          if (filter !== this.currentFilter) {
-            this.$router.replace({ name: 'message-list-unified' })
-          }
         } else if (['message-view', 'message-compose', 'message-reply'].indexOf(routeName) < 0) {
           this.showUnifiedInbox(false)
 
@@ -139,19 +135,16 @@ export default {
     },
 
     isUnifiedInbox() {
-      this.resetMessageList()
       this.changeMessageListPage(1)
       this.asyncGetMessages()
     },
 
     currentFolder() {
-      this.resetMessageList()
       this.changeMessageListPage(1)
       this.asyncGetMessages()
     },
 
     currentFilter() {
-      this.resetMessageList()
       this.changeMessageListPage(1)
       this.asyncGetMessages()
     },
@@ -168,24 +161,32 @@ export default {
       'changeCurrentFolder',
       'changeCurrentFilter',
       'changeMessageListPage',
-      'resetMessageList',
       'asyncGetFolders',
       'asyncGetMessages',
     ]),
 
     replaceRouteWithCurrentMessageList() {
+      const params = {
+        accountId: this.currentAccountId,
+        folderPath: ['INBOX'],
+      }
+
       if (this.currentFolder) {
+        params.folderPath = this.currentFolder.fullName.split(this.currentFoldersDelimiter)
+      }
+
+      if (this.currentFilter) {
         this.$router.replace({
-          name: 'message-list',
+          name: 'message-list-filter',
           params: {
-            accountId: this.currentAccountId,
-            folderPath: this.currentFolder.fullName.split(this.currentFoldersDelimiter),
+            ...params,
+            filter: this.currentFilter,
           },
         })
       } else {
         this.$router.replace({
           name: 'message-list',
-          params: { accountId: this.currentAccountId, folderPath: ['INBOX'] },
+          params,
         })
       }
     },

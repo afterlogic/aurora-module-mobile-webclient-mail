@@ -203,20 +203,22 @@ export default {
 
   async asyncGetMessages() {
     const page = this.messageListPage
-    const itemsPerPage = 20
+    const itemsPerPage = this.messageListItemsPerPage ?? 20
+    const isUnifiedInbox = this.isUnifiedInbox
+    const requestSearch = this.currentSearchText
+    const requestFilter = this.currentFilter
 
     const parameters = {
       Offset: ((page || 1) - 1) * itemsPerPage,
       Limit: itemsPerPage,
-      Search: this.currentSearchText,
-      Filters: this.currentFilter,
+      Search: requestSearch,
+      Filters: requestFilter,
       SortBy: 'arrival',
       SortOrder: 1,
       UseThreading: false,
       InboxUidnext: '',
     }
 
-    const isUnifiedInbox = this.isUnifiedInbox
     if (!isUnifiedInbox) {
       const currentFolder = this.currentFolder
       if (!currentFolder) {
@@ -226,25 +228,39 @@ export default {
       parameters.Folder = currentFolder.fullName
     }
 
+    if (page === 1) {
+      this.currentMessageList = []
+      this.messageListLastPageCount = 0
+    }
+
     this.isMessageListLoading = true
-    const messages = await mailWebApi.getMessages(parameters, isUnifiedInbox, this.isCurrentSearchInMultiFolders)
+    const messages = await mailWebApi.getMessages(
+      parameters,
+      isUnifiedInbox,
+      this.isCurrentSearchInMultiFolders
+    )
     this.isMessageListLoading = false
 
-    // Aborted or failed requests return null — do not wipe the list.
     if (messages === null) {
       return
     }
 
-    const isStillRelevant = isUnifiedInbox
-      ? this.isUnifiedInbox
-      : this.currentFolder
-        && parameters.AccountID === this.currentFolder.accountId
-        && parameters.Folder === this.currentFolder.fullName
+    const isStillRelevant = page === this.messageListPage
+      && requestSearch === this.currentSearchText
+      && requestFilter === this.currentFilter
+      && (
+        isUnifiedInbox
+          ? this.isUnifiedInbox
+          : this.currentFolder
+            && String(parameters.AccountID) === String(this.currentFolder.accountId)
+            && parameters.Folder === this.currentFolder.fullName
+      )
 
     if (isStillRelevant) {
       this.currentMessageList = page > 1
         ? this.currentMessageList.concat(messages)
         : messages
+      this.messageListLastPageCount = messages.length
     }
   },
 
@@ -254,6 +270,7 @@ export default {
 
   resetMessageList() {
     this.currentMessageList = []
+    this.messageListLastPageCount = 0
   },
 
   resetSelectedItems() {

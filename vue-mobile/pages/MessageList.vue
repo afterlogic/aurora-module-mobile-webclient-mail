@@ -1,49 +1,56 @@
 <template>
-  <div class="column fit">
-  <div v-if="isUnseenFilter" class="list__info">
+  <div class="column fit message-list">
+  <div v-if="isUnseenFilter" class="list__info col-auto">
     <span v-html="unseenFilterBannerText"></span>
     <div @click="clearUnreadMessage" class="list__button">
       {{ $t('MAILWEBCLIENT.ACTION_CLEAR_FILTER') }}
     </div>
   </div>
 
-  <EmptyFolder v-if="isListEmpty && !isUnseenFilter" />
+  <div v-if="isSearchBannerVisible" class="list__info col-auto">
+    <span v-html="searchBannerContent"></span>
+    <div v-if="showClearSearchButton" @click="clearSearch" class="list__button">
+      {{ $t('COREWEBCLIENT.ACTION_CLEAR_SEARCH') }}
+    </div>
+  </div>
+
+  <EmptyFolder v-if="isListEmpty && !isUnseenFilter && !isSearch" class="col" />
   
-  <q-scroll-area id="messages-list-scroll" :thumb-style="{ width: '5px' }" class="messages__list col full-height">
+  <q-scroll-area
+    v-else
+    id="messages-list-scroll"
+    :thumb-style="{ width: '5px' }"
+    class="messages__list col"
+  >
     <AppPullRefresh :refresh-action="reloadList">
-      <div class="messages__loader messages__loader_initial" v-if="isMessageListLoading && currentMessageList.length === 0">
+      <div class="messages__loader messages__loader_initial" v-if="isInitialListLoading">
         <q-spinner-dots color="primary" size="40px" />
       </div>
-      <q-virtual-scroll
-        v-else-if="currentMessageList.length > 0"
-        ref="messagesVirtualScroll"
-        :virtual-scroll-item-size="64"
-        :items="currentMessageList"
-        scroll-target="#messages-list-scroll > .scroll"
-      >
-        <template v-slot="{ item, index }">
-          <MessageItem 
-            :key="index"
-            :message=item
-            class="mail"
-            v-touch-hold.mouse="event => longPress(item, event)"
-            :isSelectMode="isSelectMode"
-            :selectItemHandler="selectItem"
-          />
-        </template>
-        <template #after>
-          <div class="messages__loader" v-intersection="onIntersection" v-if="!isListEndReached">
-            <q-spinner-dots color="primary" size="40px" />
-          </div>
-        </template>
-      </q-virtual-scroll>
+      <template v-else>
+        <MessageItem
+          v-for="(item, index) in currentMessageList"
+          :key="messageItemKey(item, index)"
+          :message="item"
+          class="mail"
+          v-touch-hold.mouse="event => longPress(item, event)"
+          :isSelectMode="isSelectMode"
+          :selectItemHandler="selectItem"
+        />
+        <div
+          class="messages__loader"
+          v-intersection="onIntersection"
+          v-if="currentMessageList.length > 0 && !isListEndReached"
+        >
+          <q-spinner-dots v-if="isMessageListLoading" color="primary" size="40px" />
+        </div>
+      </template>
     </AppPullRefresh>
   </q-scroll-area>
   </div>
 </template>
 
 <script>
-import { mapState, mapActions } from 'pinia'
+import { mapState, mapActions, mapGetters } from 'pinia'
 import { useMailStore } from '../store/index-pinia'
 
 import AppPullRefresh from 'src/components/common/AppPullRefresh'
@@ -51,6 +58,12 @@ import MessageItem from '../components/message-list/MessageItem'
 import EmptyFolder from '../components/message-list/EmptyFolder'
 import eventBus from 'src/event-bus'
 import TextUtils from 'src/utils/text'
+import {
+  formatSearchStringForDescription,
+  getSearchBannerI18nKey,
+  shouldHideClearSearch,
+} from '../utils/search-description'
+import { FOLDER_TYPES } from '../enums'
 
 export default {
   name: 'MessageList',
@@ -74,17 +87,48 @@ export default {
       'currentFilter',
       'currentMessageList',
       'messageListPage',
+      'messageListLastPageCount',
       'isMessageListLoading',
       'isUnifiedInbox',
     ]),
+    ...mapGetters(useMailStore, ['messageListItemsPerPage']),
+    isInitialListLoading() {
+      return this.isMessageListLoading && this.messageListPage === 1
+    },
     isUnseenFilter() {
       return this.currentFilter === 'unseen'
+    },
+    isSearch() {
+      return (this.currentSearchText || '').trim() !== ''
+    },
+    isSearchBannerVisible() {
+      return this.isSearch && !this.isUnseenFilter
+    },
+    isStarredFolder() {
+      return this.currentFolder?.type === FOLDER_TYPES.STARRED
+    },
+    showClearSearchButton() {
+      return !shouldHideClearSearch({
+        searchText: this.currentSearchText,
+        isStarredFolder: this.isStarredFolder,
+      })
     },
     isListEmpty() {
       return this.currentMessageList.length == 0 && !this.isMessageListLoading
     },
     isListEndReached() {
-      return this.currentMessageList.length === (this.currentFolder?.count ?? 0)
+      if (this.currentMessageList.length === 0) {
+        return true
+      }
+
+      const itemsPerPage = this.messageListItemsPerPage ?? 20
+      const hasFilterOrSearch = this.currentFilter !== '' || this.isSearch
+
+      if (!hasFilterOrSearch && !this.isUnifiedInbox) {
+        return this.currentMessageList.length >= (this.currentFolder?.count ?? 0)
+      }
+
+      return this.messageListLastPageCount < itemsPerPage
     },
     folderDisplayName() {
       if (this.isUnifiedInbox) {
@@ -93,13 +137,30 @@ export default {
       return this.currentFolder?.displayName || ''
     },
     searchStringForDescription() {
-      return TextUtils.encodeHtml(
-        (this.currentSearchText || '').replace(/(^|\s)folders:(all|sub)(\s|$)/, '')
-      )
+      return TextUtils.encodeHtml(formatSearchStringForDescription(this.currentSearchText))
+    },
+    searchBannerText() {
+      const folder = TextUtils.encodeHtml(this.folderDisplayName)
+      const i18nKey = getSearchBannerI18nKey({
+        searchText: this.currentSearchText,
+        isUnifiedInbox: this.isUnifiedInbox,
+      })
+
+      return this.$t(`MAILWEBCLIENT.${i18nKey}`, {
+        SEARCH: this.searchStringForDescription,
+        FOLDER: folder,
+      })
+    },
+    searchBannerContent() {
+      if (this.isListEmpty) {
+        return this.$t('MAILWEBCLIENT.INFO_SEARCH_EMPTY')
+      }
+
+      return this.searchBannerText
     },
     unseenFilterBannerText() {
       const folder = TextUtils.encodeHtml(this.folderDisplayName)
-      const hasSearch = this.currentSearchText !== ''
+      const hasSearch = this.isSearch
 
       if (this.isListEmpty) {
         return hasSearch
@@ -124,12 +185,23 @@ export default {
       'changeMessageListPage',
     ]),
 
+    messageItemKey(item, index) {
+      if (item?.uid && item?.folder) {
+        return `${item.accountId}-${item.folder}-${item.uid}`
+      }
+      return index
+    },
+
     clearUnreadMessage() {
       this.$router.push({
         name: 'message-list',
         params: {},
       });
       eventBus.$emit('closeDrawer')
+    },
+
+    clearSearch() {
+      eventBus.$emit('clearSearch')
     },
 
     async reloadList() {
@@ -152,3 +224,13 @@ export default {
   },
 }
 </script>
+
+<style scoped lang="scss">
+.message-list {
+  min-height: 0;
+
+  .messages__list {
+    min-height: 0;
+  }
+}
+</style>

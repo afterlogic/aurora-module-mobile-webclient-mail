@@ -3,8 +3,6 @@ import webApi from 'src/api/web-api'
 import foldersUtils from './utils/folders'
 import { parseMessageList, parseMessage } from './utils/messages'
 
-let getMessagesController = new AbortController()
-
 export default {
   getFolders: async (parameters) => {
     return webApi
@@ -36,9 +34,6 @@ export default {
   },
 
   getMessages: async (parameters, isUnifiedInbox, isCurrentSearchInMultiFolders) => {
-    getMessagesController.abort()
-    getMessagesController = new AbortController()
-
     let methodName = isCurrentSearchInMultiFolders ? 'GetMessagesByFolders' : 'GetMessages'
     if (isUnifiedInbox) {
       methodName = 'GetUnifiedMailboxMessages'
@@ -49,7 +44,6 @@ export default {
         moduleName: 'Mail',
         methodName,
         parameters,
-        signal: getMessagesController.signal,
       })
       .then((result) => {
         if (Array.isArray(result && result['@Collection'])) {

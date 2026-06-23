@@ -1,6 +1,8 @@
 import settings from '../settings'
 
 export default {
+  messageListItemsPerPage: () => 20,
+
   isAllowedUnifiedInbox() {
     if (!settings.get('allowUnifiedInbox')) {
       return false
