@@ -1,5 +1,5 @@
 <template>
-  <q-scroll-area :thumb-style="{ width: '5px' }" style="height: 100%;">
+  <q-scroll-area :thumb-style="{ width: '5px' }" class="message-view__scroll" style="height: 100%;">
     <div class="messages__loader" v-if="isCurrentMessageLoading">
       <q-spinner-dots color="primary" size="40px" />
     </div>
@@ -343,6 +343,14 @@ export default {
 
   &__flag-attachment {
     fill: #469CF8;
+  }
+}
+</style>
+
+<style lang="scss">
+.message-view__scroll {
+  .q-scrollarea__content {
+    max-width: 100%;
   }
 }
 </style>
