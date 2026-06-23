@@ -44,7 +44,7 @@ export const messageActions = {
   forward: {
     name: 'forward',
     displayName: 'Forward',
-    icon: 'ReplyIcon',
+    icon: 'ForwardIcon',
     isShowAction: isShowAction,
     // method: () => { notification.showReport('Comming soon') },
     // component: 'SendDialog',
