@@ -41,6 +41,16 @@
 
         <div class="message-flags">
           <div class="message-flags__flag-folder">{{ currentMessage?.folder }}</div>
+          <RepliedIcon
+            v-if="currentMessage?.isAnswered"
+            color="#949496"
+            class="message-flags__flag-replied"
+          />
+          <ForwardedIcon
+            v-if="currentMessage?.isForwarded"
+            color="#949496"
+            class="message-flags__flag-forwarded"
+          />
           <AttachmentIcon class="message-flags__flag-attachment" :color="primaryColor" v-if="currentMessage?.hasAttachments" />
           <StarIcon class="message-flags__flag-starred"
             v-if="currentMessage?.isFlagged"
@@ -77,6 +87,8 @@ import dateUtils from 'src/utils/date'
 import types from 'src/utils/types'
 
 import StarIcon from '../components/icons/message-list/StarIcon'
+import RepliedIcon from '../components/icons/message-list/RepliedIcon'
+import ForwardedIcon from '../components/icons/message-list/ForwardedIcon'
 import AttachmentIcon from '../components/icons/message-list/AttachmentIcon'
 import AttachmentListItem from '../components/AttachmentListItem'
 import CAttachment from '../classes/CAttachment'
@@ -92,6 +104,8 @@ export default {
 
   components: {
     StarIcon,
+    RepliedIcon,
+    ForwardedIcon,
     AttachmentIcon,
     AttachmentListItem
   },

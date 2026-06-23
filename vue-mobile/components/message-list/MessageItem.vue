@@ -30,8 +30,8 @@
         <span class="message__date">{{ messageDate }}</span>
       </q-item-label>
       <q-item-label class="message__status">
-        <RepliedIcon v-if="message.isAnswered" class="list-item__icon message__status-replied" />
-        <ForwardedIcon v-if="message.isForwarded" color="#949496" class="list-item__icon message__status-forwarded" />
+        <RepliedIcon v-if="message.isAnswered" :color="statusIconColor" class="list-item__icon message__status-replied" />
+        <ForwardedIcon v-if="message.isForwarded" :color="statusIconColor" class="list-item__icon message__status-forwarded" />
         <StarIcon class="color-flagged message__status-flagged"
           v-if="message.isFlagged"
           :color="goldColor"
@@ -116,6 +116,10 @@ export default {
         this.messageAccount.showUnifiedMailboxLabel &&
         this.unifiedMailboxLabelText !== ''
       )
+    },
+
+    statusIconColor() {
+      return this.message.isSelected ? '#5a5a5a' : '#949496'
     },
   },
 
@@ -205,7 +209,8 @@ export default {
 
   &__status {
     display: flex;
-    align-content: center;
+    align-items: center;
+    gap: 6px;
   }
   &__icon {
     display: flex;
@@ -213,17 +218,11 @@ export default {
     align-items: center;
   }
 
-  &__icon-attachment,
-  &__status-replied,
-  &__status-forwarded {
+  &__icon-attachment {
     fill: $secondary;
   }
   .list-item__selected &__icon-attachment {
     fill: #000;
-  }
-  .list-item__selected &__status-replied,
-  .list-item__selected &__status-forwarded {
-    fill: #5a5a5a;
   }
 }
 </style>
