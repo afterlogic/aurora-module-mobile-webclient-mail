@@ -14,6 +14,13 @@
     </div>
   </div>
 
+  <div v-if="isShowEmptyFolderButton" class="list__info col-auto">
+    <div @click="showEmptyFolderDialog" class="list__button list__button_with-icon">
+      <ActionIcon class="list__button-icon" icon="DeleteIcon" with-cross />
+      {{ emptyFolderButtonLabel }}
+    </div>
+  </div>
+
   <EmptyFolder v-if="isListEmpty && !isUnseenFilter && !isSearch" class="col" />
   
   <q-scroll-area
@@ -56,6 +63,7 @@ import { useMailStore } from '../store/index-pinia'
 import AppPullRefresh from 'src/components/common/AppPullRefresh'
 import MessageItem from '../components/message-list/MessageItem'
 import EmptyFolder from '../components/message-list/EmptyFolder'
+import ActionIcon from '../components/common/ActionIcon'
 import eventBus from 'src/event-bus'
 import TextUtils from 'src/utils/text'
 import {
@@ -72,6 +80,7 @@ export default {
     AppPullRefresh,
     MessageItem,
     EmptyFolder,
+    ActionIcon,
   },
 
   data() {
@@ -106,6 +115,28 @@ export default {
     },
     isStarredFolder() {
       return this.currentFolder?.type === FOLDER_TYPES.STARRED
+    },
+    isSpamFolder() {
+      return this.currentFolder?.type === FOLDER_TYPES.SPAM
+    },
+    isTrashFolder() {
+      return this.currentFolder?.type === FOLDER_TYPES.TRASH
+    },
+    isShowEmptyFolderButton() {
+      return (
+        !this.isUnifiedInbox
+        && (this.isSpamFolder || this.isTrashFolder)
+        && (this.currentFolder?.count > 0 || this.currentMessageList.length > 0)
+      )
+    },
+    emptyFolderButtonLabel() {
+      if (this.isSpamFolder) {
+        return this.$t('MAILWEBCLIENT.ACTION_EMPTY_SPAM')
+      }
+      if (this.isTrashFolder) {
+        return this.$t('MAILWEBCLIENT.ACTION_EMPTY_TRASH')
+      }
+      return ''
     },
     showClearSearchButton() {
       return !shouldHideClearSearch({
@@ -183,6 +214,7 @@ export default {
     ...mapActions(useMailStore, [
       'asyncGetMessages',
       'changeMessageListPage',
+      'changeDialogComponent',
     ]),
 
     messageItemKey(item, index) {
@@ -202,6 +234,13 @@ export default {
 
     clearSearch() {
       eventBus.$emit('clearSearch')
+    },
+
+    showEmptyFolderDialog() {
+      this.changeDialogComponent({
+        component: 'EmptyFolderDialog',
+        folderType: this.currentFolder?.type,
+      })
     },
 
     async reloadList() {
@@ -232,5 +271,15 @@ export default {
   .messages__list {
     min-height: 0;
   }
+}
+
+.list__button_with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.list__button-icon {
+  flex-shrink: 0;
 }
 </style>

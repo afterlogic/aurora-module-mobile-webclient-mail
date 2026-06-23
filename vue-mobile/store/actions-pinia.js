@@ -325,6 +325,133 @@ export default {
     return message || null
   },
 
+  async fetchAllFolderMessageUids(accountId, folderFullName) {
+    const uids = []
+    const limit = 100
+    let offset = 0
+
+    while (true) {
+      const messages = await mailWebApi.getMessages(
+        {
+          AccountID: accountId,
+          Folder: folderFullName,
+          Offset: offset,
+          Limit: limit,
+          Search: '',
+          Filters: '',
+          SortBy: 'arrival',
+          SortOrder: 1,
+          UseThreading: false,
+          InboxUidnext: '',
+        },
+        false,
+        false,
+      )
+
+      if (!Array.isArray(messages) || messages.length === 0) {
+        break
+      }
+
+      messages.forEach((message) => {
+        uids.push(message.uid)
+      })
+
+      if (messages.length < limit) {
+        break
+      }
+
+      offset += messages.length
+    }
+
+    return uids
+  },
+
+  async asyncMoveMessagesToFolder(accountId, sourceFolder, destinationFolder, uids) {
+    const batchSize = 100
+
+    for (let i = 0; i < uids.length; i += batchSize) {
+      const batch = uids.slice(i, i + batchSize)
+      const result = await mailWebApi.moveMessages({
+        AccountID: accountId,
+        Folder: sourceFolder,
+        ToFolder: destinationFolder,
+        Uids: batch.join(','),
+      })
+
+      if (!result) {
+        return false
+      }
+    }
+
+    return true
+  },
+
+  async asyncClearFolder() {
+    const currentFolder = this.currentFolder
+    if (!currentFolder) {
+      return false
+    }
+
+    if (currentFolder.type === FOLDER_TYPES.SPAM) {
+      const trashFolder = this.getFolderByType(currentFolder.accountId, FOLDER_TYPES.TRASH)
+      if (!trashFolder) {
+        return false
+      }
+
+      const uids = await this.fetchAllFolderMessageUids(
+        currentFolder.accountId,
+        currentFolder.fullName,
+      )
+
+      if (uids.length === 0) {
+        if ((currentFolder.count ?? 0) > 0) {
+          return false
+        }
+      } else {
+        const moved = await this.asyncMoveMessagesToFolder(
+          currentFolder.accountId,
+          currentFolder.fullName,
+          trashFolder.fullName,
+          uids,
+        )
+
+        if (!moved) {
+          return false
+        }
+
+        trashFolder.count = (trashFolder.count ?? 0) + uids.length
+        trashFolder.unseenCount = (trashFolder.unseenCount ?? 0) + (currentFolder.unseenCount ?? 0)
+      }
+
+      this.resetMessageList()
+      this.changeMessageListPage(1)
+      currentFolder.count = 0
+      currentFolder.unseenCount = 0
+
+      return true
+    }
+
+    if (currentFolder.type === FOLDER_TYPES.TRASH) {
+      const result = await mailWebApi.clearFolder({
+        AccountID: currentFolder.accountId,
+        Folder: currentFolder.fullName,
+      })
+
+      if (!result) {
+        return false
+      }
+
+      this.resetMessageList()
+      this.changeMessageListPage(1)
+      currentFolder.count = 0
+      currentFolder.unseenCount = 0
+
+      return true
+    }
+
+    return false
+  },
+
   async asyncMoveMessages(params) {
     const sUids = params?.uids ? params?.uids.join(',') : ''
     const parameters = {

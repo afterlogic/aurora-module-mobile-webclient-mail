@@ -118,4 +118,15 @@ export default {
       })
       .catch((error) => null)
   },
+
+  clearFolder: async (parameters) => {
+    return webApi
+      .sendRequest({
+        moduleName: 'Mail',
+        methodName: 'ClearFolder',
+        parameters,
+      })
+      .then((result) => result)
+      .catch(() => null)
+  },
 }

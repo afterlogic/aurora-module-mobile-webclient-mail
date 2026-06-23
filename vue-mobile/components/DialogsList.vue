@@ -4,6 +4,7 @@
 
     v-model="isShowDialog"
     :dialog="isShowDialog"
+    :folderType="dialogComponent?.folderType"
 
     @closeDialog="closeDialog"
     @dialogAction="dialogAction"
@@ -20,12 +21,14 @@ import _ from 'lodash'
 // import FileUploader from './dialogs/FileUploader'
 // import CreateFolderDialog from './dialogs/CreateFolderDialog'
 import DeleteMessageDialog from './dialogs/DeleteMessageDialog'
+import EmptyFolderDialog from './dialogs/EmptyFolderDialog'
 
 export default {
   name: 'DialogsList',
 
   components: {
     DeleteMessageDialog,
+    EmptyFolderDialog,
   //   FileUploader, 
   //   CreateFolderDialog,
   },
@@ -80,6 +83,7 @@ export default {
         this.$root.unsavedChangesDialog(() => this.isShowDialog = false)
       } else {
         this.isShowDialog = false
+        this.changeDialogComponent(null)
       }
     },
   },
