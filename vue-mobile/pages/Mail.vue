@@ -15,7 +15,12 @@
       track-color="grey-1"
       color="primary"
     />
-    <router-view @interface="getRouterViewInterface" v-else></router-view>
+    <router-view v-else v-slot="{ Component, route }">
+      <component
+        :is="Component"
+        v-bind="isComposeRoute(route.name) ? { onInterface: getRouterViewInterface } : {}"
+      />
+    </router-view>
 
     <AppCreateButton @click="showCreateButtonsDialog" v-if="isShowCreateButtons">
       <ComposeIcon color="#fff" />
@@ -199,6 +204,10 @@ export default {
       if (this.routerViewInterface[actionName]) {
         this.routerViewInterface[actionName](...args)
       }
+    },
+
+    isComposeRoute(routeName) {
+      return routeName === 'message-compose' || routeName === 'message-reply'
     },
 
     getRouterViewInterface(routerViewInterface) {
