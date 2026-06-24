@@ -72,6 +72,7 @@ import AttachmentsUploader from '../components/AttachmentsUploader'
 import notification from 'src/utils/notification'
 
 import types from 'src/utils/types'
+import addressUtils from 'src/utils/address'
 import SendingUtils from '../utils/sending'
 import htmlForEditor from '../utils/html-for-editor'
 
@@ -184,6 +185,7 @@ export default {
       'asyncGetMessage',
       'refreshAfterDraftSave',
       'saveDraftOnNavigateBack',
+      'takeComposeToAddresses',
     ]),
 
     draftFolder() {
@@ -402,7 +404,30 @@ export default {
         }
       } else {
         this.applyDefaultComposeBody()
+        this.applyComposeToAddresses()
       }
+    },
+
+    applyComposeToAddresses() {
+      const toAddresses = this.takeComposeToAddresses()
+
+      if (!toAddresses) {
+        return
+      }
+
+      toAddresses.split(',').forEach((fullEmail) => {
+        const trimmedEmail = fullEmail.trim()
+
+        if (!trimmedEmail) {
+          return
+        }
+
+        const parts = addressUtils.getEmailParts(trimmedEmail)
+        this.populateRecipientField(this.toInput, {
+          DislpayName: parts.name,
+          Email: parts.email,
+        })
+      })
     },
 
     initNewComposeBody() {

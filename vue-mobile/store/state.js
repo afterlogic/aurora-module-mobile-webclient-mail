@@ -26,5 +26,7 @@ export default function () {
     currentMessageIdentifiers: null,
     currentMessageHeaders: null,
     currentMessage: null,
+
+    composeToAddresses: '',
   }
 }

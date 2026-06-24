@@ -9,13 +9,16 @@
     </template>
 
     <q-linear-progress
-      v-if="isFolderListLoading"
+      v-if="isFolderListLoading && !isMessageContentRoute($route.name)"
       class="full-width"
       indeterminate
       track-color="grey-1"
       color="primary"
     />
-    <router-view v-else v-slot="{ Component, route }">
+    <router-view
+      v-if="!isFolderListLoading || isMessageContentRoute($route.name)"
+      v-slot="{ Component, route }"
+    >
       <component
         :is="Component"
         v-bind="isComposeRoute(route.name) ? { onInterface: getRouterViewInterface } : {}"
@@ -100,7 +103,7 @@ export default {
           if (filter !== this.currentFilter) {
             this.changeCurrentFilter(filter)
           }
-        } else if (['message-view', 'message-compose', 'message-reply'].indexOf(routeName) < 0) {
+        } else if (!this.isMessageContentRoute(routeName)) {
           this.showUnifiedInbox(false)
 
           if (this.accountIdFromRoute !== this.currentAccountId) {
@@ -133,6 +136,10 @@ export default {
     },
 
     currentFoldersTree() {
+      if (this.isMessageContentRoute(this.$route.name)) {
+        return
+      }
+
       this.changeCurrentFolder(this.folderFullNameFromRoute)
       if (this.currentFolder && this.folderFullNameFromRoute !== this.currentFolder.fullName) {
         this.replaceRouteWithCurrentMessageList()
@@ -140,16 +147,28 @@ export default {
     },
 
     isUnifiedInbox() {
+      if (this.isMessageContentRoute(this.$route.name)) {
+        return
+      }
+
       this.changeMessageListPage(1)
       this.asyncGetMessages()
     },
 
     currentFolder() {
+      if (this.isMessageContentRoute(this.$route.name)) {
+        return
+      }
+
       this.changeMessageListPage(1)
       this.asyncGetMessages()
     },
 
     currentFilter() {
+      if (this.isMessageContentRoute(this.$route.name)) {
+        return
+      }
+
       this.changeMessageListPage(1)
       this.asyncGetMessages()
     },
@@ -204,6 +223,12 @@ export default {
       if (this.routerViewInterface[actionName]) {
         this.routerViewInterface[actionName](...args)
       }
+    },
+
+    isMessageContentRoute(routeName) {
+      return routeName === 'message-compose'
+        || routeName === 'message-reply'
+        || routeName === 'message-view'
     },
 
     isComposeRoute(routeName) {

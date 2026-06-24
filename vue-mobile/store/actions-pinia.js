@@ -558,4 +558,14 @@ export default {
       }
     })
   },
+
+  setComposeToAddresses(toAddresses) {
+    this.composeToAddresses = toAddresses || ''
+  },
+
+  takeComposeToAddresses() {
+    const toAddresses = this.composeToAddresses
+    this.composeToAddresses = ''
+    return toAddresses
+  },
 }
