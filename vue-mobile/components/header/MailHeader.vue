@@ -87,9 +87,19 @@ export default {
       'asyncGetMessages',
     ]),
 
-    openSearch() {
+    openSearch(searchText) {
       this.isSearchHeader = true
-      this.searchText = this.currentSearchText || ''
+      this.searchText = searchText || this.currentSearchText || ''
+    },
+
+    onOpenSearch(searchText) {
+      this.openSearch(searchText)
+      if (searchText && searchText !== this.currentSearchText) {
+        this.updateSearchText(searchText)
+      } else if (this.currentSearchText) {
+        this.changeMessageListPage(1)
+        this.asyncGetMessages()
+      }
     },
 
     updateSearchText(text) {
@@ -116,10 +126,12 @@ export default {
 
   mounted() {
     eventBus.$on('clearSearch', this.clearSearchAndReload)
+    eventBus.$on('openSearch', this.onOpenSearch)
   },
 
   beforeUnmount() {
     eventBus.$off('clearSearch', this.clearSearchAndReload)
+    eventBus.$off('openSearch', this.onOpenSearch)
   },
 }
 </script>
