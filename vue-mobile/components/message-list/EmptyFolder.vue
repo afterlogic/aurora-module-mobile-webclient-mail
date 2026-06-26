@@ -1,6 +1,6 @@
 <template>
-  <div class="flex items-center justify-center caption full-height">
-    <div class="caption__box">
+  <div class="flex items-center justify-center caption full-height full-width">
+    <div class="flex column items-center caption__box">
       <div class="q-mb-md">
         <EmptyFolderIcon />
       </div>
