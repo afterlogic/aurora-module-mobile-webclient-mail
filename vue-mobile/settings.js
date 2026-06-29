@@ -10,6 +10,8 @@ class MailSettings {
     this.messageBodyTruncationThreshold = types.pNonNegativeInt(mailWebclientData.MessageBodyTruncationThreshold)
 
     this.allowUnifiedInbox = !!mailData.AllowUnifiedInbox
+    this.allowAddAccounts = types.pBool(mailData.AllowAddAccounts)
+    this.allowMultiAccounts = types.pBool(mailData.AllowMultiAccounts)
     this.allowAutosaveInDrafts = types.pBool(mailData.AllowAutosaveInDrafts, true)
     this.autoSaveIntervalSeconds = types.pNonNegativeInt(mailData.AutoSaveIntervalSeconds, 60)
     mailStore.parseAccounts(types.pArray(mailData.Accounts))

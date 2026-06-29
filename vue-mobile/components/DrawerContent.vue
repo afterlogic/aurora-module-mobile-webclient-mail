@@ -1,18 +1,5 @@
 <template>
-  <div class="flex items-center justify-between q-pl-lg q-pt-lg">
-    <div class="text-grey q-pt-sm">
-      {{ accountsHeading }}
-    </div>
-  </div>
-
-  <div class="q-pl-sm q-pt-lg">
-    <AccountItem
-      v-for="account in accountList"
-      :key="account.id"
-      :account="account"
-      :selected="currentAccountId === account.id"
-    />
-  </div>
+  <AccountSwitcher />
 
   <template v-if="isAllowedUnifiedInbox">
     <div class="flex items-center justify-between q-pa-md q-pl-lg">
@@ -36,10 +23,10 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'pinia'
+import { mapGetters } from 'pinia'
 import { useMailStore } from '../store/index-pinia'
 
-import AccountItem from './drawer/AccountItem'
+import AccountSwitcher from './drawer/AccountSwitcher'
 import FolderItem from './drawer/FolderItem'
 import UnifiedInboxesItem from './drawer/UnifiedInboxesItem'
 
@@ -47,28 +34,13 @@ export default {
   name: 'DrawerContent',
 
   components: {
-    AccountItem,
+    AccountSwitcher,
     FolderItem,
     UnifiedInboxesItem,
   },
 
-  data() {
-    return {}
-  },
-
   computed: {
-    ...mapState(useMailStore, ['accountList', 'currentFolder']),
-    ...mapGetters(useMailStore, ['isAllowedUnifiedInbox', 'currentAccount', 'currentFoldersTree']),
-
-    currentAccountId() {
-      return (this.currentAccount && this.currentAccount.id) || 0
-    },
-
-    accountsHeading() {
-      return (
-        (this.currentAccount && this.currentAccount.friendlyName) || this.$t('MAILMOBILEWEBCLIENT.HEADING_ACCOUNTS')
-      )
-    },
+    ...mapGetters(useMailStore, ['isAllowedUnifiedInbox', 'currentFoldersTree']),
   },
 }
 </script>

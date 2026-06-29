@@ -1,6 +1,59 @@
+import _ from 'lodash'
+
+import eventBus from 'src/event-bus'
 import { defineAsyncComponent } from 'vue'
 
+import { i18n } from '../../CoreMobileWebclient/vue-mobile/src/boot/i18n'
+
 import settings from './settings'
+import { useMailStore } from './store/index-pinia'
+
+const _getSettingsPreLogoutItems = (params) => {
+  if (!_.isArray(params.preLogoutItems)) {
+    params.preLogoutItems = []
+  }
+
+  params.preLogoutItems = params.preLogoutItems.concat([
+    {
+      labelLangConst: 'MAILWEBCLIENT.ACTION_ADD_NEW_ACCOUNT',
+      routerPath: '/settings/add-account',
+      getIconComponent: () => import('./components/icons/AddAccountIcon'),
+      getVisible: () => {
+        const mailStore = useMailStore()
+        return (
+          settings.get('allowAddAccounts') &&
+          (settings.get('allowMultiAccounts') || mailStore.accountList.length === 0)
+        )
+      },
+    },
+  ])
+}
+
+const _getSettingsPageChildren = (params) => {
+  if (!_.isArray(params.settingsPageChildren)) {
+    params.settingsPageChildren = []
+  }
+
+  params.settingsPageChildren = params.settingsPageChildren.concat([
+    {
+      path: '/settings/add-account',
+      component: () => import('./components/settings/AddAccount'),
+    },
+  ])
+}
+
+const _getSettingsHeaderTitles = (params) => {
+  if (!_.isArray(params.settingsHeaderTitles)) {
+    params.settingsHeaderTitles = []
+  }
+
+  params.settingsHeaderTitles = params.settingsHeaderTitles.concat([
+    {
+      settingsPath: '/settings/add-account',
+      settingsTitle: i18n.global.t('MAILWEBCLIENT.HEADING_ADD_NEW_ACCOUNT'),
+    },
+  ])
+}
 
 export default {
   moduleName: 'MailMobileWebclient',
@@ -9,6 +62,19 @@ export default {
 
   init(appdata) {
     settings.init(appdata)
+  },
+
+  initSubscriptions() {
+    eventBus.$off('SettingsMobileWebclient::GetSettingsPreLogoutItems', _getSettingsPreLogoutItems)
+    eventBus.$on('SettingsMobileWebclient::GetSettingsPreLogoutItems', _getSettingsPreLogoutItems)
+
+    eventBus.$off('SettingsMobileWebclient::GetSettingsPageChildren', _getSettingsPageChildren)
+    eventBus.$on('SettingsMobileWebclient::GetSettingsPageChildren', _getSettingsPageChildren)
+
+    eventBus.$off('SettingsMobileWebclient::GetSettingsHeaderTitles', _getSettingsHeaderTitles)
+    eventBus.$on('SettingsMobileWebclient::GetSettingsHeaderTitles', _getSettingsHeaderTitles)
+
+    eventBus.$emit('CoreMobileWebclient::InitSubscription')
   },
 
   getNormalUserPages() {

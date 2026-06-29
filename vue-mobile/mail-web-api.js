@@ -129,4 +129,42 @@ export default {
       .then((result) => result)
       .catch(() => null)
   },
+
+  getMailServerByDomain: async (parameters) => {
+    return webApi
+      .sendRequest({
+        moduleName: 'Mail',
+        methodName: 'GetMailServerByDomain',
+        parameters,
+      })
+      .then((result) => result)
+      .catch(() => null)
+  },
+
+  createAccount: async (parameters) => {
+    return webApi
+      .sendRequest({
+        moduleName: 'Mail',
+        methodName: 'CreateAccount',
+        parameters,
+      })
+      .then((result) => result)
+      .catch(() => null)
+  },
+
+  getAccounts: async (parameters) => {
+    return webApi
+      .sendRequest({
+        moduleName: 'Mail',
+        methodName: 'GetAccounts',
+        parameters,
+      })
+      .then((result) => {
+        if (Array.isArray(result)) {
+          return result
+        }
+        return []
+      })
+      .catch(() => null)
+  },
 }

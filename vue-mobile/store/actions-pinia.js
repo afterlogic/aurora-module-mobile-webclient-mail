@@ -6,6 +6,8 @@ import settings from '../settings'
 import { FOLDER_TYPES } from '../enums'
 import { addMessageToCache, getMessageFromCache, deleteMessageFromCache } from '../cache'
 import SendingUtils from '../utils/sending'
+import core from 'src/core'
+import types from 'src/utils/types'
 
 export default {
   changeDialogComponent(dialogComponent) {
@@ -570,5 +572,86 @@ export default {
     const toAddresses = this.composeToAddresses
     this.composeToAddresses = ''
     return toAddresses
+  },
+
+  addAccountFromData(accountData) {
+    const account = accountsUtils.parseAccountItem(accountData)
+    const existingIndex = this.accountList.findIndex((item) => item.id === account.id)
+    if (existingIndex === -1) {
+      this.accountList.push(account)
+    } else {
+      this.accountList[existingIndex] = account
+    }
+    return account.id
+  },
+
+  async asyncRefreshAccounts() {
+    const userId = types.pInt(core.appData?.User?.Id)
+    if (!userId) {
+      return false
+    }
+
+    const accounts = await mailWebApi.getAccounts({ UserId: userId })
+    if (!Array.isArray(accounts)) {
+      return false
+    }
+
+    this.parseAccounts(accounts)
+    return true
+  },
+
+  async asyncCreateAccount({ friendlyName, email, password }) {
+    const trimmedEmail = email.trim()
+    const trimmedPassword = password.trim()
+    const trimmedFriendlyName = friendlyName.trim()
+
+    if (!trimmedEmail || !trimmedPassword) {
+      return null
+    }
+
+    const domain = trimmedEmail.split('@')[1]
+    if (!domain) {
+      return null
+    }
+
+    const serverResponse = await mailWebApi.getMailServerByDomain({
+      Domain: domain,
+      AllowWildcardDomain: true,
+    })
+
+    let server = null
+    if (serverResponse?.Server) {
+      if (serverResponse.FoundWithWildcard) {
+        const defaultAccount = this.accountList[0]
+        const mainEmail = defaultAccount?.email || ''
+        const mainDomain = mainEmail.split('@')[1] || ''
+        if (domain === mainDomain) {
+          server = serverResponse.Server
+        }
+      } else {
+        server = serverResponse.Server
+      }
+    }
+
+    if (!server) {
+      return { error: 'server_not_found' }
+    }
+
+    const serverId = types.pInt(server.Id ?? server.ServerId)
+    const result = await mailWebApi.createAccount({
+      FriendlyName: trimmedFriendlyName,
+      Email: trimmedEmail,
+      IncomingLogin: trimmedEmail,
+      IncomingPassword: trimmedPassword,
+      Server: { ServerId: serverId },
+    })
+
+    if (!result) {
+      return { error: 'create_failed' }
+    }
+
+    const accountId = this.addAccountFromData(result)
+    this.changeCurrentAccount(accountId)
+    return { accountId }
   },
 }
