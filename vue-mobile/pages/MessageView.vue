@@ -4,7 +4,7 @@
       <q-spinner-dots color="primary" size="40px" />
     </div>
     <div v-else-if="currentMessage">
-      <div v-if="currentMessageHeaders" class="message-header">
+      <div class="message-header">
         <div class="message-header__basic" v-show="!isDetailVisible">
           <div class="message-header__recipients">
             <div class="message-header__recipients-sender">{{ sender }}</div>
@@ -60,7 +60,7 @@
           />
           <StarIcon v-else :strokeColor="primaryColor" @click="onStarredClick(true)" />
         </div>
-        <div class="message-header__subject">{{ currentMessageHeaders.subject }}</div>
+        <div class="message-header__subject">{{ currentMessage.subject }}</div>
         <div class="message-body" v-html="messageBodyHtml"></div>
         <div class="message-attachments">
           <AttachmentListItem
@@ -117,7 +117,7 @@ export default {
   },
 
   computed: {
-    ...mapState(useMailStore, ['currentAccountId', 'isUnifiedInbox', 'currentFolder', 'currentMessageList', 'isCurrentMessageLoading', 'currentMessageIdentifiers', 'currentMessageHeaders', 'currentMessage']),
+    ...mapState(useMailStore, ['currentAccountId', 'isUnifiedInbox', 'currentFolder', 'currentMessageList', 'isCurrentMessageLoading', 'currentMessageIdentifiers', 'currentMessage']),
     ...mapGetters(useMailStore, ['currentFoldersDelimiter']),
 
     isNoMessageOnServer() {

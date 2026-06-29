@@ -1,45 +1,39 @@
 <template>
   <q-toolbar class="app-header">
-    <div class="col app-header__left">
+    <div class="col-auto app-header__left">
       <q-btn icon="chevron_left" @click="gotoPreviousPage" color="black" flat round dense />
     </div>
 
-    <div class="col app-header__title">
-      <span class="app-header__title-main" v-t="'MAILWEBCLIENT.HEADING_BROWSER_TAB'" />
-      <span class="app-header__title-secondary">
-        {{ folderName }}
-      </span>
-    </div>
-
-    <div class="col app-header__right">
-      <div class="dropdown-more flex justify-center items-center">
-        <q-btn-dropdown :menu-offset="[12, -41]" flat unelevated dense>
-          <template v-slot:label>
-            <MoreIcon class="q-mr-sm" />
-          </template>          
-          <q-list>
-            <q-item clickable v-close-popup @click="onPerformAction(actions.reply)">
-              <ActionIcon class="q-mr-md" :icon="actions.reply.icon" />
-              <q-item-section>{{ actions.reply.displayName }}</q-item-section>
-            </q-item>
-            <q-item clickable v-close-popup @click="onPerformAction(actions.replyAll)">
-              <ActionIcon class="q-mr-md" :icon="actions.replyAll.icon" />
-              <q-item-section>{{ actions.replyAll.displayName }}</q-item-section>
-            </q-item>
-            <q-item clickable v-close-popup @click="onPerformAction(actions.forward)">
-              <ActionIcon class="q-mr-md" :icon="actions.forward.icon" />
-              <q-item-section>{{ actions.forward.displayName }}</q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown>
-      </div>
+    <div class="col app-header__right view-header__actions">
+      <ActionIcon
+        color="black"
+        :icon="actions.reply.icon"
+        @click="onPerformAction(actions.reply)"
+      />
+      <ActionIcon
+        color="black"
+        :icon="actions.replyAll.icon"
+        @click="onPerformAction(actions.replyAll)"
+      />
+      <ActionIcon
+        color="black"
+        :icon="actions.forward.icon"
+        @click="onPerformAction(actions.forward)"
+      />
+      <ActionIcon
+        color="black"
+        :icon="actions.delete.icon"
+        @click="onPerformAction(actions.delete)"
+      />
     </div>
   </q-toolbar>
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useMailStore } from '../../store/index-pinia'
+
 import ActionIcon from '../common/ActionIcon'
-import MoreIcon from 'src/components/common/icons/actions/MoreIcon'
 
 import { messageActions } from '../../utils/message-actions'
 
@@ -48,14 +42,6 @@ export default {
 
   components: {
     ActionIcon,
-    MoreIcon,
-  },
-
-  props: {
-    folderName: {
-      type: String,
-      default: '',
-    },
   },
 
   data() {
@@ -65,6 +51,10 @@ export default {
   },
 
   methods: {
+    ...mapActions(useMailStore, [
+      'changeDialogComponent',
+    ]),
+
     gotoPreviousPage() {
       this.$router.back()
     },
@@ -82,3 +72,12 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.view-header__actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 24px;
+}
+</style>

@@ -305,6 +305,9 @@ export default {
       messageIdentifiers.uid
     )
     this.currentMessage = message
+    if (message && !this.currentMessageHeaders) {
+      this.currentMessageHeaders = message
+    }
     this.isCurrentMessageLoading = false
   },
 

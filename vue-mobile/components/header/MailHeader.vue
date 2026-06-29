@@ -7,7 +7,7 @@
       :showSaveButton="showSaveButton"
       @executeAction="(...args) => { $emit('executeAction', ...args) }"
     />
-    <ViewHeader v-else-if="isViewHeader" :folderName="folderName" />
+    <ViewHeader v-else-if="isViewHeader" />
     <SearchHeader
       v-else-if="isSearchHeader"
       :folderName="folderName"

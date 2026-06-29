@@ -35,7 +35,7 @@ export const messageActions = {
   replyAll: {
     name: 'replyAll',
     displayName: 'Reply All',
-    icon: 'ReplyIcon',
+    icon: 'ReplyAllIcon',
     isShowAction: isShowAction,
     // method: () => { notification.showReport('Comming soon') },
     // component: 'SendDialog',
