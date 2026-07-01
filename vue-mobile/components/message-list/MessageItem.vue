@@ -179,6 +179,10 @@ export default {
   &__unseen {
     background-color: #f4f6f7;
     font-weight: 600;
+
+    &.list-item__selected {
+      background-color: #b5d7fc;
+    }
   }
   &__date {
     // font-size: 80%;
