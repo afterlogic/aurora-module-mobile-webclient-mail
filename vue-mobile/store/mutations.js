@@ -91,7 +91,11 @@ export default {
       if (!folder && flatList.length > 0) {
         folder = flatList[0]
       }
-      if (!state.currentFolder || folder.fullName !== state.currentFolder.fullName) {
+      if (
+        !state.currentFolder
+        || folder.fullName !== state.currentFolder.fullName
+        || folder.accountId !== state.currentFolder.accountId
+      ) {
         state.currentFolder = folder
       }
     }

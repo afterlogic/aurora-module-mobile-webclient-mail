@@ -45,7 +45,11 @@ export default {
 
     isFolderSelected() {
       const currentFolderFullName = (this.currentFolder && this.currentFolder.fullName) || ''
-      return !this.isUnifiedInbox && this.folder.fullName === currentFolderFullName
+      return (
+        !this.isUnifiedInbox
+        && this.folder.fullName === currentFolderFullName
+        && this.folder.accountId === this.currentAccountId
+      )
     },
 
     indent() {

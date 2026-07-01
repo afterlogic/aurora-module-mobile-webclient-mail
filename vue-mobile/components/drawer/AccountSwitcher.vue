@@ -7,7 +7,6 @@
     <div
       v-if="hasMultipleAccounts"
       class="account-dropdown q-mt-md"
-      :class="{ 'account-dropdown--open': isOpen }"
     >
       <div class="account-dropdown__header" @click="toggleOpen">
         <span class="account-dropdown__current-email">{{ currentAccountEmail }}</span>
@@ -130,22 +129,18 @@ export default {
   position: relative;
 
   &__header {
+    position: relative;
+    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
     padding: 14px 16px;
-    border: 1px solid #b3d8ff;
+    border: 1px solid #469cf8;
     border-radius: 12px;
     background-color: #fff;
     cursor: pointer;
     user-select: none;
-  }
-
-  &--open &__header {
-    border-radius: 12px 12px 0 0;
-    background-color: #f7fbff;
-    border-bottom-color: transparent;
   }
 
   &__current-email {
@@ -173,17 +168,14 @@ export default {
 
   &__panel {
     position: absolute;
-    top: 100%;
+    top: calc(100% - 10px);
     left: 0;
     right: 0;
-    z-index: 10;
-    margin-top: -1px;
-    padding: 0 16px 14px;
-    border: 1px solid #b3d8ff;
-    border-top: none;
+    z-index: 1;
+    padding: 22px 16px 14px;
+    border: 1px solid #469cf8;
     border-radius: 0 0 12px 12px;
-    background-color: #f7fbff;
-    box-shadow: 0 8px 16px rgba(70, 156, 248, 0.12);
+    background-color: #edf6ff;
   }
 
   &__item {
@@ -195,7 +187,7 @@ export default {
     cursor: pointer;
 
     &:first-child {
-      padding-top: 12px;
+      padding-top: 0;
     }
   }
 }

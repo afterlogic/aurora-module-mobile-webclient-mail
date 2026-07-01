@@ -189,7 +189,11 @@ export default {
       if (!folder && flatList.length > 0) {
         folder = flatList[0]
       }
-      if (!this.currentFolder || folder.fullName !== this.currentFolder.fullName) {
+      if (
+        !this.currentFolder
+        || folder.fullName !== this.currentFolder.fullName
+        || folder.accountId !== this.currentFolder.accountId
+      ) {
         this.currentFolder = folder
       }
     }
