@@ -1,4 +1,5 @@
 import modulesManager from 'src/modules-manager'
+import webApi from 'src/api/web-api'
 
 import { useMailStore } from '../store/index-pinia'
 
@@ -17,7 +18,44 @@ export function composeMessageToAddresses(toAddresses, router) {
   return true
 }
 
+export function composeMessageWithAttachments(attachments, router) {
+  if (!isComposeAvailable() || !attachments?.length || !router) {
+    return false
+  }
+
+  const mailStore = useMailStore()
+  mailStore.setComposeAttachments(attachments)
+  router.push({ name: 'message-compose' })
+  return true
+}
+
+export async function composeMessageWithAttachmentContent({ content, fileName, router }) {
+  if (!isComposeAvailable() || !content || !fileName || !router) {
+    return false
+  }
+
+  const fileItem = await webApi.sendRequest({
+    moduleName: 'Core',
+    methodName: 'SaveContentAsTempFile',
+    parameters: {
+      Content: content,
+      FileName: fileName,
+    },
+  })
+
+  if (!fileItem?.TempName) {
+    return false
+  }
+
+  return composeMessageWithAttachments([{
+    tempName: fileItem.TempName,
+    filename: fileItem.Name || fileName,
+  }], router)
+}
+
 export default {
   isComposeAvailable,
   composeMessageToAddresses,
+  composeMessageWithAttachments,
+  composeMessageWithAttachmentContent,
 }

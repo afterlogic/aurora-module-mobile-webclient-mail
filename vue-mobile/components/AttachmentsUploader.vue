@@ -98,6 +98,22 @@ export default {
     getAttachments() {
       return this.attachments.filter(item => !!item.tempName )
     },
+    addPreUploadedAttachment({ tempName, filename }) {
+      if (!tempName || !filename) {
+        return
+      }
+
+      const attachment = new CAttachment()
+      attachment.polulate({
+        id: tempName,
+        filename,
+        size: '',
+        loading: false,
+        status: 'none',
+        tempName,
+      })
+      this.attachments.push(attachment)
+    },
   },
 }
 </script>

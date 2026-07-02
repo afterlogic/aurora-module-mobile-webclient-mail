@@ -28,5 +28,6 @@ export default function () {
     currentMessage: null,
 
     composeToAddresses: '',
+    composeAttachments: [],
   }
 }

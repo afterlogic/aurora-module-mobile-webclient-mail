@@ -186,6 +186,7 @@ export default {
       'refreshAfterDraftSave',
       'saveDraftOnNavigateBack',
       'takeComposeToAddresses',
+      'takeComposeAttachments',
     ]),
 
     draftFolder() {
@@ -405,6 +406,7 @@ export default {
       } else {
         this.applyDefaultComposeBody()
         this.applyComposeToAddresses()
+        this.applyComposeAttachments()
       }
     },
 
@@ -427,6 +429,21 @@ export default {
           DislpayName: parts.name,
           Email: parts.email,
         })
+      })
+    },
+
+    applyComposeAttachments() {
+      const attachments = this.takeComposeAttachments()
+
+      if (!attachments.length) {
+        return
+      }
+
+      this.$nextTick(() => {
+        attachments.forEach((item) => {
+          this.$refs.attachmentsUploader?.addPreUploadedAttachment(item)
+        })
+        this.commit()
       })
     },
 

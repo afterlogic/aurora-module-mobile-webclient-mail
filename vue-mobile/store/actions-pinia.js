@@ -578,6 +578,16 @@ export default {
     return toAddresses
   },
 
+  setComposeAttachments(attachments) {
+    this.composeAttachments = Array.isArray(attachments) ? attachments : []
+  },
+
+  takeComposeAttachments() {
+    const attachments = this.composeAttachments
+    this.composeAttachments = []
+    return attachments
+  },
+
   addAccountFromData(accountData) {
     const account = accountsUtils.parseAccountItem(accountData)
     const existingIndex = this.accountList.findIndex((item) => item.id === account.id)
