@@ -18,13 +18,13 @@
         :extraLink="$t('COREWEBCLIENT.LABEL_BCC')"
         :extraLinkAction="showBCC"
         :showLink="!isBCCShown"
-        :label="$t('MAILWEBCLIENT.LABEL_CC')"
+        :label="$t('COREWEBCLIENT.LABEL_CC')"
       />
       <RecipientsInput
         v-model="bccInput"
         :getOptions="getOptions"
         v-if="isBCCShown"
-        :label="$t('MAILWEBCLIENT.LABEL_BCC')"
+        :label="$t('COREWEBCLIENT.LABEL_BCC')"
       />
       
       <q-input v-model="subjectInput" dense autocomplete="nope" :placeholder="$t('MAILWEBCLIENT.LABEL_SUBJECT')" class="q-mb-xs contact__form-input">
