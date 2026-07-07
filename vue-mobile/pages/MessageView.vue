@@ -1,5 +1,10 @@
 <template>
-  <q-scroll-area :thumb-style="{ width: '5px' }" class="message-view__scroll" style="height: 100%;">
+  <q-scroll-area
+    ref="messageScrollArea"
+    :thumb-style="{ width: '5px' }"
+    class="message-view__scroll"
+    style="height: 100%;"
+  >
     <div class="messages__loader" v-if="isCurrentMessageLoading">
       <q-spinner-dots color="primary" size="40px" />
     </div>
@@ -51,7 +56,12 @@
             color="#949496"
             class="message-flags__flag-forwarded"
           />
-          <AttachmentIcon class="message-flags__flag-attachment" :color="primaryColor" v-if="currentMessage?.hasAttachments" />
+          <AttachmentIcon
+            v-if="currentMessage?.hasAttachments"
+            class="message-flags__flag-attachment message-flags__flag-attachment_clickable"
+            :color="primaryColor"
+            @click="scrollToAttachments"
+          />
           <StarIcon class="message-flags__flag-starred"
             v-if="currentMessage?.isFlagged"
             :color="goldColor"
@@ -62,10 +72,14 @@
         </div>
         <div class="message-header__subject">{{ currentMessage.subject }}</div>
         <div class="message-body" v-html="messageBodyHtml"></div>
-        <div class="message-attachments">
+        <div
+          v-if="attachmentList.length"
+          ref="attachmentsSection"
+          class="message-attachments"
+        >
           <AttachmentListItem
-            v-for="attachment in attachmentList"
-            :key="attachment.MimePartIndex"
+            v-for="(attachment, index) in attachmentList"
+            :key="attachment.id || index"
             :attachment="attachment"
             :hideRemove="true"
           />
@@ -154,7 +168,8 @@ export default {
       const attachments = [];
 
       if (this.currentMessage?.attachments['@Collection']) {
-        const filteredItemsData = this.currentMessage?.attachments['@Collection'].filter(item => item.IsInline === false)
+        const filteredItemsData = this.currentMessage.attachments['@Collection']
+          .filter((item) => !item.IsLinked && !item.IsInline)
         
         filteredItemsData.forEach((item) => {
           const attachment = new CAttachment()
@@ -237,6 +252,28 @@ export default {
       if (!result) {
         this.currentMessage.isFlagged = prevFlag
       }
+    },
+
+    scrollToAttachments() {
+      if (!this.attachmentList.length) {
+        return
+      }
+
+      this.$nextTick(() => {
+        const scrollArea = this.$refs.messageScrollArea
+        const attachmentsSection = this.$refs.attachmentsSection
+
+        if (!scrollArea || !attachmentsSection) {
+          return
+        }
+
+        const scrollTarget = scrollArea.getScrollTarget()
+        const offset = attachmentsSection.getBoundingClientRect().top
+          - scrollTarget.getBoundingClientRect().top
+          + scrollTarget.scrollTop
+
+        scrollArea.setScrollPosition('vertical', offset, 300)
+      })
     },
   },
 }
@@ -343,6 +380,10 @@ export default {
 
   &__flag-attachment {
     fill: #469CF8;
+
+    &_clickable {
+      cursor: pointer;
+    }
   }
 }
 </style>
