@@ -77,6 +77,13 @@ export default {
     }
   },
 
+  getFolderByFullName: (state) => {
+    return (accountId, folderFullName) => {
+      const folderList = state.folderLists.get(accountId)
+      return folderList?.flatList?.find((folder) => folder.fullName === folderFullName) || null
+    }
+  },
+
   currentFoldersCount: (state) => {
     const currentFolderList = state.folderLists.get(state.currentAccountId)
     return currentFolderList ? currentFolderList.count : 0

@@ -152,6 +152,17 @@ export default {
       .catch(() => null)
   },
 
+  saveMessageAsTempFile: async (parameters) => {
+    return webApi
+      .sendRequest({
+        moduleName: 'Mail',
+        methodName: 'SaveMessageAsTempFile',
+        parameters,
+      })
+      .then((result) => result)
+      .catch(() => null)
+  },
+
   getAccounts: async (parameters) => {
     return webApi
       .sendRequest({

@@ -187,6 +187,7 @@ export default {
       'saveDraftOnNavigateBack',
       'takeComposeToAddresses',
       'takeComposeAttachments',
+      'takeComposeSubject',
     ]),
 
     draftFolder() {
@@ -397,6 +398,8 @@ export default {
           if (isDraftMessage) {
             this.draftUid = types.pString(uid)
             this.populateDraftFields(message)
+          } else if (replyType === 'resend') {
+            this.populateDraftFields(message)
           } else {
             this.populateReplyFields(message, replyType)
           }
@@ -407,6 +410,15 @@ export default {
         this.applyDefaultComposeBody()
         this.applyComposeToAddresses()
         this.applyComposeAttachments()
+        this.applyComposeSubject()
+      }
+    },
+
+    applyComposeSubject() {
+      const subject = this.takeComposeSubject()
+
+      if (subject) {
+        this.subjectInput = subject
       }
     },
 

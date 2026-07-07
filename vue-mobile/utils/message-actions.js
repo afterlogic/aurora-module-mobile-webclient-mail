@@ -1,100 +1,117 @@
-// import { useContactsStore } from '../store/index-pinia'
-// const contactsStore = useContactsStore()
-import notification from 'src/utils/notification'
-
-const isShowAction = (action, message) => {
-  let result = true
-  if (contact) {
-    switch (action) {
-      case 'delete':
-        break
-      // case 'delete':
-      //   if (Array.isArray(contact)) {
-      //     if ( storage?.Id === 'all') result = false
-      //   } else {
-      //     if ( contact.Storage === 'team') result = false
-      //   }
-      //   break
-      default:
-        break
-    }
-  }
-  return result
-}
+import { FOLDER_TYPES } from '../enums'
 
 export const messageActions = {
   reply: {
     name: 'reply',
-    displayName: 'Reply',
+    labelKey: 'MAILWEBCLIENT.ACTION_REPLY',
     icon: 'ReplyIcon',
-    isShowAction: isShowAction,
-    // method: () => { notification.showReport('Comming soon') },
-    // component: 'SendDialog',
-    routeMethod: (currentRoute) => { return currentRoute.path + '/reply' },
+    routeSuffix: 'reply',
   },
   replyAll: {
     name: 'replyAll',
-    displayName: 'Reply All',
+    labelKey: 'MAILWEBCLIENT.ACTION_REPLY_TO_ALL',
     icon: 'ReplyAllIcon',
-    isShowAction: isShowAction,
-    // method: () => { notification.showReport('Comming soon') },
-    // component: 'SendDialog',
-    routeMethod: (currentRoute) => { return currentRoute.path + '/reply-all' },
+    menuIcon: 'reply_all',
+    routeSuffix: 'reply-all',
   },
   forward: {
     name: 'forward',
-    displayName: 'Forward',
+    labelKey: 'MAILWEBCLIENT.ACTION_FORWARD',
     icon: 'ForwardIcon',
-    isShowAction: isShowAction,
-    // method: () => { notification.showReport('Comming soon') },
-    // component: 'SendDialog',
-    routeMethod: (currentRoute) => { return currentRoute.path + '/forward' },
+    menuIcon: 'forward',
+    routeSuffix: 'forward',
+  },
+  resend: {
+    name: 'resend',
+    labelKey: 'MAILWEBCLIENT.ACTION_RESEND',
+    icon: 'ReplyIcon',
+    menuIcon: 'send',
+    routeSuffix: 'resend',
   },
   delete: {
     name: 'delete',
-    displayName: 'Delete',
+    labelKey: 'COREWEBCLIENT.ACTION_DELETE',
     icon: 'DeleteIcon',
-    isShowAction: isShowAction,
-    // method: null,
     component: 'DeleteMessageDialog',
   },
-  // send: {
-  //   method: () => { notification.showReport('Comming soon') },
-  //   name: 'send',
-  //   component: 'SendDialog',
-  //   displayName: 'Send',
-  //   icon: 'SendIcon',
-  //   isShowAction: isShowAction,
-  // },
-  // save: {
-  //   method: null,
-  //   name: 'edit',
-  //   component: 'EditDialog',
-  //   displayName: 'Edit',
-  //   icon: 'EditIcon',
-  //   isShowAction: isShowAction,
-  // },
-  // removeFromGroup: {
-  //   method: async (group, contacts) => {
-  //     return await contactsStore.asyncRemoveFromGroup({
-  //       GroupUUID: group.UUID,
-  //       ContactUUIDs: contacts.map(item => item.UUID)
-  //     })
-  //   },
-  //   name: 'removeFromGroup',
-  //   component: 'DeleteContactDialog',
-  //   displayName: 'Remove From Group',
-  //   icon: 'DeleteIcon',
-  //   isShowAction: isShowAction,
-  // },
+  toSpam: {
+    name: 'toSpam',
+    labelKey: 'MAILWEBCLIENT.ACTION_MARK_SPAM',
+    menuIcon: 'report',
+    handler: 'toSpam',
+    isVisible: ({ getFolderByType, accountId }) => !!getFolderByType(accountId, FOLDER_TYPES.SPAM),
+  },
+  notSpam: {
+    name: 'notSpam',
+    labelKey: 'MAILWEBCLIENT.ACTION_MARK_NOT_SPAM',
+    menuIcon: 'report_off',
+    handler: 'notSpam',
+    isVisible: ({ getFolderByType, accountId }) => !!getFolderByType(accountId, FOLDER_TYPES.INBOX),
+  },
+  moveToFolder: {
+    name: 'moveToFolder',
+    labelKey: 'MAILWEBCLIENT.ACTION_MOVE_TO_FOLDER',
+    menuIcon: 'drive_file_move',
+    component: 'MoveMessageDialog',
+  },
+  viewHeaders: {
+    name: 'viewHeaders',
+    labelKey: 'MAILWEBCLIENT.ACTION_OPEN_MESSAGE_HEADERS',
+    menuIcon: 'info',
+    component: 'MessageHeadersDialog',
+  },
+  forwardAsAttachment: {
+    name: 'forwardAsAttachment',
+    labelKey: 'MAILWEBCLIENT.ACTION_FORWARD_AS_ATTACHMENT',
+    menuIcon: 'attach_email',
+    handler: 'forwardAsAttachment',
+  },
 }
 
-// export const getMessageActionList = (file) => {
-//   const actions = []
-//   if (file) {
-//     Object.keys(contactActions).forEach((key) => {
-//       actions.push(contactActions[key])
-//     })
-//   }
-//   return actions
-// }
+export function getActionLabel(action, t) {
+  if (action.labelKey) {
+    return t(action.labelKey)
+  }
+  return action.label || ''
+}
+
+export function getToolbarActions(folderType) {
+  if (folderType === FOLDER_TYPES.SENT) {
+    return [messageActions.delete]
+  }
+  return [messageActions.reply, messageActions.delete]
+}
+
+export function getMenuActions(folderType) {
+  if (folderType === FOLDER_TYPES.SENT) {
+    return [
+      messageActions.forward,
+      messageActions.resend,
+      messageActions.moveToFolder,
+      messageActions.viewHeaders,
+      messageActions.forwardAsAttachment,
+    ]
+  }
+
+  const spamAction = folderType === FOLDER_TYPES.SPAM
+    ? messageActions.notSpam
+    : messageActions.toSpam
+
+  return [
+    messageActions.replyAll,
+    messageActions.forward,
+    spamAction,
+    messageActions.moveToFolder,
+    messageActions.viewHeaders,
+    messageActions.forwardAsAttachment,
+  ]
+}
+
+export function filterVisibleActions(actions, context) {
+  return actions.filter((action) => {
+    if (typeof action.isVisible === 'function') {
+      return action.isVisible(context)
+    }
+    return true
+  })
+}

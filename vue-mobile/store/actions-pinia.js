@@ -490,7 +490,10 @@ export default {
 
   removeMessagesFromList(messages) {
     messages.forEach((message) => {
-      deleteMessageFromCache(message.AccountID, message.Folder, message.uid)
+      const accountId = message.accountId || message.AccountID
+      const folder = message.folder || message.Folder
+
+      deleteMessageFromCache(accountId, folder, message.uid)
 
       const itemIndex = this.currentMessageList.findIndex((item) => item.uid === message.uid)
 
@@ -586,6 +589,31 @@ export default {
     const attachments = this.composeAttachments
     this.composeAttachments = []
     return attachments
+  },
+
+  setComposeSubject(subject) {
+    this.composeSubject = subject || ''
+  },
+
+  takeComposeSubject() {
+    const subject = this.composeSubject
+    this.composeSubject = ''
+    return subject
+  },
+
+  async asyncMoveCurrentMessage({ accountId, sourceFolder, destinationFolder, uid, message }) {
+    const result = await this.asyncMoveMessagesToFolder(
+      accountId,
+      sourceFolder,
+      destinationFolder,
+      [uid],
+    )
+
+    if (result && message) {
+      this.removeMessagesFromList([message])
+    }
+
+    return result
   },
 
   addAccountFromData(accountData) {

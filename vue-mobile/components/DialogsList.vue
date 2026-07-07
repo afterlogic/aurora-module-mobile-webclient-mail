@@ -22,6 +22,8 @@ import _ from 'lodash'
 // import CreateFolderDialog from './dialogs/CreateFolderDialog'
 import DeleteMessageDialog from './dialogs/DeleteMessageDialog'
 import EmptyFolderDialog from './dialogs/EmptyFolderDialog'
+import MoveMessageDialog from './dialogs/MoveMessageDialog'
+import MessageHeadersDialog from './dialogs/MessageHeadersDialog'
 
 export default {
   name: 'DialogsList',
@@ -29,6 +31,8 @@ export default {
   components: {
     DeleteMessageDialog,
     EmptyFolderDialog,
+    MoveMessageDialog,
+    MessageHeadersDialog,
   //   FileUploader, 
   //   CreateFolderDialog,
   },
