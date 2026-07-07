@@ -9,3 +9,6 @@ export const FOLDER_TYPES = {
   USER: 10,
   ALL: 11,
 }
+
+export const STARRED_FOLDER_FULL_NAME = 'Starred'
+export const STARRED_FOLDER_FILTER = 'flagged'

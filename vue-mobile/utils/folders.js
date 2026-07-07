@@ -1,6 +1,6 @@
 import { i18n } from 'boot/i18n'
 
-import {FOLDER_TYPES} from '../enums'
+import {FOLDER_TYPES, STARRED_FOLDER_FULL_NAME, STARRED_FOLDER_FILTER} from '../enums'
 
 import types from 'src/utils/types'
 
@@ -21,6 +21,34 @@ function getDisplayName(folderType, folderName, isUnifiedInbox = false) {
       return i18n.global.tc('MAILWEBCLIENT.LABEL_FOLDER_SPAM')
     default:
       return folderName
+  }
+}
+
+function buildStarredFolder(accountId, delimiter, sourceFolderFullName) {
+  // Folder names are not translated in the client, so Starred stays English too
+  const displayName = STARRED_FOLDER_FULL_NAME
+  return {
+    accountId,
+    fullName: STARRED_FOLDER_FULL_NAME,
+    name: displayName,
+    type: FOLDER_TYPES.STARRED,
+    delimiter,
+    namespaced: false,
+    displayName,
+    isSubscribed: true,
+    isSelectable: true,
+    exists: true,
+    hasChanges: false,
+    count: 0,
+    unseenCount: 0,
+    nextUid: '',
+    hash: STARRED_FOLDER_FULL_NAME,
+    subFolders: [],
+    hasSubscribed: [],
+    // Virtual folder: the real request goes to INBOX with the flagged filter
+    isVirtual: true,
+    virtualFilter: STARRED_FOLDER_FILTER,
+    sourceFolderFullName,
   }
 }
 
@@ -89,6 +117,18 @@ function parseFolders(accountId, result) {
   }
 
   let newFoldersData = _recursive(foldersTree)
+
+  const inboxFolder = flatList.find((folder) => folder.type === FOLDER_TYPES.INBOX)
+  if (inboxFolder) {
+    const starredFolder = buildStarredFolder(accountId, inboxFolder.delimiter, inboxFolder.fullName)
+    flatList.push(starredFolder)
+    const inboxTreeIndex = newFoldersData.tree.findIndex((folder) => folder.type === FOLDER_TYPES.INBOX)
+    if (inboxTreeIndex !== -1) {
+      newFoldersData.tree.splice(inboxTreeIndex + 1, 0, starredFolder)
+    } else {
+      newFoldersData.tree.unshift(starredFolder)
+    }
+  }
 
   oldFlatList.forEach((folder, name) => {
     delete oldFlatList[name]

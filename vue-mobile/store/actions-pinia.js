@@ -225,13 +225,23 @@ export default {
       InboxUidnext: '',
     }
 
+    let requestFolderFullName = ''
+    let requestAccountId = null
     if (!isUnifiedInbox) {
       const currentFolder = this.currentFolder
       if (!currentFolder) {
         return
       }
+      requestFolderFullName = currentFolder.fullName
+      requestAccountId = currentFolder.accountId
       parameters.AccountID = currentFolder.accountId
-      parameters.Folder = currentFolder.fullName
+      if (currentFolder.isVirtual) {
+        // Virtual Starred folder: messages are fetched from the source folder (INBOX) with the flagged filter
+        parameters.Folder = currentFolder.sourceFolderFullName
+        parameters.Filters = currentFolder.virtualFilter
+      } else {
+        parameters.Folder = currentFolder.fullName
+      }
     }
 
     if (page === 1) {
@@ -258,8 +268,8 @@ export default {
         isUnifiedInbox
           ? this.isUnifiedInbox
           : this.currentFolder
-            && String(parameters.AccountID) === String(this.currentFolder.accountId)
-            && parameters.Folder === this.currentFolder.fullName
+            && String(requestAccountId) === String(this.currentFolder.accountId)
+            && requestFolderFullName === this.currentFolder.fullName
       )
 
     if (isStillRelevant) {

@@ -153,7 +153,7 @@ export default {
       }
 
       const itemsPerPage = this.messageListItemsPerPage ?? 20
-      const hasFilterOrSearch = this.currentFilter !== '' || this.isSearch
+      const hasFilterOrSearch = this.currentFilter !== '' || this.isSearch || this.isStarredFolder
 
       if (!hasFilterOrSearch && !this.isUnifiedInbox) {
         return this.currentMessageList.length >= (this.currentFolder?.count ?? 0)
