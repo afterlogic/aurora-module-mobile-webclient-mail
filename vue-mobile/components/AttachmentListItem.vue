@@ -17,9 +17,7 @@
     </q-item-section>
     <q-item-section class="list-item__side">
       <div class="text-grey-8 q-gutter-xs row">
-        <a v-if="viewLink" :href="viewLink" target="_blank">
-          <q-btn flat no-caps color="primary">View</q-btn>
-        </a>
+        <q-btn v-if="viewLink" flat no-caps color="primary" @click="view">View</q-btn>
         <a v-if="downloadLink" :href="downloadLink" target="_blank">
           <q-btn flat><DownloadIcon :color="iconColor" /></q-btn>
         </a>
@@ -67,6 +65,11 @@ export default {
     },
   },
   methods: {
+    view() {
+      if (this.viewLink) {
+        window.open(this.viewLink, '_blank', 'noopener')
+      }
+    },
     remove() {
       this.$emit('remove', this.attachment)
     }
