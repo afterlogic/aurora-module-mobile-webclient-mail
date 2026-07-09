@@ -6,9 +6,10 @@
 
     <div
       v-if="hasMultipleAccounts"
+      ref="dropdown"
       class="account-dropdown q-mt-md"
     >
-      <div class="account-dropdown__header" @click="toggleOpen">
+      <div class="account-dropdown__header" @click.stop="toggleOpen">
         <span class="account-dropdown__current-email">{{ currentAccountEmail }}</span>
         <span class="account-dropdown__caret" :class="{ 'account-dropdown__caret--up': isOpen }" />
       </div>
@@ -72,10 +73,14 @@ export default {
 
   mounted() {
     eventBus.$on('closeDrawer', this.closeDropdown)
+    document.addEventListener('touchstart', this.handleDocumentClick)
+    document.addEventListener('click', this.handleDocumentClick)
   },
 
   beforeUnmount() {
     eventBus.$off('closeDrawer', this.closeDropdown)
+    document.removeEventListener('touchstart', this.handleDocumentClick)
+    document.removeEventListener('click', this.handleDocumentClick)
   },
 
   methods: {
@@ -85,6 +90,17 @@ export default {
 
     closeDropdown() {
       this.isOpen = false
+    },
+
+    handleDocumentClick(event) {
+      if (!this.isOpen) {
+        return
+      }
+
+      const dropdown = this.$refs.dropdown
+      if (dropdown && !dropdown.contains(event.target)) {
+        this.closeDropdown()
+      }
     },
 
     onAccountSelect(accountId) {
