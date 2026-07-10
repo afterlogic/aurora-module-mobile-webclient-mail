@@ -6,18 +6,27 @@
       <RecipientsInput 
         v-model="toInput"
         :getOptions="getOptions"
-        :extraLink="$t('COREWEBCLIENT.LABEL_CC')"
-        :extraLinkAction="showCC"
-        :showLink="!isCCShown"
         :label="$t('MAILWEBCLIENT.LABEL_TO')" 
       />
+      <div
+        v-if="!isCCShown || !isBCCShown"
+        class="message-compose__cc-bcc-switchers"
+      >
+        <span
+          v-if="!isCCShown"
+          class="message-compose__cc-bcc-link"
+          @click="showCC"
+        >{{ $t('MAILWEBCLIENT.ACTION_SHOW_CC') }}</span>
+        <span
+          v-if="!isBCCShown"
+          class="message-compose__cc-bcc-link"
+          @click="showBCC"
+        >{{ $t('MAILWEBCLIENT.ACTION_SHOW_BCC') }}</span>
+      </div>
       <RecipientsInput
         v-model="ccInput"
         :getOptions="getOptions"
         v-if="isCCShown"
-        :extraLink="$t('COREWEBCLIENT.LABEL_BCC')"
-        :extraLinkAction="showBCC"
-        :showLink="!isBCCShown"
         :label="$t('COREWEBCLIENT.LABEL_CC')"
       />
       <RecipientsInput
@@ -27,13 +36,21 @@
         :label="$t('COREWEBCLIENT.LABEL_BCC')"
       />
       
-      <q-input v-model="subjectInput" dense autocomplete="nope" :placeholder="$t('MAILWEBCLIENT.LABEL_SUBJECT')" class="q-mb-xs contact__form-input">
-        <template v-slot:append>
-          <AppActionIconContainer @click="selectFiles">
-            <AttachmentIcon />
-          </AppActionIconContainer>
-        </template>
-      </q-input>
+      <div class="recipients-input message-compose__subject-input">
+        <span class="recipients-input__label">{{ $t('MAILWEBCLIENT.LABEL_SUBJECT') }}</span>
+        <q-input
+          v-model="subjectInput"
+          dense
+          autocomplete="nope"
+          class="recipients-input__field"
+        >
+          <template v-slot:append>
+            <AppActionIconContainer @click="selectFiles">
+              <AttachmentIcon />
+            </AppActionIconContainer>
+          </template>
+        </q-input>
+      </div>
       
       <AttachmentsUploader ref="attachmentsUploader" />
 
@@ -168,14 +185,25 @@ export default {
     this.stopAutosaveInterval()
   },
 
-  beforeRouteLeave(to, from, next) {
-    const needsSave = this.isDraftFolderAvailable && this.isChanged() && this.hasSaveableContent()
-
-    next()
-
-    if (needsSave) {
-      this.saveDraftOnNavigateBack(this.buildComposeParameters())
+  async beforeRouteLeave(to, from) {
+    if (!this.isDraftFolderAvailable || !this.isChanged()) {
+      return true
     }
+
+    const uploader = this.$refs.attachmentsUploader
+    if (uploader) {
+      const ready = await uploader.prepareTempFiles()
+      if (!ready) {
+        return true
+      }
+    }
+
+    if (!this.hasSaveableContent()) {
+      return true
+    }
+
+    this.saveDraftOnNavigateBack(this.buildComposeParameters())
+    return true
   },
 
   methods: {
@@ -201,13 +229,30 @@ export default {
         bccInput: this.bccInput,
         subjectInput: this.subjectInput,
         bodyInput: this.bodyInput,
+        attachments: this.$refs.attachmentsUploader?.getAllAttachments?.() || this.getUploadedAttachments(),
       })
     },
 
+    async ensureAttachmentsReady() {
+      const uploader = this.$refs.attachmentsUploader
+      if (!uploader) {
+        return true
+      }
+
+      const ready = await uploader.prepareTempFiles()
+      if (!ready) {
+        notification.showReport(this.$t('MAILWEBCLIENT.ERROR_MESSAGE_SAVING'))
+        return false
+      }
+
+      return true
+    },
+
     takeSnapshot() {
-      const attachments = this.getUploadedAttachments().map((item) => ({
+      const attachments = (this.$refs.attachmentsUploader?.getAllAttachments?.() || []).map((item) => ({
         tempName: item.tempName,
         filename: item.filename,
+        hash: item.hash,
       }))
       return JSON.stringify({
         to: this.toInput,
@@ -285,6 +330,23 @@ export default {
 
       if (autosave && !this.isChanged()) {
         return true
+      }
+
+      if (!autosave) {
+        const attachmentsReady = await this.ensureAttachmentsReady()
+        if (!attachmentsReady) {
+          return false
+        }
+      } else if (this.$refs.attachmentsUploader?.hasIncompleteAttachments()) {
+        if (this.$refs.attachmentsUploader.hasPendingUploads()) {
+          return false
+        }
+
+        // Convert draft attachment hashes to temp files during autosave.
+        const ready = await this.$refs.attachmentsUploader.prepareTempFiles()
+        if (!ready) {
+          return false
+        }
       }
 
       if (!this.hasSaveableContent()) {
@@ -526,6 +588,41 @@ export default {
         this.isBCCShown = true
         this.populateRecipientsFromCollection(this.bccInput, message.bcc)
       }
+
+      this.populateDraftAttachments(message)
+    },
+
+    populateDraftAttachments(message) {
+      const collection = message.attachments?.['@Collection']
+      if (!collection?.length) {
+        return
+      }
+
+      const nonInlineAttachments = collection.filter((item) => !item.IsInline && !item.IsLinked)
+      if (!nonInlineAttachments.length) {
+        return
+      }
+
+      // Only show attachments here. Temp files are created later in prepareTempFiles()
+      // right before save/send — avoids IMAP timeout on draft open.
+      this.$nextTick(() => {
+        const uploader = this.$refs.attachmentsUploader
+        if (!uploader) {
+          return
+        }
+
+        nonInlineAttachments.forEach((item) => {
+          uploader.addMessageAttachment({
+            hash: item.Hash,
+            filename: item.FileName || item.Name,
+            size: item.EstimatedSize || item.Size,
+            thumbnailUrl: item.ThumbnailUrl,
+            actions: item.Actions,
+          })
+        })
+
+        this.commit()
+      })
     },
 
     populateRecipientsFromCollection(field, collection) {
@@ -587,6 +684,11 @@ export default {
     emitInterface() {
       this.$emit('interface', {
         sendMessage: async () => {
+          const attachmentsReady = await this.ensureAttachmentsReady()
+          if (!attachmentsReady) {
+            return
+          }
+
           const parameters = this.buildComposeParameters()
           const draftFolder = this.draftFolder()
 
@@ -600,8 +702,8 @@ export default {
           notification.hideLoading()
           if (res) {
             notification.showReport(this.$t('MAILWEBCLIENT.REPORT_MESSAGE_SENT'))
+            this.$router.back()
           }
-          this.$router.back()
         },
         saveMessage: () => {
           this.executeSave({ autosave: false })
@@ -634,6 +736,46 @@ export default {
   .q-editor {
     max-width: 100%;
     min-width: 0;
+  }
+}
+
+.message-compose__cc-bcc-switchers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 0 0 8px 4.5rem;
+  font-size: 14px;
+}
+
+.message-compose__cc-bcc-link {
+  color: #469cf8;
+  cursor: pointer;
+}
+
+.message-compose__subject-input {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin-bottom: 8px;
+
+  .recipients-input__label {
+    flex: 0 0 4.5rem;
+    width: 4.5rem;
+    font-size: 14px;
+    line-height: 40px;
+    padding-right: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .recipients-input__field {
+    flex: 1 1 0;
+    width: 0;
+    min-width: 0;
+    max-width: 100%;
   }
 }
 

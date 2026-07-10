@@ -196,6 +196,16 @@ function hasSaveableContent(fields) {
         return true
     }
 
+    const attachments = fields.attachments !== undefined
+        ? fields.attachments
+        : fields.Attachments
+    if (Array.isArray(attachments) && attachments.length > 0) {
+        return true
+    }
+    if (attachments && typeof attachments === 'object' && Object.keys(attachments).length > 0) {
+        return true
+    }
+
     const body = fields.bodyInput !== undefined ? fields.bodyInput : fields.Text
 
     return getPlainBodyText(body) !== ''

@@ -13,32 +13,63 @@
         <div class="message-header__basic" v-show="!isDetailVisible">
           <div class="message-header__recipients">
             <div class="message-header__recipients-sender">{{ sender }}</div>
-            <div class="message-header__recipient" v-for="recipient in currentMessage?.to['@Collection']">{{ recipient?.Email }}</div>
+            <div class="message-header__recipients-to">
+              <span
+                v-for="(recipient, index) in currentMessage?.to['@Collection']"
+                :key="recipient?.Email || index"
+                class="message-header__recipient"
+              >{{ formatRecipient(recipient) }}</span>
+            </div>
           </div>
           <div class="message-header__date">{{ messageDate }}</div>
         </div>     
         <div class="message-header__details" v-show="isDetailVisible">
           <div class="recipients-list">
             <div class="recipient-row">
-              <div class="recipient-row__label">From:</div>
+              <div class="recipient-row__label">{{ $t('MAILWEBCLIENT.LABEL_FROM') }}</div>
               <div class="recipient-row__value">
-                <div v-for="recipient in currentMessage?.from['@Collection']">{{ recipient?.Email }}</div>
+                <span
+                  v-for="(recipient, index) in currentMessage?.from['@Collection']"
+                  :key="recipient?.Email || index"
+                  class="recipient-row__address"
+                >{{ formatRecipient(recipient) }}</span>
               </div>
             </div>
             <div class="recipient-row" v-if="currentMessage?.to['@Collection']?.length > 0">
-              <div class="recipient-row__label">To:</div>
-              <div class="recipient-row__value" v-for="recipient in currentMessage?.to['@Collection']">{{ recipient?.Email }}</div>
+              <div class="recipient-row__label">{{ $t('MAILWEBCLIENT.LABEL_TO') }}</div>
+              <div class="recipient-row__value">
+                <span
+                  v-for="(recipient, index) in currentMessage?.to['@Collection']"
+                  :key="recipient?.Email || index"
+                  class="recipient-row__address"
+                >{{ formatRecipient(recipient) }}</span>
+              </div>
             </div>
             <div class="recipient-row" v-if="currentMessage?.cc['@Collection']?.length > 0">
-              <div class="recipient-row__label">CC:</div>
-              <div class="recipient-row__value" v-for="recipient in currentMessage?.cc['@Collection']">{{ recipient?.Email }}</div>
+              <div class="recipient-row__label">{{ $t('COREWEBCLIENT.LABEL_CC') }}</div>
+              <div class="recipient-row__value">
+                <span
+                  v-for="(recipient, index) in currentMessage?.cc['@Collection']"
+                  :key="recipient?.Email || index"
+                  class="recipient-row__address"
+                >{{ formatRecipient(recipient) }}</span>
+              </div>
             </div>
             <div class="recipient-row" v-if="currentMessage?.bcc['@Collection']?.length > 0">
-              <div class="recipient-row__label">BCC:</div>
-              <div class="recipient-row__value" v-for="recipient in currentMessage?.bcc['@Collection']">{{ recipient?.Email }}</div>
+              <div class="recipient-row__label">{{ $t('COREWEBCLIENT.LABEL_BCC') }}</div>
+              <div class="recipient-row__value">
+                <span
+                  v-for="(recipient, index) in currentMessage?.bcc['@Collection']"
+                  :key="recipient?.Email || index"
+                  class="recipient-row__address"
+                >{{ formatRecipient(recipient) }}</span>
+              </div>
+            </div>
+            <div class="recipient-row">
+              <div class="recipient-row__label">{{ $t('MAILWEBCLIENT.LABEL_DATE') }}</div>
+              <div class="recipient-row__value">{{ messageFullDate }}</div>
             </div>
           </div>
-          <div class="message-header__date">{{ messageDate }}</div>
         </div>
         <div class="message-header__switcher" @click="toggleDetails">
           {{ isDetailVisible ? $t('COREWEBCLIENT.ACTION_HIDE_DETAILS') : $t('COREWEBCLIENT.ACTION_SHOW_DETAILS') }}
@@ -152,6 +183,13 @@ export default {
       return dateUtils.getShortDate(this.currentMessage.timeStampInUTC, true)
     },
 
+    messageFullDate() {
+      if (!this.currentMessage) {
+        return ''
+      }
+      return dateUtils.getFullDate(this.currentMessage.timeStampInUTC)
+    },
+
     messageBodyHtml() {
       if (!this.currentMessage) {
         return ''
@@ -243,6 +281,18 @@ export default {
       this.isDetailVisible = !this.isDetailVisible
     },
 
+    formatRecipient(recipient) {
+      if (!recipient) {
+        return ''
+      }
+
+      if (recipient.DislpayName) {
+        return recipient.DislpayName + ' <' + recipient.Email + '>'
+      }
+
+      return recipient.Email || ''
+    },
+
     async onStarredClick(flag) {
       const prevFlag = this.currentMessage.isFlagged
       const uid = this.currentMessage.uid
@@ -296,15 +346,23 @@ export default {
     &-sender {
       color: #000;
       font-size: 14px;
+      margin-bottom: 4px;
+    }
+    &-to {
+      line-height: 1.5;
     }
   }
+
+  &__recipient + &__recipient::before {
+    content: ', ';
+  }
   &__date {
-    padding: 0px 16px;
+    padding: 4px 16px 0;
     color: #B6B5B5;
   }
 
   &__switcher {
-    padding: 0px 16px;
+    padding: 8px 16px 0;
     color: #469CF8;
   }
 
@@ -315,9 +373,6 @@ export default {
   &__details {
     background-color: #dbecfd;
     padding: 16px 0;
-    .message-header__date {
-      color: #000;
-    }
   }
 
   .recipients-list {
@@ -331,9 +386,19 @@ export default {
         color: #969494;
         display: table-cell;
         width: 10%;
+        padding: 6px 8px 6px 0;
+        vertical-align: top;
+        white-space: nowrap;
       }
       &__value {
         display: table-cell;
+        padding: 6px 0;
+        vertical-align: top;
+        line-height: 1.5;
+      }
+
+      &__address + &__address::before {
+        content: ', ';
       }
     }
   }
@@ -385,6 +450,10 @@ export default {
       cursor: pointer;
     }
   }
+}
+
+.message-attachments {
+  padding: 0 16px 16px;
 }
 </style>
 
