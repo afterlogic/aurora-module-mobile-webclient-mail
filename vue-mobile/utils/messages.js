@@ -1,4 +1,13 @@
 import types from 'src/utils/types'
+import { i18n } from 'boot/i18n'
+
+function isEmptySubject(subject) {
+  return types.pString(subject).trim() === ''
+}
+
+function getSubjectForDisplay(subject) {
+  return isEmptySubject(subject) ? i18n.global.t('MAILWEBCLIENT.LABEL_NO_SUBJECT') : subject
+}
 
 function getAccountId(unifiedUid, isUnifiedInbox, accountIdFromParameters = 0) {
   if (isUnifiedInbox) {
@@ -73,6 +82,11 @@ export function parseMessage(messageData, accountIdFromParameters) {
   message.safety = !!messageData.Safety
   message.sensitivity = types.pInt(messageData.Sensitivity) // TODO: use pEnum
   return message
+}
+
+export {
+  isEmptySubject,
+  getSubjectForDisplay,
 }
 
 export function getRecipientsString(aRecipients) {

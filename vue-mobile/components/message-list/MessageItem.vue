@@ -19,8 +19,11 @@
           {{ folderDisplayName }}
         </span>
       </q-item-label>
-      <q-item-label class="list-item__text_primary message__subject">
-        {{ message.subject }}
+      <q-item-label
+        class="list-item__text_primary message__subject"
+        :class="{ 'message__subject_nosubject': isEmptySubject }"
+      >
+        {{ subjectForDisplay }}
       </q-item-label>
     </q-item-section>
 
@@ -52,6 +55,8 @@ import { mapState, mapGetters, mapActions } from 'pinia'
 import { useMailStore } from '../../store/index-pinia'
 
 import { FOLDER_TYPES } from '../../enums'
+
+import { getSubjectForDisplay, isEmptySubject } from '../../utils/messages'
 
 import addressUtils from 'src/utils/address'
 import dateUtils from 'src/utils/date'
@@ -87,6 +92,14 @@ export default {
 
     recipients() {
       return addressUtils.getDisplayNamesFromMailsoAddresses(this.message.from).join(', ')
+    },
+
+    isEmptySubject() {
+      return isEmptySubject(this.message.subject)
+    },
+
+    subjectForDisplay() {
+      return getSubjectForDisplay(this.message.subject)
     },
 
     messageDate() {
@@ -233,5 +246,13 @@ export default {
   .list-item__selected &__icon-attachment {
     fill: #000;
   }
+
+  &__subject_nosubject {
+    color: #888888;
+    opacity: 0.3;
+  }
+}
+.list-item__selected .message__subject_nosubject {
+  color: #ffffff;
 }
 </style>

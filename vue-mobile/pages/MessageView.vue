@@ -101,7 +101,10 @@
           />
           <StarIcon v-else :strokeColor="primaryColor" @click="onStarredClick(true)" />
         </div>
-        <div class="message-header__subject">{{ currentMessage.subject }}</div>
+        <div
+          class="message-header__subject"
+          :class="{ 'message-header__subject_nosubject': isEmptySubject }"
+        >{{ subjectForDisplay }}</div>
         <div class="message-body" v-html="messageBodyHtml"></div>
         <div
           v-if="attachmentList.length"
@@ -138,6 +141,7 @@ import AttachmentIcon from '../components/icons/message-list/AttachmentIcon'
 import AttachmentListItem from '../components/AttachmentListItem'
 import CAttachment from '../classes/CAttachment'
 import htmlForEditor from '../utils/html-for-editor'
+import { getSubjectForDisplay, isEmptySubject } from '../utils/messages'
 
 export default {
   name: 'MessageView',
@@ -188,6 +192,14 @@ export default {
         return ''
       }
       return dateUtils.getFullDate(this.currentMessage.timeStampInUTC)
+    },
+
+    isEmptySubject() {
+      return this.currentMessage ? isEmptySubject(this.currentMessage.subject) : false
+    },
+
+    subjectForDisplay() {
+      return this.currentMessage ? getSubjectForDisplay(this.currentMessage.subject) : ''
     },
 
     messageBodyHtml() {
@@ -343,6 +355,11 @@ export default {
     padding-bottom: 14px;
     margin: 6px 16px 24px;
     border-bottom: 1px solid #f6f6f6;
+
+    &_nosubject {
+      color: #888888;
+      opacity: 0.3;
+    }
   }
   
   &__recipients {
