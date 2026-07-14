@@ -146,6 +146,10 @@ export default {
         return true
       }
 
+      if (this.bodyInput.trim()) {
+        return true
+      }
+
       return SendingUtils.composeBodyHasSignature(this.bodyInput)
     },
   },
@@ -154,13 +158,13 @@ export default {
     currentAccount: {
       immediate: true,
       handler(account) {
-        if (account && this.isNewComposeRoute) {
+        if (account && this.isNewComposeRoute && !this.bodyInput.trim()) {
           this.initNewComposeBody()
         }
       },
     },
     '$route.name'(routeName) {
-      if (routeName === 'message-compose' && this.currentAccount) {
+      if (routeName === 'message-compose' && this.currentAccount && !this.bodyInput.trim()) {
         this.initNewComposeBody()
       }
     },
@@ -173,7 +177,7 @@ export default {
   async mounted() {
     this.emitInterface()
     await this.setMessageFromRoute()
-    if (this.isNewComposeRoute && !SendingUtils.composeBodyHasSignature(this.bodyInput)) {
+    if (this.isNewComposeRoute && !this.bodyInput.trim()) {
       this.initNewComposeBody()
     }
     this.patchComposeImages()
@@ -216,6 +220,8 @@ export default {
       'takeComposeToAddresses',
       'takeComposeAttachments',
       'takeComposeSubject',
+      'takeComposeBody',
+      'takeComposeIsHtml',
     ]),
 
     draftFolder() {
@@ -469,11 +475,36 @@ export default {
           this.$router.back()
         }
       } else {
-        this.applyDefaultComposeBody()
         this.applyComposeToAddresses()
         this.applyComposeAttachments()
         this.applyComposeSubject()
+        if (!this.applyComposeBody()) {
+          this.applyDefaultComposeBody()
+        }
       }
+    },
+
+    applyComposeBody() {
+      const body = this.takeComposeBody()
+      const isHtml = this.takeComposeIsHtml()
+
+      if (!body) {
+        return false
+      }
+
+      if (isHtml) {
+        this.setEditorHtml(body)
+      } else {
+        this.bodyInput = body
+        this.$nextTick(() => {
+          const editorEl = this.$refs.messageBodyEditor?.getContentEl?.()
+          if (editorEl) {
+            editorEl.innerText = body
+          }
+        })
+      }
+
+      return true
     },
 
     applyComposeSubject() {
@@ -522,7 +553,7 @@ export default {
     },
 
     initNewComposeBody() {
-      if (!this.isNewComposeRoute || SendingUtils.composeBodyHasSignature(this.bodyInput)) {
+      if (!this.isNewComposeRoute || this.bodyInput.trim() || SendingUtils.composeBodyHasSignature(this.bodyInput)) {
         return
       }
 

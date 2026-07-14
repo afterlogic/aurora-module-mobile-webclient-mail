@@ -625,6 +625,26 @@ export default {
     return subject
   },
 
+  setComposeBody(body) {
+    this.composeBody = body || ''
+  },
+
+  setComposeIsHtml(isHtml) {
+    this.composeIsHtml = isHtml !== false
+  },
+
+  takeComposeBody() {
+    const body = this.composeBody
+    this.composeBody = ''
+    return body
+  },
+
+  takeComposeIsHtml() {
+    const isHtml = this.composeIsHtml
+    this.composeIsHtml = true
+    return isHtml
+  },
+
   async asyncMoveCurrentMessage({ accountId, sourceFolder, destinationFolder, uid, message }) {
     const result = await this.asyncMoveMessagesToFolder(
       accountId,

@@ -30,5 +30,7 @@ export default function () {
     composeToAddresses: '',
     composeAttachments: [],
     composeSubject: '',
+    composeBody: '',
+    composeIsHtml: true,
   }
 }
