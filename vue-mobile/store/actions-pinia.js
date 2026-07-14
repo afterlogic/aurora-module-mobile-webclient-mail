@@ -485,15 +485,29 @@ export default {
     return result
   },
 
-  async asyncSetMessageFlagged(uid, flag) {
+  async asyncSetMessageFlagged(uid, flag, folder, accountId = 0) {
+    const messageFolder = folder || (this.currentFolder?.isVirtual ? null : this.currentFolder?.fullName)
+    if (!messageFolder) {
+      return false
+    }
+
     const parameters = {
-      AccountID: this.currentAccountId,
-      Folder: this.currentFolder?.fullName,
+      AccountID: accountId || this.currentAccountId,
+      Folder: messageFolder,
       Uids: uid,
       SetAction: flag,
     }
 
     const result = await mailWebApi.setMessageFlagged(parameters)
+
+    if (result && this.currentFolder?.isVirtual && !flag) {
+      const message = this.currentMessageList.find(
+        (item) => item.uid === uid && item.folder === messageFolder
+      )
+      if (message) {
+        this.removeMessagesFromList([message])
+      }
+    }
 
     return result
   },

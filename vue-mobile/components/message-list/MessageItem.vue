@@ -163,7 +163,12 @@ export default {
       const uid = this.message.uid
       
       this.message.isFlagged = flag
-      const result = await this.asyncSetMessageFlagged(uid, flag)
+      const result = await this.asyncSetMessageFlagged(
+        uid,
+        flag,
+        this.message.folder,
+        this.message.accountId,
+      )
       if (!result) {
         this.message.isFlagged = prevFlag
       }
