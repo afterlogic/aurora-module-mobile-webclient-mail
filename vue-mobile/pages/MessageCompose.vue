@@ -68,6 +68,8 @@
         min-height="10rem"
       />
     </q-form>
+
+    <ConfirmComposeExitDialog ref="exitDialog" />
   </q-scroll-area>
 </template>
 
@@ -85,6 +87,7 @@ import AttachmentIcon from '../components/icons/message-list/AttachmentIcon'
 import RecipientsInput from '../components/RecipientsInput'
 
 import AttachmentsUploader from '../components/AttachmentsUploader'
+import ConfirmComposeExitDialog, { COMPOSE_EXIT_ANSWER } from '../components/dialogs/ConfirmComposeExitDialog'
 
 import notification from 'src/utils/notification'
 
@@ -102,6 +105,7 @@ export default {
     AttachmentIcon,
     RecipientsInput,
     AttachmentsUploader,
+    ConfirmComposeExitDialog,
   },
 
   emits: ['interface'],
@@ -121,6 +125,7 @@ export default {
       disableAutosave: false,
       initialSnapshot: null,
       autosaveInterval: null,
+      messageSent: false,
     }
   },
 
@@ -190,23 +195,26 @@ export default {
   },
 
   async beforeRouteLeave(to, from) {
-    if (!this.isDraftFolderAvailable || !this.isChanged()) {
+    if (this.messageSent || !this.isDraftFolderAvailable || !this.isChanged()) {
       return true
-    }
-
-    const uploader = this.$refs.attachmentsUploader
-    if (uploader) {
-      const ready = await uploader.prepareTempFiles()
-      if (!ready) {
-        return true
-      }
     }
 
     if (!this.hasSaveableContent()) {
       return true
     }
 
-    this.saveDraftOnNavigateBack(this.buildComposeParameters())
+    this.disableAutosave = true
+    this.stopAutosaveInterval()
+
+    const answer = await this.$refs.exitDialog.open()
+
+    if (answer !== COMPOSE_EXIT_ANSWER.OK) {
+      this.disableAutosave = false
+      this.startAutosaveInterval()
+      return false
+    }
+
+    // COMPOSE_EXIT_ANSWER.OK: discard the pending changes and leave.
     return true
   },
 
@@ -216,7 +224,6 @@ export default {
       'changeCurrentMessageIdentifiers',
       'asyncGetMessage',
       'refreshAfterDraftSave',
-      'saveDraftOnNavigateBack',
       'takeComposeToAddresses',
       'takeComposeAttachments',
       'takeComposeSubject',
@@ -733,6 +740,8 @@ export default {
           notification.hideLoading()
           if (res) {
             notification.showReport(this.$t('MAILWEBCLIENT.REPORT_MESSAGE_SENT'))
+            this.messageSent = true
+            this.stopAutosaveInterval()
             this.$router.back()
           }
         },
