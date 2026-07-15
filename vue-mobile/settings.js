@@ -7,6 +7,8 @@ class MailSettings {
     const mailStore = useMailStore()
     const mailWebclientData = types.pObject(appData.MailWebclient)
     const mailData = types.pObject(appData.Mail)
+    const mailZipData = types.pObject(appData.MailZipWebclientPlugin)
+    const hasMailZipPlugin = !!appData.MailZipWebclientPlugin
     this.messageBodyTruncationThreshold = types.pNonNegativeInt(mailWebclientData.MessageBodyTruncationThreshold)
 
     this.allowUnifiedInbox = !!mailData.AllowUnifiedInbox
@@ -14,6 +16,9 @@ class MailSettings {
     this.allowMultiAccounts = types.pBool(mailData.AllowMultiAccounts)
     this.allowAutosaveInDrafts = types.pBool(mailData.AllowAutosaveInDrafts, true)
     this.autoSaveIntervalSeconds = types.pNonNegativeInt(mailData.AutoSaveIntervalSeconds, 60)
+    // AllowZip comes from MailZipWebclientPlugin::GetSettings() as class_exists('ZipArchive').
+    // If plugin is present in AppData, default to enabled unless explicitly false.
+    this.allowZip = hasMailZipPlugin ? types.pBool(mailZipData.AllowZip, true) : false
     mailStore.parseAccounts(types.pArray(mailData.Accounts))
   }
 }

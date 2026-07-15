@@ -29,14 +29,25 @@
       </q-btn>
     </div>
 
-    <div v-if="viewLink || downloadLink" class="attachment-card__actions">
+    <div v-if="hasActions" class="attachment-card__actions">
       <q-btn
-        v-if="viewLink"
+        v-if="isExpandableZip"
         flat
         no-caps
         dense
         color="primary"
-        label="VIEW"
+        :label="expandLabel"
+        :disable="isExpanding"
+        class="attachment-card__action"
+        @click="toggleExpand"
+      />
+      <q-btn
+        v-else-if="viewLink"
+        flat
+        no-caps
+        dense
+        color="primary"
+        :label="$t('COREWEBCLIENT.ACTION_VIEW_FILE')"
         class="attachment-card__action"
         @click="view"
       />
@@ -46,11 +57,21 @@
         no-caps
         dense
         color="primary"
-        label="DOWNLOAD"
+        :label="$t('COREWEBCLIENT.ACTION_DOWNLOAD_FILE')"
         class="attachment-card__action"
         :href="downloadLink"
         target="_blank"
         tag="a"
+      />
+    </div>
+
+    <div v-if="isExpanded && subFiles.length" class="attachment-card__children">
+      <AttachmentListItem
+        v-for="(subFile, index) in subFiles"
+        :key="subFile.hash || subFile.id || index"
+        :attachment="subFile"
+        :hideRemove="true"
+        class="attachment-card__child"
       />
     </div>
   </div>
@@ -64,6 +85,9 @@ import { getApiHost } from 'src/api/helpers'
 import text from 'src/utils/text'
 import FileIcon from './icons/FileIcon'
 import CancelCrossIcon from '/src/components/common/icons/CancelCrossIcon'
+import mailWebApi from '../mail-web-api'
+import settings from '../settings'
+import CAttachment from '../classes/CAttachment'
 
 function resolveActionUrl(actions, actionName, hash) {
   const fromActions = actions?.[actionName]?.url || actions?.[actionName]?.Url || ''
@@ -82,6 +106,31 @@ function resolveActionUrl(actions, actionName, hash) {
   return '?file-cache/' + hash
 }
 
+function getFileExtension(filename) {
+  if (!filename || typeof filename !== 'string') {
+    return ''
+  }
+
+  const parts = filename.split('.')
+  return parts.length > 1 ? parts.pop().toLowerCase() : ''
+}
+
+function mapExpandedFile(fileData) {
+  const attachment = new CAttachment()
+  const hash = fileData?.Hash || ''
+
+  attachment.polulate({
+    id: hash || fileData?.TempName || fileData?.FileName,
+    filename: fileData?.FileName || fileData?.Name || '',
+    size: fileData?.Size || '',
+    thumbnailUrl: fileData?.ThumbnailUrl || '',
+    actions: fileData?.Actions || null,
+    hash,
+  })
+
+  return attachment
+}
+
 export default {
   name: 'AttachmentListItem',
   components: {
@@ -94,6 +143,14 @@ export default {
     hideRemove: { type: Boolean, default: false },
     iconColor: { type: String, default: getPaletteColor('primary') },
   },
+  data() {
+    return {
+      isExpanded: false,
+      isExpanding: false,
+      subFilesLoaded: false,
+      subFiles: [],
+    }
+  },
   computed: {
     thumbnail() {
       return this.attachment?.thumbnailUrl ? (getApiHost() + this.attachment.thumbnailUrl) : ''
@@ -101,13 +158,34 @@ export default {
     size() {
       return this.attachment?.size ? text.getFriendlySize(this.attachment.size) : ''
     },
+    attachmentHash() {
+      return this.attachment?.hash || this.attachment?.id || ''
+    },
     viewLink() {
-      const url = resolveActionUrl(this.attachment?.actions, 'view', this.attachment?.hash)
+      const url = resolveActionUrl(this.attachment?.actions, 'view', this.attachmentHash)
       return url ? (getApiHost() + url) : ''
     },
     downloadLink() {
-      const url = resolveActionUrl(this.attachment?.actions, 'download', this.attachment?.hash)
+      const url = resolveActionUrl(this.attachment?.actions, 'download', this.attachmentHash)
       return url ? (getApiHost() + url) : ''
+    },
+    isZipAttachment() {
+      return getFileExtension(this.attachment?.filename) === 'zip'
+    },
+    isExpandableZip() {
+      return this.isZipAttachment && !!settings.get('allowZip') && !!this.attachmentHash
+    },
+    expandLabel() {
+      if (this.isExpanding) {
+        return this.$t('COREWEBCLIENT.INFO_LOADING')
+      }
+      if (this.isExpanded) {
+        return this.$t('COREWEBCLIENT.ACTION_COLLAPSE_FILE')
+      }
+      return this.$t('COREWEBCLIENT.ACTION_EXPAND_FILE')
+    },
+    hasActions() {
+      return this.isExpandableZip || !!this.viewLink || !!this.downloadLink
     },
   },
   methods: {
@@ -118,6 +196,35 @@ export default {
     },
     remove() {
       this.$emit('remove', this.attachment)
+    },
+    async toggleExpand() {
+      if (this.isExpanding) {
+        return
+      }
+
+      if (this.isExpanded) {
+        this.isExpanded = false
+        return
+      }
+
+      if (this.subFilesLoaded) {
+        this.isExpanded = true
+        return
+      }
+
+      this.isExpanding = true
+      const result = await mailWebApi.expandZipFile({
+        Hash: this.attachmentHash,
+      })
+      this.isExpanding = false
+
+      if (!result || !Array.isArray(result.Files)) {
+        return
+      }
+
+      this.subFiles = result.Files.map(mapExpandedFile)
+      this.subFilesLoaded = true
+      this.isExpanded = true
     },
   },
 }
@@ -187,5 +294,18 @@ export default {
 .attachment-card__action {
   font-size: 12px;
   min-height: 28px;
+}
+
+.attachment-card__children {
+  padding: 0 8px 8px 28px;
+}
+
+.attachment-card__child {
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px #ddd;
+}
+
+.attachment-card__child:last-child {
+  margin-bottom: 0;
 }
 </style>

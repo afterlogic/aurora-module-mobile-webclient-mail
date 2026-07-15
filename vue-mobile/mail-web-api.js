@@ -190,4 +190,15 @@ export default {
       })
       .catch(() => null)
   },
+
+  expandZipFile: async (parameters) => {
+    return webApi
+      .sendRequest({
+        moduleName: 'MailZipWebclientPlugin',
+        methodName: 'ExpandFile',
+        parameters,
+      })
+      .then((result) => result)
+      .catch(() => null)
+  },
 }

@@ -229,7 +229,8 @@ export default {
             filename: item.FileName,
             size: item.EstimatedSize,
             thumbnailUrl: item.ThumbnailUrl,
-            actions: item?.Actions
+            actions: item?.Actions,
+            hash: item.Hash,
           })
 
           attachments.push(attachment)
