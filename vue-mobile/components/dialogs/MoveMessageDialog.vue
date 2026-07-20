@@ -31,9 +31,18 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'pinia'
 import { useMailStore } from '../../store/index-pinia'
+import { FOLDER_TYPES } from '../../enums'
 
 import AppDialog from 'components/common/AppDialog'
 import notification from 'src/utils/notification'
+
+const MOVE_TARGET_TYPES_ALWAYS = [
+  FOLDER_TYPES.SENT,
+  FOLDER_TYPES.DRAFTS,
+  FOLDER_TYPES.SPAM,
+  FOLDER_TYPES.TRASH,
+  FOLDER_TYPES.USER,
+]
 
 export default {
   name: 'MoveMessageDialog',
@@ -76,7 +85,15 @@ export default {
       }
 
       return folderList.flatList
-        .filter((folder) => folder.isSelectable && folder.fullName !== this.currentFolderFullName)
+        .filter((folder) => {
+          if (folder.isVirtual || folder.fullName === this.currentFolderFullName) {
+            return false
+          }
+          if (folder.isSelectable) {
+            return true
+          }
+          return MOVE_TARGET_TYPES_ALWAYS.includes(folder.type)
+        })
         .map((folder) => ({
           ...folder,
           depth: folder.fullName.split(delimiter).length - 1,
