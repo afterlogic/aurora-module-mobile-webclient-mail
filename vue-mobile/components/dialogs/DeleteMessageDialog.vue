@@ -20,6 +20,7 @@
 <script>
 import { mapState, mapActions, mapGetters } from 'pinia'
 import { useMailStore } from '../../store/index-pinia.js'
+import { FOLDER_TYPES } from '../../enums'
 
 import AppDialog from 'components/common/AppDialog'
 import ButtonDialog from 'src/components/common/ButtonDialog'
@@ -38,34 +39,50 @@ export default {
     saving: false
   }),
   computed: {
-    ...mapState(useMailStore, ['currentFolder', 'currentMessage']),
-    ...mapGetters(useMailStore, ['selectedMessages']),
+    ...mapState(useMailStore, ['currentFolder', 'currentMessage', 'currentAccountId']),
+    ...mapGetters(useMailStore, ['selectedMessages', 'getFolderByType']),
   },
   methods: {
     ...mapActions(useMailStore, ['asyncMoveMessages', 'removeMessagesFromList']),
     async deleteItems() {
       this.saving = true
+
+      const fromMessageView = this.selectedMessages.length === 0 && !!this.currentMessage
       const params = {
         sourceFolder: '',
-        destinationFolder: 'Trash',
+        destinationFolder: '',
         uids: []
       }
+      let accountId = this.currentAccountId
 
       if (this.selectedMessages.length > 0) {
+        accountId = this.currentFolder?.accountId || this.currentAccountId
         params.sourceFolder = this.currentFolder?.fullName
 
         this.selectedMessages.forEach((item) => {
           params.uids.push(item.uid)
         })
       } else if (this.currentMessage) {
-        params.sourceFolder = this.currentMessage.Folder
+        accountId = this.currentMessage.accountId
+        params.sourceFolder = this.currentMessage.folder || this.currentMessage.Folder
         params.uids.push(this.currentMessage.uid)
       }
+
+      const trashFolder = this.getFolderByType(accountId, FOLDER_TYPES.TRASH)
+      if (!trashFolder || !params.sourceFolder || params.uids.length === 0) {
+        this.saving = false
+        return
+      }
+
+      params.destinationFolder = trashFolder.fullName
 
       const result = await this.asyncMoveMessages(params)
       if (result) {
         this.removeMessagesFromList(this.selectedMessages.length ? this.selectedMessages : [this.currentMessage])
         this.$emit('closeDialog')
+        if (fromMessageView) {
+          this.$router.back()
+        }
       }
       this.saving = false
     },
