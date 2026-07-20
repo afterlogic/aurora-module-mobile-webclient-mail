@@ -1,13 +1,22 @@
 <template>
   <q-toolbar class="app-header">
     <div class="col-auto app-header__left">
-      <q-btn icon="chevron_left" @click="gotoPreviousPage" color="black" flat round dense />
+      <q-btn
+        data-test-id="mail-message-back"
+        icon="chevron_left"
+        @click="gotoPreviousPage"
+        color="black"
+        flat
+        round
+        dense
+      />
     </div>
 
     <div class="col app-header__right view-header__actions">
       <ActionIcon
         v-for="action in toolbarActions"
         :key="action.name"
+        :data-test-id="`mail-action-${action.name}`"
         color="black"
         :icon="action.icon"
         @click="onPerformAction(action)"
@@ -15,6 +24,7 @@
 
       <q-btn
         v-if="menuActions.length"
+        data-test-id="mail-message-more"
         icon="more_vert"
         color="black"
         flat
@@ -26,6 +36,7 @@
             <q-item
               v-for="action in menuActions"
               :key="action.name"
+              :data-test-id="`mail-menu-${action.name}`"
               clickable
               v-close-popup
               @click="onPerformAction(action)"

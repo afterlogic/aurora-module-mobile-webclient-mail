@@ -1,5 +1,16 @@
 <template>
-  <q-item class="folder" dense :active="isFolderSelected" clickable v-ripple @click="selectFolder">
+  <q-item
+    class="folder"
+    dense
+    :active="isFolderSelected"
+    clickable
+    v-ripple
+    data-test-id="mail-folder-item"
+    :data-folder-name="folder.name"
+    :data-folder-full-name="folder.fullName"
+    :data-folder-type="String(folder.type)"
+    @click="selectFolder"
+  >
     <q-item-section class="folder-indent" :style="indent" side></q-item-section>
     <q-item-section side>
       <FolderIcon :folderType="folder.type" :color="isFolderSelected ? '#469CF8' : '#969494'" />

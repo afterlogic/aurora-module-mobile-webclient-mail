@@ -1,5 +1,5 @@
 <template>
-  <AppDialog :close="closeDialog">
+  <AppDialog data-test-id="mail-delete-dialog" :close="closeDialog">
     <template v-slot:content>
       <div class="dialog__title-text q-ma-lg">
         <span>{{ $tc('MAILWEBCLIENT.CONFIRM_DELETE_MESSAGES_PLURAL', selectedMessages.length) }}</span>
@@ -7,6 +7,7 @@
     </template>
     <template v-slot:actions>
       <ButtonDialog
+          data-test-id="mail-delete-confirm"
           class="q-mr-sm q-mb-sm"
           :saving="saving"
           :action="deleteItems"
@@ -34,14 +35,8 @@ export default {
     dialog: { type: Boolean, default: false },
   },
   data: () => ({
-    // openDialog: false,
     saving: false
   }),
-  // watch: {
-  //   dialog(val) {
-  //     this.openDialog = val
-  //   },
-  // },
   computed: {
     ...mapState(useMailStore, ['currentFolder', 'currentMessage']),
     ...mapGetters(useMailStore, ['selectedMessages']),
@@ -66,12 +61,10 @@ export default {
         params.sourceFolder = this.currentMessage.Folder
         params.uids.push(this.currentMessage.uid)
       }
-      
+
       const result = await this.asyncMoveMessages(params)
       if (result) {
         this.removeMessagesFromList(this.selectedMessages.length ? this.selectedMessages : [this.currentMessage])
-      //   // await this.selectContact(null)
-      //   // this.$router.push('/contacts')
         this.$emit('closeDialog')
       }
       this.saving = false

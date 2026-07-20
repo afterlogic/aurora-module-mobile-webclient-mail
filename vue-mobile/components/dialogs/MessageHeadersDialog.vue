@@ -1,11 +1,14 @@
 <template>
-  <AppDialog :close="closeDialog" width="90vw">
+  <AppDialog data-test-id="mail-headers-dialog" :close="closeDialog" width="90vw">
     <template v-slot:content>
       <div class="dialog__title-text q-ma-md">
         {{ $t('MAILWEBCLIENT.ACTION_OPEN_MESSAGE_HEADERS') }}
       </div>
       <q-scroll-area style="height: 60vh; max-height: 500px">
-        <pre class="message-headers-dialog__content q-ma-md">{{ headersText }}</pre>
+        <pre
+          class="message-headers-dialog__content q-ma-md"
+          data-test-id="mail-headers-content"
+        >{{ headersText }}</pre>
       </q-scroll-area>
     </template>
   </AppDialog>

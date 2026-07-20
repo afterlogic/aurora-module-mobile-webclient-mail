@@ -1,5 +1,5 @@
 <template>
-  <div class="column fit message-list">
+  <div class="column fit message-list" data-test-id="mail-message-list">
   <div v-if="isUnseenFilter" class="list__info col-auto">
     <span v-html="unseenFilterBannerText"></span>
     <div @click="clearUnreadMessage" class="list__button">

@@ -25,7 +25,11 @@
       />
     </router-view>
 
-    <AppCreateButton @click="showCreateButtonsDialog" v-if="isShowCreateButtons">
+    <AppCreateButton
+      data-test-id="mail-compose-fab"
+      @click="showCreateButtonsDialog"
+      v-if="isShowCreateButtons"
+    >
       <ComposeIcon color="#fff" />
     </AppCreateButton>
     

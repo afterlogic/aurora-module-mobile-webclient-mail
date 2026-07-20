@@ -1,7 +1,8 @@
 <template>
-  <div class="add-account q-px-lg q-pt-lg">
+  <div class="add-account q-px-lg q-pt-lg" data-test-id="settings-add-account">
     <q-form @submit.prevent="onSubmit">
       <q-input
+        data-test-id="settings-add-account-name"
         v-model="friendlyName"
         dense
         autocomplete="name"
@@ -9,6 +10,7 @@
         class="q-mb-md"
       />
       <q-input
+        data-test-id="settings-add-account-email"
         v-model="email"
         dense
         type="email"
@@ -17,6 +19,7 @@
         class="q-mb-md"
       />
       <q-input
+        data-test-id="settings-add-account-password"
         v-model="password"
         dense
         type="password"

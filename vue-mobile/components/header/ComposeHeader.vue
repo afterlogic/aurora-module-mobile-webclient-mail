@@ -1,7 +1,15 @@
 <template>
   <q-toolbar class="app-header">
     <div class="col app-header__left">
-      <q-btn icon="chevron_left" @click="gotoPreviousPage" color="black" flat round dense />
+      <q-btn
+        data-test-id="mail-compose-back"
+        icon="chevron_left"
+        @click="gotoPreviousPage"
+        color="black"
+        flat
+        round
+        dense
+      />
     </div>
 
     <div class="col app-header__title">
@@ -12,11 +20,21 @@
     </div>
 
     <div class="col app-header__right">
-      <AppActionIconContainer @click="$emit('executeAction', 'sendMessage')" class="q-mr-md">
+      <AppActionIconContainer
+        data-test-id="mail-compose-send"
+        @click="$emit('executeAction', 'sendMessage')"
+        class="q-mr-md"
+      >
         <SendActionIcon />
       </AppActionIconContainer>
       <div v-if="showSaveButton" class="dropdown-more flex justify-center items-center">
-        <q-btn-dropdown :menu-offset="[12, -41]" flat unelevated dense>
+        <q-btn-dropdown
+          data-test-id="mail-compose-more"
+          :menu-offset="[12, -41]"
+          flat
+          unelevated
+          dense
+        >
           <template v-slot:label>
             <AppActionIconContainer>
               <MoreIcon />
@@ -25,6 +43,7 @@
           <q-list>
             <AppMoreActionContainer
               v-if="showSaveButton"
+              data-test-id="mail-compose-save"
               :actionLabel="$t('MAILWEBCLIENT.ACTION_SAVE')"
               @click="$emit('executeAction', 'saveMessage')"
             >

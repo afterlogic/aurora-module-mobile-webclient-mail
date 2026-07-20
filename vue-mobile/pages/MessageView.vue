@@ -1,6 +1,7 @@
 <template>
   <q-scroll-area
     ref="messageScrollArea"
+    data-test-id="mail-message-view"
     :thumb-style="{ width: '5px' }"
     class="message-view__scroll"
     style="height: 100%;"
@@ -12,7 +13,10 @@
       <div class="message-header">
         <div class="message-header__basic" v-show="!isDetailVisible">
           <div class="message-header__recipients">
-            <div class="message-header__recipients-sender">{{ sender }}</div>
+            <div
+              class="message-header__recipients-sender"
+              data-test-id="mail-message-sender"
+            >{{ sender }}</div>
             <div class="message-header__recipients-to">
               <span
                 v-for="(recipient, index) in currentMessage?.to['@Collection']"
@@ -23,7 +27,11 @@
           </div>
           <div class="message-header__date">{{ messageDate }}</div>
         </div>     
-        <div class="message-header__details" v-show="isDetailVisible">
+        <div
+          class="message-header__details"
+          data-test-id="mail-message-details"
+          v-show="isDetailVisible"
+        >
           <div class="recipients-list">
             <div class="recipient-row">
               <div class="recipient-row__label">{{ $t('MAILWEBCLIENT.LABEL_FROM') }}</div>
@@ -71,38 +79,60 @@
             </div>
           </div>
         </div>
-        <div class="message-header__switcher" @click="toggleDetails">
+        <div
+          class="message-header__switcher"
+          data-test-id="mail-message-toggle-details"
+          @click="toggleDetails"
+        >
           {{ isDetailVisible ? $t('COREWEBCLIENT.ACTION_HIDE_DETAILS') : $t('COREWEBCLIENT.ACTION_SHOW_DETAILS') }}
         </div>
 
         <div class="message-flags">
-          <div class="message-flags__flag-folder">{{ currentMessage?.folder }}</div>
+          <div
+            class="message-flags__flag-folder"
+            data-test-id="mail-message-folder"
+          >{{ currentMessage?.folder }}</div>
           <RepliedIcon
             v-if="currentMessage?.isAnswered"
             color="#949496"
             class="message-flags__flag-replied"
+            data-test-id="mail-message-flag-replied"
           />
           <ForwardedIcon
             v-if="currentMessage?.isForwarded"
             color="#949496"
             class="message-flags__flag-forwarded"
+            data-test-id="mail-message-flag-forwarded"
           />
           <AttachmentIcon
             v-if="currentMessage?.hasAttachments"
             class="message-flags__flag-attachment message-flags__flag-attachment_clickable"
+            data-test-id="mail-message-flag-attachment"
             :color="primaryColor"
             @click="scrollToAttachments"
           />
-          <StarIcon class="message-flags__flag-starred"
-            v-if="currentMessage?.isFlagged"
-            :color="goldColor"
-            :strokeColor="goldColor"
-            @click="onStarredClick(false)"
-          />
-          <StarIcon v-else :strokeColor="primaryColor" @click="onStarredClick(true)" />
+          <div
+            data-test-id="mail-message-star"
+            class="message-flags__star"
+            @click="onStarredClick(!currentMessage?.isFlagged)"
+          >
+            <StarIcon
+              v-if="currentMessage?.isFlagged"
+              class="message-flags__flag-starred"
+              data-test-id="mail-message-star-on"
+              :color="goldColor"
+              :strokeColor="goldColor"
+            />
+            <StarIcon
+              v-else
+              data-test-id="mail-message-star-off"
+              :strokeColor="primaryColor"
+            />
+          </div>
         </div>
         <div
           class="message-header__subject"
+          data-test-id="mail-message-subject"
           :class="{ 'message-header__subject_nosubject': isEmptySubject }"
         >{{ subjectForDisplay }}</div>
         <div class="message-body" v-html="messageBodyHtml"></div>
@@ -110,10 +140,12 @@
           v-if="attachmentList.length"
           ref="attachmentsSection"
           class="message-attachments"
+          data-test-id="mail-message-attachments"
         >
           <AttachmentListItem
             v-for="(attachment, index) in attachmentList"
             :key="attachment.id || index"
+            data-test-id="mail-attachment-item"
             :attachment="attachment"
             :hideRemove="true"
           />

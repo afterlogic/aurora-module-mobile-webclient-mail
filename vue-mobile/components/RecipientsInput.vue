@@ -1,5 +1,5 @@
 <template>
-  <div class="recipients-input">
+  <div class="recipients-input" v-bind="$attrs">
     <span class="recipients-input__label">{{ label }}</span>
     <q-select
       ref="selectRef"
@@ -68,6 +68,7 @@ import Utils from 'src/utils/address'
 
 export default {
   name: 'RecipientsInput',
+  inheritAttrs: false,
 
   props: {
     getOptions: { type: Function, required: true },

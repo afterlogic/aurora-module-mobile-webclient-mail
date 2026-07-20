@@ -5,6 +5,7 @@
     :isChoice="isSelectMode"
     clickable
     :active="message.isSelected"
+    data-test-id="mail-message-item"
     @click="onMessageClick"
     class="list-item"
     :class="{'message__unseen': !message.isSeen}"

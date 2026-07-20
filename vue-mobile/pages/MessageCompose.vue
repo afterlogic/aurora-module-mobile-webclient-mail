@@ -1,9 +1,14 @@
 <template>
-  <q-scroll-area :thumb-style="{width: '5px'}" class="full-height contacts__list message-compose__scroll">
+  <q-scroll-area
+    data-test-id="mail-compose"
+    :thumb-style="{width: '5px'}"
+    class="full-height contacts__list message-compose__scroll"
+  >
     <q-form class="q-px-md message-compose__form">      
       <!-- <q-input v-model="fromInput" dense autocomplete="nope" :placeholder="$t('MAILWEBCLIENT.LABEL_FROM')" class="q-mb-xs contact__form-input" /> -->
 
       <RecipientsInput 
+        data-test-id="mail-compose-to"
         v-model="toInput"
         :getOptions="getOptions"
         :label="$t('MAILWEBCLIENT.LABEL_TO')" 
@@ -40,12 +45,16 @@
         <span class="recipients-input__label">{{ $t('MAILWEBCLIENT.LABEL_SUBJECT') }}</span>
         <q-input
           v-model="subjectInput"
+          data-test-id="mail-compose-subject"
           dense
           autocomplete="nope"
           class="recipients-input__field"
         >
           <template v-slot:append>
-            <AppActionIconContainer @click="selectFiles">
+            <AppActionIconContainer
+              data-test-id="mail-compose-attach"
+              @click="selectFiles"
+            >
               <AttachmentIcon />
             </AppActionIconContainer>
           </template>
@@ -60,6 +69,7 @@
       <q-editor
         v-if="shouldShowBodyEditor"
         ref="messageBodyEditor"
+        data-test-id="mail-compose-body"
         v-model="bodyInput"
         dense
         flat

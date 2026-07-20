@@ -2,7 +2,15 @@
   <div>
     <q-toolbar class="app-header search-toolbar">
       <div class="col app-header__left">
-        <q-btn icon="close" @click="closeSearch" color="black" round flat dense />
+        <q-btn
+          data-test-id="mail-search-close"
+          icon="close"
+          @click="closeSearch"
+          color="black"
+          round
+          flat
+          dense
+        />
       </div>
       <div class="col app-header__title">
         <span class="app-header__title-main" v-t="'COREMOBILEWEBCLIENT.LABEL_SEARCH'" />
@@ -14,6 +22,7 @@
     </q-toolbar>
     <q-toolbar class="search-toolbar__field">
       <q-input
+        data-test-id="mail-search-input"
         v-model="searchText"
         :placeholder="$t('COREMOBILEWEBCLIENT.LABEL_SEARCH')"
         autofocus
@@ -26,6 +35,7 @@
     </q-toolbar>
     <q-toolbar>
       <q-btn
+        data-test-id="mail-search-advanced"
         class="q-mx-auto"
         size="12px"
         flat

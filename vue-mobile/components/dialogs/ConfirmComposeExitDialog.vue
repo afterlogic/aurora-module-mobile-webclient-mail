@@ -1,5 +1,5 @@
 <template>
-  <AppDialog v-model="visible" :close="onCancel">
+  <AppDialog data-test-id="mail-compose-discard-dialog" v-model="visible" :close="onCancel">
     <template v-slot:content>
       <div class="dialog__title-text q-mx-lg q-my-md">
         <span>{{ $t('COREWEBCLIENT.CONFIRM_DISCARD_CHANGES') }}</span>
@@ -8,11 +8,13 @@
 
     <template v-slot:actions>
       <ButtonDialog
+        data-test-id="mail-compose-discard-cancel"
         class="q-mb-sm"
         :action="onCancel"
         :label="$t('COREWEBCLIENT.ACTION_CANCEL')"
       />
       <ButtonDialog
+        data-test-id="mail-compose-discard-ok"
         class="q-mr-sm q-mb-sm"
         :action="onOk"
         :label="$t('COREWEBCLIENT.ACTION_OK')"

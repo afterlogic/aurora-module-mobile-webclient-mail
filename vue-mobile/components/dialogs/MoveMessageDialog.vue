@@ -1,5 +1,5 @@
 <template>
-  <AppDialog :close="closeDialog" width="90vw">
+  <AppDialog data-test-id="mail-move-dialog" :close="closeDialog" width="90vw">
     <template v-slot:content>
       <div class="dialog__title-text q-ma-md">
         {{ $t('MAILWEBCLIENT.ACTION_MOVE_TO_FOLDER') }}
@@ -9,6 +9,10 @@
           <q-item
             v-for="folder in selectableFolders"
             :key="folder.fullName"
+            data-test-id="mail-move-folder-item"
+            :data-folder-name="folder.name || folder.displayName"
+            :data-folder-full-name="folder.fullName"
+            :data-folder-type="String(folder.type)"
             clickable
             @click="moveToFolder(folder)"
           >

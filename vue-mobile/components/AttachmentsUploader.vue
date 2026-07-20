@@ -2,6 +2,7 @@
   <AttachmentListItem
     v-for="file in attachments"
     :key="file.uid"
+    data-test-id="mail-compose-attachment-item"
     :attachment="file"
     @remove="onAttachmentRemove"
   />

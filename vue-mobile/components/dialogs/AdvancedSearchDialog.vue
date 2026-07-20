@@ -1,14 +1,44 @@
 <template>
-  <AppDialog v-bind="$attrs" :close="close" @show="applyDefaultSearchText">
+  <AppDialog
+    data-test-id="mail-advanced-search"
+    v-bind="$attrs"
+    :close="close"
+    @show="applyDefaultSearchText"
+  >
     <template v-slot:content>
       <div class="dialog__title-text q-mx-lg q-mb-md">
         {{ $t('MAILWEBCLIENT.ACTION_OPEN_ADVANCED_SEARCH') }}
       </div>
       <div class="q-mx-lg">
-        <q-input v-model="fromInput" autocomplete="nope" :placeholder="$t('MAILWEBCLIENT.LABEL_FROM')" autofocus />
-        <q-input v-model="toInput" autocomplete="nope" :placeholder="$t('MAILWEBCLIENT.LABEL_TO')" />
-        <q-input v-model="subjectInput" autocomplete="nope" :placeholder="$t('MAILWEBCLIENT.LABEL_SUBJECT')" />
-        <q-input v-model="textInput" autocomplete="nope" :placeholder="$t('MAILWEBCLIENT.LABEL_TEXT')" />
+        <div data-test-id="mail-adv-from">
+          <q-input
+            v-model="fromInput"
+            autocomplete="nope"
+            :placeholder="$t('MAILWEBCLIENT.LABEL_FROM')"
+            autofocus
+          />
+        </div>
+        <div data-test-id="mail-adv-to">
+          <q-input
+            v-model="toInput"
+            autocomplete="nope"
+            :placeholder="$t('MAILWEBCLIENT.LABEL_TO')"
+          />
+        </div>
+        <div data-test-id="mail-adv-subject">
+          <q-input
+            v-model="subjectInput"
+            autocomplete="nope"
+            :placeholder="$t('MAILWEBCLIENT.LABEL_SUBJECT')"
+          />
+        </div>
+        <div data-test-id="mail-adv-text">
+          <q-input
+            v-model="textInput"
+            autocomplete="nope"
+            :placeholder="$t('MAILWEBCLIENT.LABEL_TEXT')"
+          />
+        </div>
         <div class="flex no-wrap justify-between">
           <SearchDate :label="$t('MAILWEBCLIENT.LABEL_SINCE')" :defaultDate="sinceDate" @setDate="setSinceDate" />
           <div style="width: 60px"></div>
@@ -29,7 +59,12 @@
       </div>
     </template>
     <template v-slot:actions>
-      <ButtonDialog class="q-ma-sm" :action="search" :label="$t('COREWEBCLIENT.ACTION_SEARCH')" />
+      <ButtonDialog
+        data-test-id="mail-adv-search-submit"
+        class="q-ma-sm"
+        :action="search"
+        :label="$t('COREWEBCLIENT.ACTION_SEARCH')"
+      />
     </template>
   </AppDialog>
 </template>
