@@ -1,0 +1,17 @@
+{
+  "name": "mail-mobile-webclient-unit",
+  "private": true,
+  "scripts": {
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest"
+  },
+  "dependencies": {
+    "moment": "^2.30.1"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1",
+    "vite": "^6",
+    "vitest": "^4.1.10"
+  }
+}
