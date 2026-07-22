@@ -1,15 +1,24 @@
 <template>
-  <q-toolbar class="app-header">
+  <q-toolbar data-test-id="mail-select-header" class="app-header">
     <div class="col app-header__left">
-      <q-btn @click="resetSelectedItems" icon="close" color="black" flat round dense />
+      <q-btn
+        data-test-id="mail-select-close"
+        @click="resetSelectedItems"
+        icon="close"
+        color="black"
+        flat
+        round
+        dense
+      />
     </div>
 
-    <div class="col app-header__title">
+    <div class="col app-header__title" data-test-id="mail-select-count">
       {{ `Selected: ${items.length}` }}
     </div>
     
     <div class="col app-header__right">
       <ActionIcon
+        data-test-id="mail-select-delete"
         class="q-mr-md"
         color="black"
         icon="DeleteIcon"

@@ -1,5 +1,13 @@
 <template>
-  <q-item class="folder" dense :active="isUnifiedInbox" clickable v-ripple @click="selectUnifiedInbox">
+  <q-item
+    data-test-id="mail-unified-inbox"
+    class="folder"
+    dense
+    :active="isUnifiedInbox"
+    clickable
+    v-ripple
+    @click="selectUnifiedInbox"
+  >
     <q-item-section class="folder-indent" :style="indent" side></q-item-section>
     <q-item-section side>
       <FolderIcon :folderType="folderType" :color="selected ? '#469CF8' : '#969494'" />
@@ -8,7 +16,7 @@
       {{ $t('MAILWEBCLIENT.LABEL_FOLDER_ALL_INBOXES') }}
     </q-item-section>
     <q-item-section side v-if="unifiedInboxUnseenCount" clickable @click.stop="showUnseenMessages">
-      <div class="folder-counter">{{ unifiedInboxUnseenCount }}</div>
+      <div data-test-id="mail-folder-unseen-count" class="folder-counter">{{ unifiedInboxUnseenCount }}</div>
     </q-item-section>
   </q-item>
 </template>

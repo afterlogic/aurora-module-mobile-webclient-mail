@@ -1,5 +1,5 @@
 <template>
-  <AppDialog :close="closeDialog">
+  <AppDialog data-test-id="mail-empty-folder-dialog" :close="closeDialog">
     <template v-slot:title>
       {{ dialogTitle }}
     </template>
@@ -10,6 +10,7 @@
     </template>
     <template v-slot:actions>
       <q-btn
+        data-test-id="mail-empty-folder-cancel"
         class="q-mr-sm q-mb-sm text-no-wrap"
         no-caps
         flat
@@ -18,6 +19,7 @@
         @click="closeDialog"
       />
       <q-btn
+        data-test-id="mail-empty-folder-confirm"
         class="q-mr-sm q-mb-sm text-no-wrap button-dialog"
         no-caps
         flat

@@ -19,7 +19,7 @@
       {{ folder.name }}
     </q-item-section>
     <q-item-section side v-if="showUnseenCount" clickable @click.stop="showUnseenMessages">
-      <div class="folder-counter">{{ folder.unseenCount }}</div>
+      <div data-test-id="mail-folder-unseen-count" class="folder-counter">{{ folder.unseenCount }}</div>
     </q-item-section>
     <q-item-section side v-else-if="showTotalCount">
       <div class="folder-counter folder-counter_total">{{ folder.count }}</div>

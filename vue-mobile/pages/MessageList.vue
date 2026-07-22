@@ -1,8 +1,12 @@
 <template>
   <div class="column fit message-list" data-test-id="mail-message-list">
-  <div v-if="isUnseenFilter" class="list__info col-auto">
+  <div v-if="isUnseenFilter" class="list__info col-auto" data-test-id="mail-filter-banner">
     <span v-html="unseenFilterBannerText"></span>
-    <div @click="clearUnreadMessage" class="list__button">
+    <div
+      data-test-id="mail-filter-clear"
+      @click="clearUnreadMessage"
+      class="list__button"
+    >
       {{ $t('MAILWEBCLIENT.ACTION_CLEAR_FILTER') }}
     </div>
   </div>
@@ -15,7 +19,11 @@
   </div>
 
   <div v-if="isShowEmptyFolderButton" class="list__info col-auto">
-    <div @click="showEmptyFolderDialog" class="list__button list__button_with-icon">
+    <div
+      data-test-id="mail-empty-folder-button"
+      @click="showEmptyFolderDialog"
+      class="list__button list__button_with-icon"
+    >
       <ActionIcon class="list__button-icon" icon="DeleteIcon" with-cross />
       {{ emptyFolderButtonLabel }}
     </div>

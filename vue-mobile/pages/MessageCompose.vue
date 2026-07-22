@@ -19,22 +19,26 @@
       >
         <span
           v-if="!isCCShown"
+          data-test-id="mail-compose-show-cc"
           class="message-compose__cc-bcc-link"
           @click="showCC"
         >{{ $t('MAILWEBCLIENT.ACTION_SHOW_CC') }}</span>
         <span
           v-if="!isBCCShown"
+          data-test-id="mail-compose-show-bcc"
           class="message-compose__cc-bcc-link"
           @click="showBCC"
         >{{ $t('MAILWEBCLIENT.ACTION_SHOW_BCC') }}</span>
       </div>
       <RecipientsInput
+        data-test-id="mail-compose-cc"
         v-model="ccInput"
         :getOptions="getOptions"
         v-if="isCCShown"
         :label="$t('COREWEBCLIENT.LABEL_CC')"
       />
       <RecipientsInput
+        data-test-id="mail-compose-bcc"
         v-model="bccInput"
         :getOptions="getOptions"
         v-if="isBCCShown"
