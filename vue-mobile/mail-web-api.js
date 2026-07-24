@@ -1,4 +1,5 @@
 import webApi from 'src/api/web-api'
+import { i18n } from 'src/boot/i18n'
 
 import foldersUtils from './utils/folders'
 import { parseMessageList, parseMessage } from './utils/messages'
@@ -147,6 +148,8 @@ export default {
         moduleName: 'Mail',
         methodName: 'CreateAccount',
         parameters,
+        // Toast is shown by web-api; AddAccount must not show a second fallback.
+        defaultErrorText: i18n.global.t('MAILWEBCLIENT.ERROR_CREATE_ACCOUNT'),
       })
       .then((result) => result)
       .catch(() => null)

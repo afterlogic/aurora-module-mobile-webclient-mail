@@ -97,8 +97,8 @@ export default {
         return
       }
 
+      // Toast already shown by web-api (credentials / create error).
       if (result.error === 'create_failed') {
-        notification.showError(i18n.global.t('MAILWEBCLIENT.ERROR_CREATE_ACCOUNT'))
         return
       }
 
