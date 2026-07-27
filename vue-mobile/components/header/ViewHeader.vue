@@ -29,16 +29,20 @@
         />
       </q-btn>
 
-      <q-btn
+      <div
         v-if="menuActions.length"
-        data-test-id="mail-message-more"
-        icon="more_vert"
-        color="black"
-        flat
-        round
-        dense
+        class="dropdown-more flex justify-center items-center"
       >
-        <q-menu anchor="bottom right" self="top right">
+        <q-btn-dropdown
+          data-test-id="mail-message-more"
+          :menu-offset="[8, -45]"
+          flat
+          unelevated
+          dense
+        >
+          <template v-slot:label>
+            <ActionIcon icon="MoreIcon" />
+          </template>
           <q-list style="min-width: 220px">
             <q-item
               v-for="action in menuActions"
@@ -54,8 +58,8 @@
               <q-item-section>{{ getActionLabel(action, $t) }}</q-item-section>
             </q-item>
           </q-list>
-        </q-menu>
-      </q-btn>
+        </q-btn-dropdown>
+      </div>
     </div>
   </q-toolbar>
 </template>
