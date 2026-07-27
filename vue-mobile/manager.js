@@ -55,6 +55,20 @@ const _getSettingsHeaderTitles = (params) => {
   ])
 }
 
+const _getSettingsHeaderActions = (params) => {
+  if (!_.isArray(params.settingsHeaderActions)) {
+    params.settingsHeaderActions = []
+  }
+
+  params.settingsHeaderActions = params.settingsHeaderActions.concat([
+    {
+      settingsPath: '/settings/add-account',
+      labelLangConst: 'MAILWEBCLIENT.ACTION_ADD',
+      eventName: 'MailMobileWebclient::AddAccount',
+    },
+  ])
+}
+
 export default {
   moduleName: 'MailMobileWebclient',
 
@@ -73,6 +87,9 @@ export default {
 
     eventBus.$off('SettingsMobileWebclient::GetSettingsHeaderTitles', _getSettingsHeaderTitles)
     eventBus.$on('SettingsMobileWebclient::GetSettingsHeaderTitles', _getSettingsHeaderTitles)
+
+    eventBus.$off('SettingsMobileWebclient::GetSettingsHeaderActions', _getSettingsHeaderActions)
+    eventBus.$on('SettingsMobileWebclient::GetSettingsHeaderActions', _getSettingsHeaderActions)
 
     eventBus.$emit('CoreMobileWebclient::InitSubscription')
   },
