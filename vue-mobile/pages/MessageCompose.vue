@@ -460,12 +460,13 @@ export default {
         WithUserGroups: false,
         WithoutTeamContactsDuplicates: true,
       }
-      let contacts = await this.asyncGetContactsSuggestions(parameters)
+      const contacts = await this.asyncGetContactsSuggestions(parameters)
+      const list = Array.isArray(contacts?.List) ? contacts.List : []
 
-      return contacts.List.map((item) => { return { 
-        'label': item.FullName ? (item.FullName + ' ' + item.ViewEmail) : item.ViewEmail,
-        'value': item.FullName ? item.FullName + ' <' + item.ViewEmail + '>' : item.ViewEmail 
-      } })
+      return list.map((item) => ({
+        label: item.FullName ? (item.FullName + ' ' + item.ViewEmail) : item.ViewEmail,
+        value: item.FullName ? item.FullName + ' <' + item.ViewEmail + '>' : item.ViewEmail,
+      }))
     },
 
     async setMessageFromRoute() {
