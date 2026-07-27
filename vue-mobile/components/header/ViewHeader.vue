@@ -13,14 +13,21 @@
     </div>
 
     <div class="col app-header__right view-header__actions">
-      <ActionIcon
+      <q-btn
         v-for="action in toolbarActions"
         :key="action.name"
         :data-test-id="`mail-action-${action.name}`"
         color="black"
-        :icon="action.icon"
+        flat
+        round
+        dense
         @click="onPerformAction(action)"
-      />
+      >
+        <ActionIcon
+          color="black"
+          :icon="action.icon"
+        />
+      </q-btn>
 
       <q-btn
         v-if="menuActions.length"
