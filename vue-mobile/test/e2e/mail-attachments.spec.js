@@ -102,7 +102,7 @@ test.describe('Mobile mail attachments', () => {
         timeout: 60000,
       })
       await expect(
-        page.getByTestId('mail-message-view').locator('.messages__loader')
+        page.getByTestId('mail-message-view').locator('.app-list-loader_initial')
       ).toHaveCount(0, { timeout: 30000 })
 
       const openedSubject = (

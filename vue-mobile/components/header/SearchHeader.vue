@@ -2,14 +2,10 @@
   <div>
     <q-toolbar class="app-header search-toolbar">
       <div class="col app-header__left">
-        <q-btn
+        <AppHeaderButton
           data-test-id="mail-search-close"
           icon="close"
           @click="closeSearch"
-          color="black"
-          round
-          flat
-          dense
         />
       </div>
       <div class="col app-header__title">
@@ -34,17 +30,14 @@
       />
     </q-toolbar>
     <q-toolbar>
-      <q-btn
+      <AppHeaderButton
         data-test-id="mail-search-advanced"
+        variant="text"
+        color="blue"
         class="q-mx-auto"
-        size="12px"
-        flat
-        no-caps
-        text-color="blue"
         :label="$t('MAILWEBCLIENT.ACTION_OPEN_ADVANCED_SEARCH')"
         @click="openAdvancedSearch"
-      >
-      </q-btn>
+      />
       <AdvancedSearchDialog
         v-model="showAdvancedSearch"
         :defaultSearchText="searchText"
@@ -57,6 +50,7 @@
 
 <script>
 import AdvancedSearchDialog from '../dialogs/AdvancedSearchDialog'
+import AppHeaderButton from 'src/components/common/AppHeaderButton'
 
 export default {
   name: 'SearchHeader',
@@ -65,6 +59,7 @@ export default {
 
   components: {
     AdvancedSearchDialog,
+    AppHeaderButton,
   },
 
   props: {

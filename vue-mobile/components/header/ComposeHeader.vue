@@ -1,14 +1,10 @@
 <template>
   <q-toolbar class="app-header">
     <div class="col app-header__left">
-      <q-btn
+      <AppHeaderButton
         data-test-id="mail-compose-back"
         icon="chevron_left"
         @click="gotoPreviousPage"
-        color="black"
-        flat
-        round
-        dense
       />
     </div>
 
@@ -59,6 +55,7 @@
 <script>
 import AppActionIconContainer from 'src/components/common/AppActionIconContainer'
 import AppMoreActionContainer from 'src/components/common/AppMoreActionContainer'
+import AppHeaderButton from 'src/components/common/AppHeaderButton'
 import MoreIcon from 'src/components/common/icons/actions/MoreIcon'
 import SendActionIcon from '../icons/message-compose/actions/SendIcon'
 import SaveActionIcon from '../icons/message-compose/actions/SaveIcon'
@@ -69,6 +66,7 @@ export default {
   components: {
     AppActionIconContainer,
     AppMoreActionContainer,
+    AppHeaderButton,
     MoreIcon,
     SendActionIcon,
     SaveActionIcon,

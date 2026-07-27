@@ -33,7 +33,7 @@ test.describe('Mobile mail compose', () => {
       await waitForListReady(page, {
         itemTestIds: 'mail-message-item',
         emptyTestId: 'mail-empty-folder',
-        spinnerSelectors: ['.messages__loader_initial'],
+        spinnerSelectors: ['.app-list-loader_initial'],
         timeout: 60000,
       })
       await expect(page.getByTestId('mail-compose-fab')).toBeVisible({

@@ -8,22 +8,23 @@
       <DrawerContent />
     </template>
 
-    <q-linear-progress
-      v-if="isFolderListLoading && !isMessageContentRoute($route.name)"
-      class="full-width"
-      indeterminate
-      track-color="grey-1"
-      color="primary"
-    />
-    <router-view
-      v-if="!isFolderListLoading || isMessageContentRoute($route.name)"
-      v-slot="{ Component, route }"
-    >
+    <div class="column fit">
+      <AppListLoader
+        v-if="isFolderListLoading && !isMessageContentRoute($route.name)"
+        initial
+        class="col"
+      />
+      <router-view
+        v-if="!isFolderListLoading || isMessageContentRoute($route.name)"
+        class="col fit"
+        v-slot="{ Component, route }"
+      >
       <component
         :is="Component"
         v-bind="isComposeRoute(route.name) ? { onInterface: getRouterViewInterface } : {}"
       />
     </router-view>
+    </div>
 
     <AppCreateButton
       data-test-id="mail-compose-fab"
@@ -49,6 +50,7 @@ import DrawerContent from '../components/DrawerContent'
 import DialogsList from '../components/DialogsList'
 
 import ComposeIcon from '../components/icons/ComposeIcon'
+import AppListLoader from 'src/components/common/AppListLoader'
 
 export default {
   name: 'Mail',
@@ -60,6 +62,7 @@ export default {
     DrawerContent,
     DialogsList,
     ComposeIcon,
+    AppListLoader,
   },
 
   data() {
@@ -250,17 +253,6 @@ export default {
 .messages {
   &__list {
     height: 100%;
-  }
-
-  &__loader {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-
-    &_initial {
-      min-height: 50vh;
-    }
   }
 }
 .list {

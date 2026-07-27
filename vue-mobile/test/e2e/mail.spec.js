@@ -29,8 +29,8 @@ test.describe('Mobile mail', () => {
         itemTestIds: 'mail-message-item',
         emptyTestId: 'mail-empty-folder',
         spinnerSelectors: [
-          '.messages__loader_initial',
-          '.messages__loader_initial .q-spinner-dots',
+          '.app-list-loader_initial',
+          '.app-list-loader_initial .q-spinner-dots',
         ],
         timeout: 60000,
       })
@@ -83,7 +83,7 @@ test.describe('Mobile mail', () => {
         timeout: 60000,
       })
       await expect(
-        page.getByTestId('mail-message-view').locator('.messages__loader')
+        page.getByTestId('mail-message-view').locator('.app-list-loader_initial')
       ).toHaveCount(0, { timeout: 30000 })
       const subject = (
         await page.getByTestId('mail-message-subject').innerText()
@@ -103,7 +103,7 @@ test.describe('Mobile mail', () => {
       await waitForListReady(page, {
         itemTestIds: 'mail-message-item',
         emptyTestId: 'mail-empty-folder',
-        spinnerSelectors: ['.messages__loader_initial'],
+        spinnerSelectors: ['.app-list-loader_initial'],
         timeout: 60000,
       })
       await expect(page.getByTestId('mail-message-item').first()).toBeVisible({

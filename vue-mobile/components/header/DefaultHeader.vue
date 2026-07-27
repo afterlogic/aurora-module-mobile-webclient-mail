@@ -1,14 +1,10 @@
 <template>
   <q-toolbar class="app-header">
     <div class="col app-header__left">
-      <q-btn
+      <AppHeaderButton
         data-test-id="mail-folder-menu"
         icon="menu"
         @click="openDrawer"
-        color="black"
-        flat
-        round
-        dense
       />
     </div>
 
@@ -23,14 +19,10 @@
     </div>
 
     <div class="col app-header__right">
-      <q-btn
+      <AppHeaderButton
         data-test-id="mail-search"
         icon="search"
         @click="showSearchHeader"
-        color="black"
-        flat
-        round
-        dense
       />
     </div>
   </q-toolbar>
@@ -38,9 +30,14 @@
 
 <script>
 import eventBus from 'src/event-bus'
+import AppHeaderButton from 'src/components/common/AppHeaderButton'
 
 export default {
   name: 'DefaultHeader',
+
+  components: {
+    AppHeaderButton,
+  },
 
   emits: ['openSearch'],
 

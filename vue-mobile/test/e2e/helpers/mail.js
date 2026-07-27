@@ -19,8 +19,8 @@ const listReadyOptions = {
   itemTestIds: 'mail-message-item',
   emptyTestId: 'mail-empty-folder',
   spinnerSelectors: [
-    '.messages__loader_initial',
-    '.messages__loader_initial .q-spinner-dots',
+    '.app-list-loader_initial',
+    '.app-list-loader_initial .q-spinner-dots',
   ],
   timeout: 60000,
 }
@@ -65,7 +65,7 @@ async function openFirstInboxMessage(page) {
       timeout: 60000,
     })
     await expect(
-      page.getByTestId('mail-message-view').locator('.messages__loader')
+      page.getByTestId('mail-message-view').locator('.app-list-loader_initial')
     ).toHaveCount(0, { timeout: 30000 })
   })
 

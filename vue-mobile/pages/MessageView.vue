@@ -1,15 +1,13 @@
 <template>
-  <q-scroll-area
-    ref="messageScrollArea"
-    data-test-id="mail-message-view"
-    :thumb-style="{ width: '5px' }"
-    class="message-view__scroll"
-    style="height: 100%;"
-  >
-    <div class="messages__loader" v-if="isCurrentMessageLoading">
-      <q-spinner-dots color="primary" size="40px" />
-    </div>
-    <div v-else-if="currentMessage">
+  <div class="column fit" data-test-id="mail-message-view">
+    <AppListLoader v-if="isCurrentMessageLoading" initial class="col" />
+    <q-scroll-area
+      v-else
+      ref="messageScrollArea"
+      :thumb-style="{ width: '5px' }"
+      class="message-view__scroll col fit"
+    >
+      <div v-if="currentMessage">
       <div class="message-header">
         <div class="message-header__basic" v-show="!isDetailVisible">
           <div class="message-header__recipients">
@@ -153,6 +151,7 @@
       </div>
     </div>
   </q-scroll-area>
+  </div>
 </template>
 
 <script>
@@ -171,6 +170,7 @@ import RepliedIcon from '../components/icons/message-list/RepliedIcon'
 import ForwardedIcon from '../components/icons/message-list/ForwardedIcon'
 import AttachmentIcon from '../components/icons/message-list/AttachmentIcon'
 import AttachmentListItem from '../components/AttachmentListItem'
+import AppListLoader from 'src/components/common/AppListLoader'
 import CAttachment from '../classes/CAttachment'
 import htmlForEditor from '../utils/html-for-editor'
 import { getSubjectForDisplay, isEmptySubject } from '../utils/messages'
@@ -188,7 +188,8 @@ export default {
     RepliedIcon,
     ForwardedIcon,
     AttachmentIcon,
-    AttachmentListItem
+    AttachmentListItem,
+    AppListLoader,
   },
 
   data() {

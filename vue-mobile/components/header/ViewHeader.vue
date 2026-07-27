@@ -1,33 +1,25 @@
 <template>
   <q-toolbar class="app-header">
     <div class="col-auto app-header__left">
-      <q-btn
+      <AppHeaderButton
         data-test-id="mail-message-back"
         icon="chevron_left"
         @click="gotoPreviousPage"
-        color="black"
-        flat
-        round
-        dense
       />
     </div>
 
     <div class="col app-header__right view-header__actions">
-      <q-btn
+      <AppHeaderButton
         v-for="action in toolbarActions"
         :key="action.name"
         :data-test-id="`mail-action-${action.name}`"
-        color="black"
-        flat
-        round
-        dense
         @click="onPerformAction(action)"
       >
         <ActionIcon
           color="black"
           :icon="action.icon"
         />
-      </q-btn>
+      </AppHeaderButton>
 
       <div
         v-if="menuActions.length"
@@ -73,6 +65,7 @@ import mailWebApi from '../../mail-web-api'
 import SendingUtils from '../../utils/sending'
 
 import ActionIcon from '../common/ActionIcon'
+import AppHeaderButton from 'src/components/common/AppHeaderButton'
 import notification from 'src/utils/notification'
 
 import {
@@ -87,6 +80,7 @@ export default {
 
   components: {
     ActionIcon,
+    AppHeaderButton,
   },
 
   computed: {

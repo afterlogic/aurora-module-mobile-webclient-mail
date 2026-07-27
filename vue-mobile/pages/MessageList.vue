@@ -29,8 +29,10 @@
     </div>
   </div>
 
-  <EmptyFolder v-if="isListEmpty && !isUnseenFilter && !isSearch" class="col" />
-  
+  <EmptyFolder v-if="isListEmpty && !isUnseenFilter && !isSearch && !isInitialListLoading" class="col" />
+
+  <AppListLoader v-else-if="isInitialListLoading" initial class="col" />
+
   <q-scroll-area
     v-else
     id="messages-list-scroll"
@@ -38,27 +40,21 @@
     class="messages__list col"
   >
     <AppPullRefresh :refresh-action="reloadList">
-      <div class="messages__loader messages__loader_initial" v-if="isInitialListLoading">
-        <q-spinner-dots color="primary" size="40px" />
+      <MessageItem
+        v-for="(item, index) in currentMessageList"
+        :key="messageItemKey(item, index)"
+        :message="item"
+        class="mail"
+        v-touch-hold.mouse="event => longPress(item, event)"
+        :isSelectMode="isSelectMode"
+        :selectItemHandler="selectItem"
+      />
+      <div
+        v-intersection="onIntersection"
+        v-if="currentMessageList.length > 0 && !isListEndReached"
+      >
+        <AppListLoader v-if="isMessageListLoading" />
       </div>
-      <template v-else>
-        <MessageItem
-          v-for="(item, index) in currentMessageList"
-          :key="messageItemKey(item, index)"
-          :message="item"
-          class="mail"
-          v-touch-hold.mouse="event => longPress(item, event)"
-          :isSelectMode="isSelectMode"
-          :selectItemHandler="selectItem"
-        />
-        <div
-          class="messages__loader"
-          v-intersection="onIntersection"
-          v-if="currentMessageList.length > 0 && !isListEndReached"
-        >
-          <q-spinner-dots v-if="isMessageListLoading" color="primary" size="40px" />
-        </div>
-      </template>
     </AppPullRefresh>
   </q-scroll-area>
   </div>
@@ -69,6 +65,7 @@ import { mapState, mapActions, mapGetters } from 'pinia'
 import { useMailStore } from '../store/index-pinia'
 
 import AppPullRefresh from 'src/components/common/AppPullRefresh'
+import AppListLoader from 'src/components/common/AppListLoader'
 import MessageItem from '../components/message-list/MessageItem'
 import EmptyFolder from '../components/message-list/EmptyFolder'
 import ActionIcon from '../components/common/ActionIcon'
@@ -86,6 +83,7 @@ export default {
 
   components: {
     AppPullRefresh,
+    AppListLoader,
     MessageItem,
     EmptyFolder,
     ActionIcon,

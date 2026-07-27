@@ -1,14 +1,10 @@
 <template>
   <q-toolbar data-test-id="mail-select-header" class="app-header">
     <div class="col app-header__left">
-      <q-btn
+      <AppHeaderButton
         data-test-id="mail-select-close"
-        @click="resetSelectedItems"
         icon="close"
-        color="black"
-        flat
-        round
-        dense
+        @click="resetSelectedItems"
       />
     </div>
 
@@ -35,12 +31,14 @@ import { useMailStore } from '../../store/index-pinia'
 import { messageActions } from '../../utils/message-actions'
 
 import ActionIcon from '../common/ActionIcon'
+import AppHeaderButton from 'src/components/common/AppHeaderButton'
 
 export default {
   name: 'SelectHeader',
 
   components: {
     ActionIcon,
+    AppHeaderButton,
   },
 
   props: {
