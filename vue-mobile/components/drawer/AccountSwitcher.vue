@@ -19,6 +19,7 @@
           v-for="account in accountList"
           :key="account.id"
           class="account-dropdown__item"
+          :class="{ 'account-dropdown__item--selected': account.id === currentAccountId }"
           @click="onAccountSelect(account.id)"
         >
           {{ account.email }}
@@ -198,12 +199,23 @@ export default {
     padding: 10px 0 0;
     font-size: 16px;
     line-height: 1.3;
-    color: #969494;
+    color: #000;
     word-break: break-all;
     cursor: pointer;
+    transition: color 0.15s ease;
 
     &:first-child {
       padding-top: 0;
+    }
+
+    &:hover,
+    &:active {
+      color: #469cf8;
+    }
+
+    &--selected {
+      color: #469cf8;
+      font-weight: 500;
     }
   }
 }
