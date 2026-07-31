@@ -71,15 +71,20 @@ export default {
 
   asyncGetRelevantFoldersInformation: async ({ commit, getters }, foldersFullNames = []) => {
     const currentAccountId = getters['currentAccountId']
+    let totalFoldersCount = getters['currentFoldersCount']
     if (foldersFullNames.length === 0) {
-      foldersFullNames = getters['newFoldersFullNames'].find((data) => data.accountId === currentAccountId)
+      const data = getters['newFoldersFullNames'].find((item) => item.accountId === currentAccountId)
+      foldersFullNames = data?.newFoldersFullNames || []
+      if (data) {
+        totalFoldersCount = data.totalFoldersCount
+      }
       commit('clearNewFoldersFullNames', currentAccountId)
     }
     if (foldersFullNames.length !== 0) {
       const parameters = {
         AccountID: currentAccountId,
         Folders: foldersFullNames,
-        UseListStatusIfPossible: getters['currentFoldersCount'] < 100 || foldersFullNames.length > 50,
+        UseListStatusIfPossible: totalFoldersCount < 100 || foldersFullNames.length > 50,
       }
       const foldersData = await mailWebApi.getRelevantFoldersInformation(parameters, false)
       commit('setRelevantFoldersInformation', [

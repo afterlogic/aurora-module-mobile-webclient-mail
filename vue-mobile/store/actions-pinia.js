@@ -146,16 +146,20 @@ export default {
 
   async asyncGetRelevantFoldersInformation(foldersFullNames = []) {
     const currentAccountId = this.currentAccountId
+    let totalFoldersCount = this.currentFoldersCount
     if (foldersFullNames.length === 0) {
-      foldersFullNames = this.newFoldersFullNames.find((data) => data.accountId === currentAccountId)
-      // commit('clearNewFoldersFullNames', currentAccountId)
+      const data = this.newFoldersFullNames.find((item) => item.accountId === currentAccountId)
+      foldersFullNames = data?.newFoldersFullNames || []
+      if (data) {
+        totalFoldersCount = data.totalFoldersCount
+      }
       this.clearNewFoldersFullNames(currentAccountId)
     }
     if (foldersFullNames.length !== 0) {
       const parameters = {
         AccountID: currentAccountId,
         Folders: foldersFullNames,
-        UseListStatusIfPossible: this.currentFoldersCount < 100 || foldersFullNames.length > 50,
+        UseListStatusIfPossible: totalFoldersCount < 100 || foldersFullNames.length > 50,
       }
       const foldersData = await mailWebApi.getRelevantFoldersInformation(parameters, false)
       this.setRelevantFoldersInformation([
