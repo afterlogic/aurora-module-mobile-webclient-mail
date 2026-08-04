@@ -13,13 +13,12 @@
     </div>
     
     <div class="col app-header__right">
-      <ActionIcon
+      <AppHeaderButton
         data-test-id="mail-select-delete"
-        class="q-mr-md"
-        color="black"
-        icon="DeleteIcon"
         @click="onPerformAction(actions.delete)"
-      />
+      >
+        <ActionIcon color="black" icon="DeleteIcon" />
+      </AppHeaderButton>
     </div>
   </q-toolbar>
 </template>

@@ -8,7 +8,7 @@
       />
     </div>
 
-    <div class="col app-header__right view-header__actions">
+    <div class="col app-header__right">
       <AppHeaderButton
         v-for="action in toolbarActions"
         :key="action.name"
@@ -23,7 +23,7 @@
 
       <div
         v-if="menuActions.length"
-        class="dropdown-more flex justify-center items-center"
+        class="dropdown-more"
       >
         <q-btn-dropdown
           data-test-id="mail-message-more"
@@ -33,7 +33,7 @@
           dense
         >
           <template v-slot:label>
-            <ActionIcon icon="MoreIcon" />
+            <ActionIcon color="black" icon="MoreIcon" />
           </template>
           <q-list style="min-width: 220px">
             <q-item
@@ -222,12 +222,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-.view-header__actions {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 24px;
-}
-</style>

@@ -16,14 +16,13 @@
     </div>
 
     <div class="col app-header__right">
-      <AppActionIconContainer
+      <AppHeaderButton
         data-test-id="mail-compose-send"
         @click="$emit('executeAction', 'sendMessage')"
-        class="q-mr-md"
       >
         <SendActionIcon />
-      </AppActionIconContainer>
-      <div v-if="showSaveButton" class="dropdown-more flex justify-center items-center">
+      </AppHeaderButton>
+      <div v-if="showSaveButton" class="dropdown-more">
         <q-btn-dropdown
           data-test-id="mail-compose-more"
           :menu-offset="[12, -41]"
@@ -32,9 +31,7 @@
           dense
         >
           <template v-slot:label>
-            <AppActionIconContainer>
-              <MoreIcon />
-            </AppActionIconContainer>
+            <MoreIcon />
           </template>
           <q-list>
             <AppMoreActionContainer
@@ -53,7 +50,6 @@
 </template>
 
 <script>
-import AppActionIconContainer from 'src/components/common/AppActionIconContainer'
 import AppMoreActionContainer from 'src/components/common/AppMoreActionContainer'
 import AppHeaderButton from 'src/components/common/AppHeaderButton'
 import MoreIcon from 'src/components/common/icons/actions/MoreIcon'
@@ -64,7 +60,6 @@ export default {
   name: 'ComposeHeader',
 
   components: {
-    AppActionIconContainer,
     AppMoreActionContainer,
     AppHeaderButton,
     MoreIcon,
