@@ -10,6 +10,7 @@ class MailSettings {
     const mailZipData = types.pObject(appData.MailZipWebclientPlugin)
     const hasMailZipPlugin = !!appData.MailZipWebclientPlugin
     this.messageBodyTruncationThreshold = types.pNonNegativeInt(mailWebclientData.MessageBodyTruncationThreshold)
+    this.markMessageSeenWhenViewing = types.pBool(mailWebclientData.MarkMessageSeenWhenViewing, true)
 
     this.allowUnifiedInbox = !!mailData.AllowUnifiedInbox
     this.allowAddAccounts = types.pBool(mailData.AllowAddAccounts)

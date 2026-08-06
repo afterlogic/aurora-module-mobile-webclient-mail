@@ -120,6 +120,19 @@ export default {
       .catch((error) => null)
   },
 
+  setMessagesSeen: async (parameters) => {
+    return webApi
+      .sendRequest({
+        moduleName: 'Mail',
+        methodName: 'SetMessagesSeen',
+        parameters,
+      })
+      .then((result) => {
+        return result
+      })
+      .catch(() => null)
+  },
+
   clearFolder: async (parameters) => {
     return webApi
       .sendRequest({

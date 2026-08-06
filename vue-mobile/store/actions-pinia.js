@@ -318,12 +318,26 @@ export default {
       return
     }
 
+    const { accountId, folder, uid } = messageIdentifiers
+
     this.isCurrentMessageLoading = true
-    const message = await this.asyncGetMessage(
-      messageIdentifiers.accountId,
-      messageIdentifiers.folder,
-      messageIdentifiers.uid
-    )
+
+    if (settings.get('markMessageSeenWhenViewing')) {
+      const listItem = this.currentMessageHeaders
+      const cachedMessage = getMessageFromCache(accountId, folder, uid)
+      const sourceMessage = listItem || cachedMessage
+
+      if (sourceMessage && !sourceMessage.isSeen) {
+        await this.asyncSetMessagesSeen(uid, true, folder, accountId)
+      }
+    }
+
+    const message = await this.asyncGetMessage(accountId, folder, uid)
+
+    if (settings.get('markMessageSeenWhenViewing') && message && !message.isSeen) {
+      await this.asyncSetMessagesSeen(uid, true, folder, accountId)
+    }
+
     this.currentMessage = message
     if (message && !this.currentMessageHeaders) {
       this.currentMessageHeaders = message
@@ -485,6 +499,67 @@ export default {
     }
 
     const result = await mailWebApi.moveMessages(parameters)
+
+    return result
+  },
+
+  updateMessageSeenLocally(accountId, folder, uid, isSeen) {
+    let wasUnseen = false
+
+    const applySeen = (message) => {
+      if (
+        message
+        && message.uid === uid
+        && message.folder === folder
+        && message.accountId === accountId
+        && message.isSeen !== isSeen
+      ) {
+        if (!message.isSeen && isSeen) {
+          wasUnseen = true
+        }
+        message.isSeen = isSeen
+      }
+    }
+
+    this.currentMessageList.forEach(applySeen)
+    applySeen(this.currentMessage)
+    applySeen(this.currentMessageHeaders)
+
+    const cachedMessage = getMessageFromCache(accountId, folder, uid)
+    if (cachedMessage) {
+      applySeen(cachedMessage)
+    }
+
+    if (wasUnseen && isSeen) {
+      const folderObj = this.getFolderByFullName(accountId, folder)
+      if (folderObj && folderObj.unseenCount > 0) {
+        folderObj.unseenCount -= 1
+      }
+
+      if (this.isUnifiedInbox && this.unifiedInboxInfo?.unseenCount > 0) {
+        this.unifiedInboxInfo.unseenCount -= 1
+      }
+    }
+  },
+
+  async asyncSetMessagesSeen(uid, setAction, folder, accountId = 0) {
+    const messageFolder = folder
+    if (!messageFolder) {
+      return false
+    }
+
+    const parameters = {
+      AccountID: accountId || this.currentAccountId,
+      Folder: messageFolder,
+      Uids: String(uid),
+      SetAction: setAction,
+    }
+
+    const result = await mailWebApi.setMessagesSeen(parameters)
+
+    if (result) {
+      this.updateMessageSeenLocally(parameters.AccountID, messageFolder, uid, setAction)
+    }
 
     return result
   },
