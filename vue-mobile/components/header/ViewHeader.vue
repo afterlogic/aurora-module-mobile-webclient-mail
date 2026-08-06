@@ -21,37 +21,25 @@
         />
       </AppHeaderButton>
 
-      <div
+      <AppHeaderMoreDropdown
         v-if="menuActions.length"
-        class="dropdown-more"
+        data-test-id="mail-message-more"
       >
-        <q-btn-dropdown
-          data-test-id="mail-message-more"
-          :menu-offset="[8, -45]"
-          flat
-          unelevated
-          dense
-        >
-          <template v-slot:label>
-            <ActionIcon color="black" icon="MoreIcon" />
-          </template>
-          <q-list style="min-width: 220px">
-            <q-item
-              v-for="action in menuActions"
-              :key="action.name"
-              :data-test-id="`mail-menu-${action.name}`"
-              clickable
-              v-close-popup
-              @click="onPerformAction(action)"
-            >
-              <q-item-section avatar>
-                <q-icon :name="action.menuIcon" />
-              </q-item-section>
-              <q-item-section>{{ getActionLabel(action, $t) }}</q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown>
-      </div>
+        <template #label>
+          <ActionIcon color="black" icon="MoreIcon" />
+        </template>
+        <q-list style="min-width: 220px">
+          <AppMoreActionContainer
+            v-for="action in menuActions"
+            :key="action.name"
+            :data-test-id="`mail-menu-${action.name}`"
+            :action-label="getActionLabel(action, $t)"
+            @click="onPerformAction(action)"
+          >
+            <q-icon :name="action.menuIcon" size="16px" />
+          </AppMoreActionContainer>
+        </q-list>
+      </AppHeaderMoreDropdown>
     </div>
   </q-toolbar>
 </template>
@@ -66,6 +54,8 @@ import SendingUtils from '../../utils/sending'
 
 import ActionIcon from '../common/ActionIcon'
 import AppHeaderButton from 'src/components/common/AppHeaderButton'
+import AppHeaderMoreDropdown from 'src/components/common/AppHeaderMoreDropdown'
+import AppMoreActionContainer from 'src/components/common/AppMoreActionContainer'
 import notification from 'src/utils/notification'
 
 import {
@@ -81,6 +71,8 @@ export default {
   components: {
     ActionIcon,
     AppHeaderButton,
+    AppHeaderMoreDropdown,
+    AppMoreActionContainer,
   },
 
   computed: {
