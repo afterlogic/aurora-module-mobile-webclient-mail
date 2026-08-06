@@ -8,6 +8,18 @@ import { i18n } from '../../CoreMobileWebclient/vue-mobile/src/boot/i18n'
 import settings from './settings'
 import { useMailStore } from './store/index-pinia'
 
+const _isAddAccountScreenVisible = () => {
+  if (!settings.get('showAddAccountInSettings')) {
+    return false
+  }
+
+  const mailStore = useMailStore()
+  return (
+    settings.get('allowAddAccounts') &&
+    (settings.get('allowMultiAccounts') || mailStore.accountList.length === 0)
+  )
+}
+
 const _getSettingsPreLogoutItems = (params) => {
   if (!_.isArray(params.preLogoutItems)) {
     params.preLogoutItems = []
@@ -18,18 +30,16 @@ const _getSettingsPreLogoutItems = (params) => {
       labelLangConst: 'MAILWEBCLIENT.ACTION_ADD_NEW_ACCOUNT',
       routerPath: '/settings/add-account',
       getIconComponent: () => import('./components/icons/AddAccountIcon'),
-      getVisible: () => {
-        const mailStore = useMailStore()
-        return (
-          settings.get('allowAddAccounts') &&
-          (settings.get('allowMultiAccounts') || mailStore.accountList.length === 0)
-        )
-      },
+      getVisible: () => _isAddAccountScreenVisible(),
     },
   ])
 }
 
 const _getSettingsPageChildren = (params) => {
+  if (!_isAddAccountScreenVisible()) {
+    return
+  }
+
   if (!_.isArray(params.settingsPageChildren)) {
     params.settingsPageChildren = []
   }
@@ -43,6 +53,10 @@ const _getSettingsPageChildren = (params) => {
 }
 
 const _getSettingsHeaderTitles = (params) => {
+  if (!_isAddAccountScreenVisible()) {
+    return
+  }
+
   if (!_.isArray(params.settingsHeaderTitles)) {
     params.settingsHeaderTitles = []
   }
@@ -56,6 +70,10 @@ const _getSettingsHeaderTitles = (params) => {
 }
 
 const _getSettingsHeaderActions = (params) => {
+  if (!_isAddAccountScreenVisible()) {
+    return
+  }
+
   if (!_.isArray(params.settingsHeaderActions)) {
     params.settingsHeaderActions = []
   }

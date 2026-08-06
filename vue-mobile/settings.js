@@ -14,6 +14,7 @@ class MailSettings {
 
     this.allowUnifiedInbox = !!mailData.AllowUnifiedInbox
     this.allowAddAccounts = types.pBool(mailData.AllowAddAccounts)
+    this.showAddAccountInSettings = false
     this.allowMultiAccounts = types.pBool(mailData.AllowMultiAccounts)
     this.allowAutosaveInDrafts = types.pBool(mailData.AllowAutosaveInDrafts, true)
     this.autoSaveIntervalSeconds = types.pNonNegativeInt(mailData.AutoSaveIntervalSeconds, 60)
