@@ -11,26 +11,39 @@
     <div class="col app-header__title" data-test-id="mail-select-count">
       {{ `Selected: ${items.length}` }}
     </div>
-    
+
     <div class="col app-header__right">
       <AppHeaderButton
-        data-test-id="mail-select-delete"
-        @click="onPerformAction(actions.delete)"
+        v-for="action in selectToolbarActions"
+        :key="action.name"
+        :data-test-id="`mail-select-${action.name}`"
+        @click="onPerformAction(action)"
       >
-        <ActionIcon color="black" icon="DeleteIcon" />
+        <q-icon
+          v-if="action.menuIcon"
+          :name="action.menuIcon"
+          size="20px"
+          color="black"
+        />
+        <ActionIcon
+          v-else
+          color="black"
+          :icon="action.icon"
+        />
       </AppHeaderButton>
     </div>
   </q-toolbar>
 </template>
 
 <script>
-import {mapActions, mapGetters} from 'pinia'
+import { mapActions } from 'pinia'
 import { useMailStore } from '../../store/index-pinia'
 
-import { messageActions } from '../../utils/message-actions'
+import { getSelectToolbarActions } from '../../utils/message-actions'
 
 import ActionIcon from '../common/ActionIcon'
 import AppHeaderButton from 'src/components/common/AppHeaderButton'
+import notification from 'src/utils/notification'
 
 export default {
   name: 'SelectHeader',
@@ -44,29 +57,46 @@ export default {
     items: { type: Array, default: () => [], },
   },
 
-  data() {
-    return {
-      actions: messageActions
-    }
+  computed: {
+    selectToolbarActions() {
+      return getSelectToolbarActions(this.items)
+    },
   },
 
   methods: {
     ...mapActions(useMailStore, [
       'resetSelectedItems',
       'changeDialogComponent',
+      'asyncSetMessagesSeenForMessages',
     ]),
+
     async onPerformAction(action) {
-      // console.log('onPerformAction')
-      if (action.routeMethod) {
-        this.$router.push(action.routeMethod(this.$route))
-      }
-      if (action.method) {
-        console.log('this.$router', this.$route.path)
-        const result = await action.method()
-        console.log('action result', result)
-      }
       if (action.component) {
         this.changeDialogComponent({ component: action.component })
+        return
+      }
+
+      if (action.handler === 'markAsRead') {
+        await this.markSelectedSeen(true)
+        return
+      }
+
+      if (action.handler === 'markAsUnread') {
+        await this.markSelectedSeen(false)
+      }
+    },
+
+    async markSelectedSeen(setAction) {
+      if (!this.items.length) {
+        return
+      }
+
+      notification.showLoading(this.$t('COREWEBCLIENT.INFO_LOADING'))
+      const result = await this.asyncSetMessagesSeenForMessages(this.items, setAction)
+      notification.hideLoading()
+
+      if (result) {
+        this.resetSelectedItems()
       }
     },
   },

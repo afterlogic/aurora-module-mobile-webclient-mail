@@ -56,6 +56,49 @@ test.describe('Mobile mail mutations', () => {
     })
   })
 
+  test('marks current message as unread then read from overflow menu', async ({
+    page,
+  }) => {
+    test.setTimeout(180000)
+    await loginAsTestUser(page)
+    const opened = await openFirstInboxMessage(page)
+    test.skip(!opened, 'Inbox is empty')
+
+    await step('Overflow → only Mark as unread (message is seen)', async () => {
+      await clickReady(page.getByTestId('mail-message-more'))
+      await expect(page.getByTestId('mail-menu-markAsUnread')).toBeVisible({
+        timeout: 10000,
+      })
+      await expect(page.getByTestId('mail-menu-markAsRead')).toBeHidden()
+      await clickReady(page.getByTestId('mail-menu-markAsUnread'))
+      await attachScreenshot(page, 'mail-mark-unread-01')
+    })
+
+    await step('Overflow → only Mark as read, then apply', async () => {
+      await clickReady(page.getByTestId('mail-message-more'))
+      await expect(page.getByTestId('mail-menu-markAsRead')).toBeVisible({
+        timeout: 10000,
+      })
+      await expect(page.getByTestId('mail-menu-markAsUnread')).toBeHidden()
+      await clickReady(page.getByTestId('mail-menu-markAsRead'))
+      await attachScreenshot(page, 'mail-mark-read-01')
+    })
+
+    await step('Back to list — message seen', async () => {
+      await clickReady(page.getByTestId('mail-message-back'))
+      await expect(page.getByTestId('mail-message-list')).toBeVisible({
+        timeout: 30000,
+      })
+      const after = page
+        .getByTestId('mail-message-item')
+        .filter({ hasText: opened.viewSubject })
+        .first()
+      await expect(after).toBeVisible({ timeout: 15000 })
+      await expect(after).not.toHaveClass(/message__unseen/, { timeout: 15000 })
+      await attachScreenshot(page, 'mail-mark-read-02-list')
+    })
+  })
+
   test('moves message via Move dialog to Trash', async ({ page }) => {
     test.setTimeout(180000)
     await loginAsTestUser(page)

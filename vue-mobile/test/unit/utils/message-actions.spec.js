@@ -3,6 +3,7 @@ import { FOLDER_TYPES } from '../../../enums.js'
 import {
   getToolbarActions,
   getMenuActions,
+  getSelectToolbarActions,
   filterVisibleActions,
   messageActions,
 } from 'utils/message-actions.js'
@@ -16,16 +17,43 @@ describe('message-actions', () => {
     ])
   })
 
+  it('getSelectToolbarActions: filters mark actions by selection seen state', () => {
+    expect(getSelectToolbarActions([]).map((a) => a.name)).toEqual(['delete'])
+
+    expect(
+      getSelectToolbarActions([{ isSeen: true }, { isSeen: true }]).map((a) => a.name)
+    ).toEqual(['markAsUnread', 'delete'])
+
+    expect(
+      getSelectToolbarActions([{ isSeen: false }, { isSeen: false }]).map((a) => a.name)
+    ).toEqual(['markAsRead', 'delete'])
+
+    expect(
+      getSelectToolbarActions([{ isSeen: true }, { isSeen: false }]).map((a) => a.name)
+    ).toEqual(['markAsRead', 'markAsUnread', 'delete'])
+  })
+
   it('getMenuActions: SENT vs SPAM vs default spam action', () => {
     expect(getMenuActions(FOLDER_TYPES.SENT).map((a) => a.name)).toEqual([
       'forward',
       'resend',
+      'markAsRead',
+      'markAsUnread',
       'moveToFolder',
       'viewHeaders',
       'forwardAsAttachment',
     ])
     expect(getMenuActions(FOLDER_TYPES.SPAM).map((a) => a.name)).toContain('notSpam')
-    expect(getMenuActions(FOLDER_TYPES.INBOX).map((a) => a.name)).toContain('toSpam')
+    expect(getMenuActions(FOLDER_TYPES.INBOX).map((a) => a.name)).toEqual([
+      'replyAll',
+      'forward',
+      'markAsRead',
+      'markAsUnread',
+      'toSpam',
+      'moveToFolder',
+      'viewHeaders',
+      'forwardAsAttachment',
+    ])
   })
 
   it('filterVisibleActions respects isVisible', () => {
@@ -41,5 +69,33 @@ describe('message-actions', () => {
       accountId: 1,
     })
     expect(withSpam.map((a) => a.name)).toEqual(['delete', 'toSpam'])
+  })
+
+  it('filterVisibleActions shows only relevant mark action for message seen state', () => {
+    const markActions = [messageActions.markAsRead, messageActions.markAsUnread]
+
+    expect(
+      filterVisibleActions(markActions, { isSeen: true }).map((a) => a.name)
+    ).toEqual(['markAsUnread'])
+
+    expect(
+      filterVisibleActions(markActions, { isSeen: false }).map((a) => a.name)
+    ).toEqual(['markAsRead'])
+  })
+
+  it('filterVisibleActions shows mark actions by selection hasSeen/hasUnseen', () => {
+    const markActions = [messageActions.markAsRead, messageActions.markAsUnread]
+
+    expect(
+      filterVisibleActions(markActions, { hasSeen: true, hasUnseen: false }).map((a) => a.name)
+    ).toEqual(['markAsUnread'])
+
+    expect(
+      filterVisibleActions(markActions, { hasSeen: false, hasUnseen: true }).map((a) => a.name)
+    ).toEqual(['markAsRead'])
+
+    expect(
+      filterVisibleActions(markActions, { hasSeen: true, hasUnseen: true }).map((a) => a.name)
+    ).toEqual(['markAsRead', 'markAsUnread'])
   })
 })

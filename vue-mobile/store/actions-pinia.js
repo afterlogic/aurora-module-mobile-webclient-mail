@@ -504,7 +504,8 @@ export default {
   },
 
   updateMessageSeenLocally(accountId, folder, uid, isSeen) {
-    let wasUnseen = false
+    let becameSeen = false
+    let becameUnseen = false
 
     const applySeen = (message) => {
       if (
@@ -515,7 +516,10 @@ export default {
         && message.isSeen !== isSeen
       ) {
         if (!message.isSeen && isSeen) {
-          wasUnseen = true
+          becameSeen = true
+        }
+        if (message.isSeen && !isSeen) {
+          becameUnseen = true
         }
         message.isSeen = isSeen
       }
@@ -530,14 +534,22 @@ export default {
       applySeen(cachedMessage)
     }
 
-    if (wasUnseen && isSeen) {
-      const folderObj = this.getFolderByFullName(accountId, folder)
+    const folderObj = this.getFolderByFullName(accountId, folder)
+    if (becameSeen) {
       if (folderObj && folderObj.unseenCount > 0) {
         folderObj.unseenCount -= 1
       }
 
       if (this.isUnifiedInbox && this.unifiedInboxInfo?.unseenCount > 0) {
         this.unifiedInboxInfo.unseenCount -= 1
+      }
+    } else if (becameUnseen) {
+      if (folderObj) {
+        folderObj.unseenCount = (folderObj.unseenCount ?? 0) + 1
+      }
+
+      if (this.isUnifiedInbox && this.unifiedInboxInfo) {
+        this.unifiedInboxInfo.unseenCount = (this.unifiedInboxInfo.unseenCount ?? 0) + 1
       }
     }
   },
@@ -562,6 +574,68 @@ export default {
     }
 
     return result
+  },
+
+  /**
+   * Mark messages as read/unread (bulk or single), grouped by account+folder like desktop SetMessagesSeen.
+   */
+  async asyncSetMessagesSeenForMessages(messages, setAction) {
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return false
+    }
+
+    const groups = new Map()
+    messages.forEach((message) => {
+      if (!message) {
+        return
+      }
+      const accountId = message.accountId || message.AccountID || this.currentAccountId
+      const folder = message.folder || message.Folder
+      const uid = message.uid
+      if (!folder || uid === undefined || uid === null || uid === '') {
+        return
+      }
+      const key = `${accountId}:${folder}`
+      if (!groups.has(key)) {
+        groups.set(key, { accountId, folder, uids: [], messages: [] })
+      }
+      const group = groups.get(key)
+      group.uids.push(uid)
+      group.messages.push(message)
+    })
+
+    if (groups.size === 0) {
+      return false
+    }
+
+    let allSucceeded = true
+    const updatedMessages = []
+
+    for (const group of groups.values()) {
+      const parameters = {
+        AccountID: group.accountId,
+        Folder: group.folder,
+        Uids: group.uids.join(','),
+        SetAction: setAction,
+      }
+
+      const result = await mailWebApi.setMessagesSeen(parameters)
+      if (!result) {
+        allSucceeded = false
+        continue
+      }
+
+      group.uids.forEach((uid) => {
+        this.updateMessageSeenLocally(group.accountId, group.folder, uid, setAction)
+      })
+      updatedMessages.push(...group.messages)
+    }
+
+    if (setAction && this.currentFilter === 'unseen' && updatedMessages.length > 0) {
+      this.removeMessagesFromList(updatedMessages)
+    }
+
+    return allSucceeded
   },
 
   async asyncSetMessageFlagged(uid, flag, folder, accountId = 0) {

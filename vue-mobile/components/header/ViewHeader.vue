@@ -98,6 +98,7 @@ export default {
       return {
         getFolderByType: this.getFolderByType,
         accountId: this.messageAccountId,
+        isSeen: !!this.currentMessage?.isSeen,
       }
     },
 
@@ -117,6 +118,7 @@ export default {
     ...mapActions(useMailStore, [
       'changeDialogComponent',
       'asyncMoveCurrentMessage',
+      'asyncSetMessagesSeenForMessages',
       'setComposeAttachments',
       'setComposeSubject',
     ]),
@@ -148,12 +150,25 @@ export default {
         toSpam: () => this.moveMessageToFolderType(FOLDER_TYPES.SPAM),
         notSpam: () => this.moveMessageToFolderType(FOLDER_TYPES.INBOX),
         forwardAsAttachment: () => this.forwardAsAttachment(),
+        markAsRead: () => this.markCurrentMessageSeen(true),
+        markAsUnread: () => this.markCurrentMessageSeen(false),
       }
 
       const handler = handlers[handlerName]
       if (handler) {
         await handler()
       }
+    },
+
+    async markCurrentMessageSeen(setAction) {
+      const message = this.currentMessage
+      if (!message) {
+        return
+      }
+
+      notification.showLoading(this.$t('COREWEBCLIENT.INFO_LOADING'))
+      await this.asyncSetMessagesSeenForMessages([message], setAction)
+      notification.hideLoading()
     },
 
     async moveMessageToFolderType(folderType) {

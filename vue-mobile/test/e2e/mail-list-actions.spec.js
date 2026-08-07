@@ -163,6 +163,119 @@ test.describe('Mobile mail list filters and bulk actions', () => {
     })
   })
 
+  test('multi-select mark as unread then mark as read', async ({ page }) => {
+    test.setTimeout(180000)
+    await loginAsTestUser(page)
+    await waitForInboxList(page)
+
+    const items = page.getByTestId('mail-message-item')
+    const beforeCount = await items.count()
+    test.skip(beforeCount === 0, 'Inbox is empty — need at least one message')
+
+    let subject = ''
+
+    await step('Long-press first message → select mode', async () => {
+      const first = items.first()
+      subject = (
+        await first.locator('.message__subject').innerText().catch(() => '')
+      ).trim()
+      await longPressMessageItem(page, first)
+      await expect(page.getByTestId('mail-select-header')).toBeVisible({
+        timeout: 15000,
+      })
+      console.log(`  → Selected subject: ${subject}`)
+      await attachScreenshot(page, 'mail-select-mark-01')
+    })
+
+    const markUnread = page.getByTestId('mail-select-markAsUnread')
+    const markRead = page.getByTestId('mail-select-markAsRead')
+    const canMarkUnread = await markUnread.isVisible().catch(() => false)
+
+    if (canMarkUnread) {
+      await step('All/some seen → Mark as unread only path', async () => {
+        await expect(markUnread).toBeVisible()
+        await clickReady(markUnread)
+        await expect(page.getByTestId('mail-select-header')).toBeHidden({
+          timeout: 30000,
+        })
+        await waitForListReady(page, listReadyOptions)
+        const target = page
+          .getByTestId('mail-message-item')
+          .filter({ hasText: subject })
+          .first()
+        await expect(target).toBeVisible({ timeout: 15000 })
+        await expect(target).toHaveClass(/message__unseen/, { timeout: 15000 })
+        await attachScreenshot(page, 'mail-select-mark-02-unread')
+      })
+
+      await step('Select again — only Mark as read', async () => {
+        const target = page
+          .getByTestId('mail-message-item')
+          .filter({ hasText: subject })
+          .first()
+        await longPressMessageItem(page, target)
+        await expect(page.getByTestId('mail-select-header')).toBeVisible({
+          timeout: 15000,
+        })
+        await expect(page.getByTestId('mail-select-markAsRead')).toBeVisible()
+        await expect(page.getByTestId('mail-select-markAsUnread')).toBeHidden()
+        await clickReady(page.getByTestId('mail-select-markAsRead'))
+        await expect(page.getByTestId('mail-select-header')).toBeHidden({
+          timeout: 30000,
+        })
+        await waitForListReady(page, listReadyOptions)
+        const after = page
+          .getByTestId('mail-message-item')
+          .filter({ hasText: subject })
+          .first()
+        await expect(after).toBeVisible({ timeout: 15000 })
+        await expect(after).not.toHaveClass(/message__unseen/, { timeout: 15000 })
+        await attachScreenshot(page, 'mail-select-mark-03-read')
+      })
+    } else {
+      await step('All unread → Mark as read only path', async () => {
+        await expect(markRead).toBeVisible()
+        await expect(markUnread).toBeHidden()
+        await clickReady(markRead)
+        await expect(page.getByTestId('mail-select-header')).toBeHidden({
+          timeout: 30000,
+        })
+        await waitForListReady(page, listReadyOptions)
+        const after = page
+          .getByTestId('mail-message-item')
+          .filter({ hasText: subject })
+          .first()
+        await expect(after).toBeVisible({ timeout: 15000 })
+        await expect(after).not.toHaveClass(/message__unseen/, { timeout: 15000 })
+        await attachScreenshot(page, 'mail-select-mark-02-read')
+      })
+
+      await step('Select again — only Mark as unread', async () => {
+        const target = page
+          .getByTestId('mail-message-item')
+          .filter({ hasText: subject })
+          .first()
+        await longPressMessageItem(page, target)
+        await expect(page.getByTestId('mail-select-header')).toBeVisible({
+          timeout: 15000,
+        })
+        await expect(page.getByTestId('mail-select-markAsUnread')).toBeVisible()
+        await expect(page.getByTestId('mail-select-markAsRead')).toBeHidden()
+        await clickReady(page.getByTestId('mail-select-markAsUnread'))
+        await expect(page.getByTestId('mail-select-header')).toBeHidden({
+          timeout: 30000,
+        })
+        await waitForListReady(page, listReadyOptions)
+        const after = page
+          .getByTestId('mail-message-item')
+          .filter({ hasText: subject })
+          .first()
+        await expect(after).toHaveClass(/message__unseen/, { timeout: 15000 })
+        await attachScreenshot(page, 'mail-select-mark-03-unread')
+      })
+    }
+  })
+
   test('empties Trash folder', async ({ page }) => {
     test.setTimeout(180000)
     await loginAsTestUser(page)

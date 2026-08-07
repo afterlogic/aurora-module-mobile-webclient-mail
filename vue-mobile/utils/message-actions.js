@@ -34,6 +34,30 @@ export const messageActions = {
     icon: 'DeleteIcon',
     component: 'DeleteMessageDialog',
   },
+  markAsRead: {
+    name: 'markAsRead',
+    labelKey: 'MAILWEBCLIENT.ACTION_MARK_AS_READ',
+    icon: 'MarkAsReadIcon',
+    menuIcon: 'mark_email_read',
+    handler: 'markAsRead',
+    // View: show when current message is unread.
+    // Select: show when selection has at least one unread (hasUnseen).
+    isVisible: ({ isSeen, hasUnseen }) => (
+      typeof hasUnseen === 'boolean' ? hasUnseen : isSeen === false
+    ),
+  },
+  markAsUnread: {
+    name: 'markAsUnread',
+    labelKey: 'MAILWEBCLIENT.ACTION_MARK_AS_UNREAD',
+    icon: 'MarkAsUnreadIcon',
+    menuIcon: 'mark_email_unread',
+    handler: 'markAsUnread',
+    // View: show when current message is read.
+    // Select: show when selection has at least one read (hasSeen).
+    isVisible: ({ isSeen, hasSeen }) => (
+      typeof hasSeen === 'boolean' ? hasSeen : isSeen === true
+    ),
+  },
   toSpam: {
     name: 'toSpam',
     labelKey: 'MAILWEBCLIENT.ACTION_MARK_SPAM',
@@ -82,11 +106,27 @@ export function getToolbarActions(folderType) {
   return [messageActions.reply, messageActions.delete]
 }
 
+export function getSelectToolbarActions(items = []) {
+  const hasSeen = items.some((item) => !!item?.isSeen)
+  const hasUnseen = items.some((item) => !item?.isSeen)
+
+  return filterVisibleActions(
+    [
+      messageActions.markAsRead,
+      messageActions.markAsUnread,
+      messageActions.delete,
+    ],
+    { hasSeen, hasUnseen },
+  )
+}
+
 export function getMenuActions(folderType) {
   if (folderType === FOLDER_TYPES.SENT) {
     return [
       messageActions.forward,
       messageActions.resend,
+      messageActions.markAsRead,
+      messageActions.markAsUnread,
       messageActions.moveToFolder,
       messageActions.viewHeaders,
       messageActions.forwardAsAttachment,
@@ -100,6 +140,8 @@ export function getMenuActions(folderType) {
   return [
     messageActions.replyAll,
     messageActions.forward,
+    messageActions.markAsRead,
+    messageActions.markAsUnread,
     spamAction,
     messageActions.moveToFolder,
     messageActions.viewHeaders,
