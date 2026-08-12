@@ -1,12 +1,28 @@
 # Mobile E2E (Playwright)
 
-Scenarios for **MailMobileWebclient**. Runner: `modules/CoreMobileWebclient/vue-mobile`.
+Scenarios for **MailMobileWebclient**.
+
+Full docs (run / UI Mode / filters / env):
+
+- Install root: [`README-e2e-mobile.md`](../../../../../README-e2e-mobile.md)
+- Runner: [`CoreMobileWebclient/vue-mobile/test/e2e/README.md`](../../../../CoreMobileWebclient/vue-mobile/test/e2e/README.md)
 
 ```bash
-# from CoreMobileWebclient/vue-mobile
-yarn test:e2e_local:iphone
-yarn test:e2e_local -- --project=MailMobileWebclient-iPhone13
+# from Aurora install root
+yarn test:e2e-mobile -- --setup "MailMobileWebclient iPhone13"
+yarn test:e2e-mobile:ui -- --setup "MailMobileWebclient iPhone13"
+
+# from modules/CoreMobileWebclient/vue-mobile
+yarn test:e2e_local -- --setup "MailMobileWebclient iPhone13"
+yarn test:e2e:ui -- --setup "MailMobileWebclient iPhone13"
 ```
 
-Shared helpers: Core `test/e2e/helpers/` (`AURORA_MOBILE_E2E_ROOT`).
-Domain helpers: `./helpers/` here.
+`--setup "<modules> <devices>"` (like desktop). Comma-separate multiple modules/devices.
+`*` = all modules: `--setup "* iPhone13"`. Device aliases: `"iPhone 13"` → `iPhone13`.
+
+Shared helpers: Core `test/e2e/helpers/` (`AURORA_MOBILE_E2E_ROOT`). Domain helpers: `./helpers/` here.
+
+## Known stand / product issues
+
+- **Mail.SendMessage → `MailSo-Net-Exceptions-SocketReadTimeoutException`**: compose stays open (UI is correct when send fails). Affects `compose.spec.js`, `compose-draft.spec.js` (send), and other send flows. Fix SMTP/mail server on the stand (backend); `sendCompose` retries once for transient timeouts.
+

@@ -11,6 +11,7 @@ const {
   fieldControl,
 } = sharedHelper('login')
 const { waitForListReady, clickReady } = sharedHelper('ready')
+const { sendCompose } = require('./helpers/mail')
 
 const hasCredentials = !!(process.env.E2E_LOGIN && process.env.E2E_PASSWORD)
 const composeTo = process.env.E2E_COMPOSE_TO || process.env.E2E_LOGIN
@@ -88,15 +89,8 @@ test.describe('Mobile mail compose', () => {
       await attachScreenshot(page, 'compose-03-filled')
     })
 
-    await step('Send message', async () => {
-      await clickReady(page.getByTestId('mail-compose-send'))
-      console.log('  → Send clicked')
-    })
-
-    await step('Return to inbox after send', async () => {
-      await expect(page.getByTestId('mail-compose')).toBeHidden({
-        timeout: 60000,
-      })
+    await step('Send message and return to inbox', async () => {
+      await sendCompose(page)
       await expect(page.getByTestId('mail-message-list')).toBeVisible({
         timeout: 30000,
       })

@@ -152,11 +152,38 @@ async function fillComposeRecipient(page, email, fieldTestId = 'mail-compose-to'
   )
 }
 
-async function sendCompose(page) {
-  await clickReady(page.getByTestId('mail-compose-send'))
-  await expect(page.getByTestId('mail-compose')).toBeHidden({
-    timeout: 60000,
-  })
+async function sendCompose(page, { attempts = 2, timeout = 90000 } = {}) {
+  const compose = page.getByTestId('mail-compose')
+  const send = page.getByTestId('mail-compose-send')
+
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    await expect(send).toBeVisible({ timeout: 15000 })
+    await clickReady(send)
+
+    const closed = await compose
+      .waitFor({ state: 'hidden', timeout })
+      .then(() => true)
+      .catch(() => false)
+
+    if (closed) {
+      return
+    }
+
+    // Mail SendMessage can fail with MailSo SocketReadTimeoutException on the
+    // stand; the UI stays on compose (error toast ~2s). Retry once.
+    console.log(
+      `  → Send attempt ${attempt}/${attempts}: compose still open (likely SMTP/API timeout)`
+    )
+    if (attempt < attempts) {
+      await page.keyboard.press('Escape').catch(() => undefined)
+      await page.waitForTimeout(500)
+    }
+  }
+
+  await expect(
+    compose,
+    'Compose still open after Send — Mail.SendMessage likely failed (e.g. SMTP SocketReadTimeoutException)'
+  ).toBeHidden({ timeout: 5000 })
 }
 
 async function openFolderByName(page, folderName) {
