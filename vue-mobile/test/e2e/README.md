@@ -22,7 +22,7 @@ npm run test:e2e:ui -- --setup "MailMobileWebclient iPhone13"
 
 Shared helpers: Core `test/e2e/helpers/` (`AURORA_MOBILE_E2E_ROOT`). Domain helpers: `./helpers/` here.
 
-## Known stand / product issues
+## Stand / environment
 
-- **Mail.SendMessage → `MailSo-Net-Exceptions-SocketReadTimeoutException`**: compose stays open (UI is correct when send fails). Affects `compose.spec.js`, `compose-draft.spec.js` (send), and other send flows. Fix SMTP/mail server on the stand (backend); `sendCompose` retries once for transient timeouts.
+- **Mail.SendMessage → `MailSo-Net-Exceptions-SocketReadTimeoutException`**: compose stays open (UI is correct when send fails). Affects `compose.spec.js`, `compose-draft.spec.js` (send), and other send flows. Fix SMTP/mail server on the stand; `sendCompose` retries once for transient timeouts.
 
