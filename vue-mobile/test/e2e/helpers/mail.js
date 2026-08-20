@@ -5,7 +5,7 @@ const { sharedHelper, fixturePath } = require(path.join(
 ))
 const { expect } = require('@playwright/test')
 const { step, attachScreenshot, fieldControl } = sharedHelper('login')
-const { waitForListReady, clickReady } = sharedHelper('ready')
+const { waitForListReady, clickReady, clickDrawerItem } = sharedHelper('ready')
 
 const FOLDER_TYPES = {
   INBOX: 1,
@@ -126,7 +126,7 @@ async function openFolderByType(page, folderType) {
   await expect(folder).toBeVisible({ timeout: 15000 })
   const name = (await folder.getAttribute('data-folder-name')) || ''
   console.log(`  → Opening folder type=${folderType} name=${name}`)
-  await clickReady(folder)
+  await clickDrawerItem(page, folder)
   await expect(page.getByTestId('mail-message-list')).toBeVisible({
     timeout: 30000,
   })
@@ -194,7 +194,7 @@ async function openFolderByName(page, folderName) {
     )
     .first()
   await expect(folder).toBeVisible({ timeout: 15000 })
-  await clickReady(folder)
+  await clickDrawerItem(page, folder)
   await expect(page.getByTestId('mail-message-list')).toBeVisible({
     timeout: 30000,
   })
@@ -213,6 +213,77 @@ async function longPressMessageItem(page, item) {
   await page.mouse.up()
 }
 
+async function sendInboxMessage(page, { subject, body, recipient } = {}) {
+  const composeTo =
+    recipient || process.env.E2E_COMPOSE_TO || process.env.E2E_LOGIN
+  const messageSubject = subject || `E2E mail ${Date.now()}`
+  const messageBody = body || `E2E mail body ${Date.now()}`
+
+  await waitForInboxList(page)
+  await clickReady(page.getByTestId('mail-compose-fab'))
+  await expect(page.getByTestId('mail-compose')).toBeVisible({
+    timeout: 15000,
+  })
+  await fillComposeRecipient(page, composeTo)
+  await fieldControl(page, 'mail-compose-subject').fill(messageSubject)
+  const editor = page
+    .getByTestId('mail-compose-body')
+    .locator('.q-editor__content')
+  await expect(editor).toBeVisible({ timeout: 15000 })
+  await editor.click()
+  await editor.fill(messageBody)
+  await sendCompose(page)
+  await expect(page.getByTestId('mail-message-list')).toBeVisible({
+    timeout: 30000,
+  })
+  return messageSubject
+}
+
+async function waitForInboxMessage(page, subject, { timeout = 120000 } = {}) {
+  await openFolderByType(page, FOLDER_TYPES.INBOX)
+  const item = page
+    .getByTestId('mail-message-item')
+    .filter({ hasText: subject })
+    .first()
+  await expect(item).toBeVisible({ timeout })
+  return item
+}
+
+async function openInboxMessageBySubject(page, subject) {
+  const item = await waitForInboxMessage(page, subject)
+  await clickReady(item)
+  await expect(page.getByTestId('mail-message-view')).toBeVisible({
+    timeout: 30000,
+  })
+  await expect(page.getByTestId('mail-message-subject')).toBeVisible({
+    timeout: 60000,
+  })
+  await expect(
+    page.getByTestId('mail-message-view').locator('.app-list-loader_initial')
+  ).toHaveCount(0, { timeout: 30000 })
+}
+
+/** Best-effort delete of a message by subject (cleanup after dedicated sends). */
+async function cleanupDeleteMessageBySubject(page, subject) {
+  try {
+    if (!(await page.getByTestId('mail-message-view').isVisible().catch(() => false))) {
+      await openInboxMessageBySubject(page, subject)
+    }
+    await clickReady(page.getByTestId('mail-action-delete'))
+    const dialog = page.getByTestId('mail-delete-dialog')
+    if (await dialog.isVisible().catch(() => false)) {
+      await clickReady(page.getByTestId('mail-delete-confirm'))
+      await expect(dialog).toBeHidden({ timeout: 30000 })
+    }
+    await expect(page.getByTestId('mail-message-list')).toBeVisible({
+      timeout: 30000,
+    })
+    console.log(`  → cleanup mail: ${subject}`)
+  } catch (e) {
+    console.log(`  → cleanup mail failed (${subject}): ${e.message}`)
+  }
+}
+
 module.exports = {
   FOLDER_TYPES,
   waitForInboxList,
@@ -226,6 +297,10 @@ module.exports = {
   longPressMessageItem,
   fillComposeRecipient,
   sendCompose,
+  sendInboxMessage,
+  waitForInboxMessage,
+  openInboxMessageBySubject,
+  cleanupDeleteMessageBySubject,
   waitForListReady,
   listReadyOptions,
   clickReady,

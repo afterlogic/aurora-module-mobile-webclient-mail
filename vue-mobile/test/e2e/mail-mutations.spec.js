@@ -18,6 +18,10 @@ const {
   openFolderByType,
   fillComposeRecipient,
   sendCompose,
+  sendInboxMessage,
+  openInboxMessageBySubject,
+  waitForInboxMessage,
+  cleanupDeleteMessageBySubject,
   waitForInboxList,
 } = require('./helpers/mail')
 
@@ -162,66 +166,75 @@ test.describe('Mobile mail mutations', () => {
   })
 
   test('marks spam as not spam and restores to Inbox', async ({ page }) => {
-    test.setTimeout(240000)
+    test.setTimeout(300000)
     await loginAsTestUser(page)
-    const opened = await openFirstInboxMessage(page)
-    test.skip(!opened, 'Inbox is empty')
 
-    const subject = opened.viewSubject
-    test.skip(!subject, 'Opened message has empty subject')
+    const subject = `E2E not-spam ${Date.now()}`
 
-    await step('Mark as spam', async () => {
-      await clickReady(page.getByTestId('mail-message-more'))
-      await expect(page.getByTestId('mail-menu-toSpam')).toBeVisible({
-        timeout: 10000,
+    try {
+      await step('Send dedicated test message', async () => {
+        await sendInboxMessage(page, {
+          subject,
+          body: `E2E not-spam body ${Date.now()}`,
+        })
+        console.log(`  → Sent test message: ${subject}`)
       })
-      await clickReady(page.getByTestId('mail-menu-toSpam'))
-      await expect(page.getByTestId('mail-message-list')).toBeVisible({
-        timeout: 45000,
-      })
-      console.log(`  → Marked as spam: ${subject}`)
-    })
 
-    await step('Open message in Spam', async () => {
-      await openFolderByType(page, FOLDER_TYPES.SPAM)
-      const item = page
-        .getByTestId('mail-message-item')
-        .filter({ hasText: subject })
-        .first()
-      await expect(item).toBeVisible({ timeout: 60000 })
-      await clickReady(item)
-      await expect(page.getByTestId('mail-message-view')).toBeVisible({
-        timeout: 30000,
+      await step('Open sent message in Inbox', async () => {
+        await openInboxMessageBySubject(page, subject)
+        await attachScreenshot(page, 'mail-not-spam-00-open')
       })
-      await expect(page.getByTestId('mail-message-subject')).toBeVisible({
-        timeout: 60000,
-      })
-      await attachScreenshot(page, 'mail-not-spam-01-in-spam')
-    })
 
-    await step('Overflow → Not spam', async () => {
-      await clickReady(page.getByTestId('mail-message-more'))
-      await expect(page.getByTestId('mail-menu-notSpam')).toBeVisible({
-        timeout: 10000,
+      await step('Mark as spam', async () => {
+        await clickReady(page.getByTestId('mail-message-more'))
+        await expect(page.getByTestId('mail-menu-toSpam')).toBeVisible({
+          timeout: 10000,
+        })
+        await clickReady(page.getByTestId('mail-menu-toSpam'))
+        await expect(page.getByTestId('mail-message-list')).toBeVisible({
+          timeout: 45000,
+        })
+        console.log(`  → Marked as spam: ${subject}`)
       })
-      await clickReady(page.getByTestId('mail-menu-notSpam'))
-      await expect(page.getByTestId('mail-message-list')).toBeVisible({
-        timeout: 45000,
-      })
-      console.log(`  → Marked as not spam: ${subject}`)
-      await attachScreenshot(page, 'mail-not-spam-02-after')
-    })
 
-    await step('Confirm message is back in Inbox', async () => {
-      await openFolderByType(page, FOLDER_TYPES.INBOX)
-      const item = page
-        .getByTestId('mail-message-item')
-        .filter({ hasText: subject })
-        .first()
-      await expect(item).toBeVisible({ timeout: 60000 })
-      console.log(`  → Restored in Inbox: ${subject}`)
-      await attachScreenshot(page, 'mail-not-spam-03-inbox')
-    })
+      await step('Open message in Spam', async () => {
+        await openFolderByType(page, FOLDER_TYPES.SPAM)
+        const item = page
+          .getByTestId('mail-message-item')
+          .filter({ hasText: subject })
+          .first()
+        await expect(item).toBeVisible({ timeout: 60000 })
+        await clickReady(item)
+        await expect(page.getByTestId('mail-message-view')).toBeVisible({
+          timeout: 30000,
+        })
+        await expect(page.getByTestId('mail-message-subject')).toBeVisible({
+          timeout: 60000,
+        })
+        await attachScreenshot(page, 'mail-not-spam-01-in-spam')
+      })
+
+      await step('Overflow → Not spam', async () => {
+        await clickReady(page.getByTestId('mail-message-more'))
+        await expect(page.getByTestId('mail-menu-notSpam')).toBeVisible({
+          timeout: 10000,
+        })
+        await clickReady(page.getByTestId('mail-menu-notSpam'))
+        await expect(page.getByTestId('mail-message-list')).toBeVisible({
+          timeout: 45000,
+        })
+        console.log(`  → Marked as not spam: ${subject}`)
+        await attachScreenshot(page, 'mail-not-spam-02-after')
+      })
+
+      await step('Confirm message is back in Inbox', async () => {
+        await waitForInboxMessage(page, subject, { timeout: 120000 })
+        console.log(`  → Restored in Inbox: ${subject}`)
+        await attachScreenshot(page, 'mail-not-spam-03-inbox')
+      })
+    } finally {
+      await cleanupDeleteMessageBySubject(page, subject)
+    }
   })
 
   test('deletes message to Trash via toolbar', async ({ page }) => {
