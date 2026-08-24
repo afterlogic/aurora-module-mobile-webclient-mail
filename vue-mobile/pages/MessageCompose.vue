@@ -238,6 +238,7 @@ export default {
       'changeCurrentMessageIdentifiers',
       'asyncGetMessage',
       'refreshAfterDraftSave',
+      'refreshAfterMessageSend',
       'takeComposeToAddresses',
       'takeComposeAttachments',
       'takeComposeSubject',
@@ -757,6 +758,7 @@ export default {
             notification.showReport(this.$t('MAILWEBCLIENT.REPORT_MESSAGE_SENT'))
             this.messageSent = true
             this.stopAutosaveInterval()
+            await this.refreshAfterMessageSend()
             this.$router.back()
           }
         },

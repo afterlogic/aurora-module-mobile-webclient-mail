@@ -720,6 +720,17 @@ export default {
     }
   },
 
+  /**
+   * After SendMessage the folder list stays stale until the user switches folders.
+   * Reload page 1 of the current folder so Inbox (or whatever was open) shows new mail.
+   */
+  async refreshAfterMessageSend() {
+    if (this.isUnifiedInbox || this.currentFolder) {
+      this.changeMessageListPage(1)
+      await this.asyncGetMessages()
+    }
+  },
+
   saveDraftOnNavigateBack(parameters) {
     if (!SendingUtils.hasSaveableContent(parameters)) {
       return
