@@ -126,9 +126,14 @@ async function openFolderByType(page, folderType) {
   await expect(folder).toBeVisible({ timeout: 15000 })
   const name = (await folder.getAttribute('data-folder-name')) || ''
   console.log(`  → Opening folder type=${folderType} name=${name}`)
-  await clickDrawerItem(page, folder)
+  // Click the label, not the unread badge (badge opens unseen-only filter).
+  const folderLabel = folder.locator('.folder-name').first()
+  await clickDrawerItem(page, folderLabel)
   await expect(page.getByTestId('mail-message-list')).toBeVisible({
     timeout: 30000,
+  })
+  await expect(page.getByTestId('mail-filter-banner')).toHaveCount(0, {
+    timeout: 15000,
   })
   await waitForListReady(page, listReadyOptions)
   return name
