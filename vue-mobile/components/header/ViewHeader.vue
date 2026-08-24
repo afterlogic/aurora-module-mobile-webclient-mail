@@ -77,7 +77,11 @@ export default {
 
   computed: {
     ...mapState(useMailStore, ['currentMessage', 'currentFolder']),
-    ...mapGetters(useMailStore, ['getFolderByFullName', 'getFolderByType']),
+    ...mapGetters(useMailStore, [
+      'getFolderByFullName',
+      'getFolderByType',
+      'currentFoldersDelimiter',
+    ]),
 
     messageAccountId() {
       return this.currentMessage?.accountId || this.currentFolder?.accountId || 0
@@ -119,6 +123,7 @@ export default {
       'changeDialogComponent',
       'asyncMoveCurrentMessage',
       'asyncSetMessagesSeenForMessages',
+      'changeCurrentFilter',
       'setComposeAttachments',
       'setComposeSubject',
     ]),
@@ -194,7 +199,18 @@ export default {
       notification.hideLoading()
 
       if (result) {
-        this.$router.back()
+        // Do not router.back() into a leftover unread-filter URL — the moved
+        // (often already read) message would be hidden in the destination list.
+        this.changeCurrentFilter('')
+        await this.$router.replace({
+          name: 'message-list',
+          params: {
+            accountId,
+            folderPath: destinationFolder.fullName.split(
+              this.currentFoldersDelimiter
+            ),
+          },
+        })
       }
     },
 
