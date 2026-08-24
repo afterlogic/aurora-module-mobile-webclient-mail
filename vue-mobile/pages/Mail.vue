@@ -206,7 +206,9 @@ export default {
         params.folderPath = this.currentFolder.fullName.split(this.currentFoldersDelimiter)
       }
 
-      if (this.currentFilter) {
+      // Unread filter is a temporary list mode; do not re-apply it when
+      // correcting the route after a folder switch.
+      if (this.currentFilter && this.currentFilter !== 'unseen') {
         this.$router.replace({
           name: 'message-list-filter',
           params: {

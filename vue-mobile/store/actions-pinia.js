@@ -199,6 +199,11 @@ export default {
         || folder.accountId !== this.currentFolder.accountId
       ) {
         this.currentFolder = folder
+        // Unread filter is per-folder view; do not carry it when switching folders.
+        // Route can re-apply it (message-list-filter / unseen badge click).
+        if (this.currentFilter === 'unseen') {
+          this.currentFilter = ''
+        }
       }
     }
   },
