@@ -48,9 +48,19 @@ export default {
       })
       .then((result) => {
         if (Array.isArray(result && result['@Collection'])) {
-          return parseMessageList(result['@Collection'], isUnifiedInbox, parameters.AccountID)
+          const messageResultCount = parseInt(result.MessageResultCount, 10)
+          const messageCount = parseInt(result.MessageCount, 10)
+          const hasSearchOrFilter = !!(parameters.Search || parameters.Filters)
+          const totalCount = hasSearchOrFilter
+            ? (Number.isFinite(messageResultCount) ? messageResultCount : (Number.isFinite(messageCount) ? messageCount : 0))
+            : (Number.isFinite(messageCount) ? messageCount : (Number.isFinite(messageResultCount) ? messageResultCount : 0))
+
+          return {
+            messages: parseMessageList(result['@Collection'], isUnifiedInbox, parameters.AccountID),
+            messageCount: totalCount,
+          }
         }
-        return []
+        return { messages: [], messageCount: 0 }
       })
       .catch((error) => null)
   },

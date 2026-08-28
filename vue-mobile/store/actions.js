@@ -134,12 +134,12 @@ export default {
     }
 
     commit('setMessageListLoading', true)
-    const messages = await mailWebApi.getMessages(parameters, isUnifiedInbox, getters['isCurrentSearchInMultiFolders'])
+    const result = await mailWebApi.getMessages(parameters, isUnifiedInbox, getters['isCurrentSearchInMultiFolders'])
     commit('setMessageListLoading', false)
     commit('setMessageList', {
       accountId: parameters.AccountID,
       folderFullName: parameters.Folder,
-      list: messages,
+      list: result?.messages || [],
       page: page
     })
   },

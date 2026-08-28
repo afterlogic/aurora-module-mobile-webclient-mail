@@ -256,19 +256,23 @@ export default {
     if (page === 1) {
       this.currentMessageList = []
       this.messageListLastPageCount = 0
+      this.numberOfMessages = 0
     }
 
     this.isMessageListLoading = true
-    const messages = await mailWebApi.getMessages(
+    const result = await mailWebApi.getMessages(
       parameters,
       isUnifiedInbox,
       this.isCurrentSearchInMultiFolders
     )
     this.isMessageListLoading = false
 
-    if (messages === null) {
+    if (result === null) {
       return
     }
+
+    const messages = result.messages || []
+    const messageCount = result.messageCount || 0
 
     const isStillRelevant = page === this.messageListPage
       && requestSearch === this.currentSearchText
@@ -286,6 +290,11 @@ export default {
         ? this.currentMessageList.concat(messages)
         : messages
       this.messageListLastPageCount = messages.length
+
+      const folderCount = isUnifiedInbox
+        ? (this.unifiedInboxInfo?.count ?? 0)
+        : (this.currentFolder?.count ?? 0)
+      this.numberOfMessages = Math.max(messageCount, folderCount)
     }
   },
 
@@ -296,6 +305,7 @@ export default {
   resetMessageList() {
     this.currentMessageList = []
     this.messageListLastPageCount = 0
+    this.numberOfMessages = 0
   },
 
   resetSelectedItems() {
@@ -373,7 +383,7 @@ export default {
     let offset = 0
 
     while (true) {
-      const messages = await mailWebApi.getMessages(
+      const result = await mailWebApi.getMessages(
         {
           AccountID: accountId,
           Folder: folderFullName,
@@ -390,6 +400,7 @@ export default {
         false,
       )
 
+      const messages = result?.messages
       if (!Array.isArray(messages) || messages.length === 0) {
         break
       }

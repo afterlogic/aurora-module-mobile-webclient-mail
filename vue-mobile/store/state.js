@@ -20,6 +20,7 @@ export default function () {
     currentFilter: '',
     messageListPage: 1,
     messageListLastPageCount: 0,
+    numberOfMessages: 0,
     currentMessageList: [],
 
     isCurrentMessageLoading: false,

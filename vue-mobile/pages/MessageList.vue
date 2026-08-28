@@ -36,6 +36,7 @@
   <q-scroll-area
     v-else
     id="messages-list-scroll"
+    ref="messagesScrollArea"
     :thumb-style="{ width: '5px' }"
     class="messages__list col"
   >
@@ -50,8 +51,9 @@
         :selectItemHandler="selectItem"
       />
       <div
-        v-intersection="onIntersection"
-        v-if="currentMessageList.length > 0 && !isListEndReached"
+        v-if="currentMessageList.length > 0 && !isMessageListEndReached"
+        v-intersection="messagesIntersectionBinding"
+        class="messages__list-sentinel"
       >
         <AppListLoader v-if="isMessageListLoading" />
       </div>
@@ -92,6 +94,7 @@ export default {
   data() {
     return {
       isSelectMode: false,
+      messagesIntersectionBinding: null,
     }
   },
 
@@ -102,11 +105,10 @@ export default {
       'currentFilter',
       'currentMessageList',
       'messageListPage',
-      'messageListLastPageCount',
       'isMessageListLoading',
       'isUnifiedInbox',
     ]),
-    ...mapGetters(useMailStore, ['messageListItemsPerPage']),
+    ...mapGetters(useMailStore, ['isMessageListEndReached']),
     isInitialListLoading() {
       return this.isMessageListLoading && this.messageListPage === 1
     },
@@ -152,20 +154,6 @@ export default {
     },
     isListEmpty() {
       return this.currentMessageList.length == 0 && !this.isMessageListLoading
-    },
-    isListEndReached() {
-      if (this.currentMessageList.length === 0) {
-        return true
-      }
-
-      const itemsPerPage = this.messageListItemsPerPage ?? 20
-      const hasFilterOrSearch = this.currentFilter !== '' || this.isSearch || this.isStarredFolder
-
-      if (!hasFilterOrSearch && !this.isUnifiedInbox) {
-        return this.currentMessageList.length >= (this.currentFolder?.count ?? 0)
-      }
-
-      return this.messageListLastPageCount < itemsPerPage
     },
     folderDisplayName() {
       if (this.isUnifiedInbox) {
@@ -216,12 +204,47 @@ export default {
     },
   },
 
+  created() {
+    this.messagesIntersectionBinding = {
+      handler: this.onIntersection,
+      cfg: {
+        root: null,
+        threshold: 0,
+      },
+    }
+  },
+
+  mounted() {
+    this.$nextTick(() => {
+      this.syncMessagesScrollRoot()
+    })
+  },
+
+  updated() {
+    this.syncMessagesScrollRoot()
+  },
+
   methods: {
     ...mapActions(useMailStore, [
       'asyncGetMessages',
       'changeMessageListPage',
       'changeDialogComponent',
     ]),
+
+    syncMessagesScrollRoot() {
+      const scrollRoot = this.$refs.messagesScrollArea?.getScrollTarget?.()
+      if (!scrollRoot || scrollRoot === this.messagesIntersectionBinding.cfg.root) {
+        return
+      }
+
+      this.messagesIntersectionBinding = {
+        handler: this.onIntersection,
+        cfg: {
+          root: scrollRoot,
+          threshold: 0,
+        },
+      }
+    },
 
     messageItemKey(item, index) {
       if (item?.uid && item?.folder) {
@@ -253,15 +276,18 @@ export default {
       this.changeMessageListPage(1)
       await this.asyncGetMessages()
     },
+
     onIntersection(data) {
-      if (!this.isMessageListLoading && data.isIntersecting) {
+      if (!this.isMessageListLoading && !this.isMessageListEndReached && data.isIntersecting) {
         this.changeMessageListPage(this.messageListPage + 1)
         this.asyncGetMessages()
       }
     },
+
     selectItem(message) {
       message.isSelected = !message.isSelected
     },
+
     longPress(message) {
       this.isSelectMode = true
       this.selectItem(message)
@@ -277,6 +303,10 @@ export default {
   .messages__list {
     min-height: 0;
   }
+}
+
+.messages__list-sentinel {
+  min-height: 1px;
 }
 
 .list__button_with-icon {

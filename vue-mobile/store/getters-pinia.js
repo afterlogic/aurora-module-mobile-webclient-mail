@@ -1,7 +1,22 @@
 import settings from '../settings'
+import { isPagedListEndReached } from '../utils/paged-list-end'
 
 export default {
   messageListItemsPerPage: () => 20,
+
+  isMessageListEndReached: (state) => {
+    const folderCount = state.isUnifiedInbox
+      ? (state.unifiedInboxInfo?.count ?? 0)
+      : (state.currentFolder?.count ?? 0)
+    const totalCount = Math.max(state.numberOfMessages || 0, folderCount)
+
+    return isPagedListEndReached({
+      listLength: (state.currentMessageList || []).length,
+      totalCount,
+      lastPageCount: state.messageListLastPageCount || 0,
+      itemsPerPage: 20,
+    })
+  },
 
   isAllowedUnifiedInbox() {
     if (!settings.get('allowUnifiedInbox')) {
