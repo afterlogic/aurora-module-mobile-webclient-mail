@@ -100,6 +100,7 @@ export default {
 
   computed: {
     ...mapState(useMailStore, [
+      'currentAccountId',
       'currentFolder',
       'currentSearchText',
       'currentFilter',
@@ -108,7 +109,7 @@ export default {
       'isMessageListLoading',
       'isUnifiedInbox',
     ]),
-    ...mapGetters(useMailStore, ['isMessageListEndReached']),
+    ...mapGetters(useMailStore, ['isMessageListEndReached', 'currentFoldersDelimiter']),
     isInitialListLoading() {
       return this.isMessageListLoading && this.messageListPage === 1
     },
@@ -254,10 +255,19 @@ export default {
     },
 
     clearUnreadMessage() {
-      this.$router.push({
-        name: 'message-list',
-        params: {},
-      });
+      if (this.isUnifiedInbox) {
+        this.$router.push({ name: 'message-list-unified' })
+      } else {
+        this.$router.push({
+          name: 'message-list',
+          params: {
+            accountId: this.currentAccountId,
+            folderPath: (this.currentFolder?.fullName || 'INBOX').split(
+              this.currentFoldersDelimiter
+            ),
+          },
+        })
+      }
       eventBus.$emit('closeDrawer')
     },
 
