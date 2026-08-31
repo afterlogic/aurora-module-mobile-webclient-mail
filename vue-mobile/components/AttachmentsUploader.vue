@@ -130,17 +130,25 @@ export default {
 
     getUploadRequestParams() {
       const url = getApiHost() + '?/Api/'
-      const authToken = VueCookies.get('AuthToken')
       const accountId = this.accountId
 
-      if (!accountId || !authToken) {
+      if (!accountId) {
         return null
       }
 
       return {
         url,
         method: 'POST',
-        headers: [{ name: 'Authorization', value: 'Bearer ' + authToken }],
+        // Auth rides on the httpOnly AuthToken cookie the server set at login; the client
+        // no longer holds the token. X-Client marks this as a web client; X-DeviceId is
+        // required on every Api entry when TwoFactorAuth AllowUsedDevices is on.
+        headers: [
+          { name: 'X-Client', value: 'webclient' },
+          { name: 'X-DeviceId', value: VueCookies.get('DeviceId') || '' },
+          { name: 'X-MobileApp', value: '1' },
+        ],
+        // So the browser attaches the cookie on the cross-origin dev API host.
+        withCredentials: true,
         fieldName: 'jua-uploader',
         formFields: [
           { name: 'jua-post-type', value: 'ajax' },
