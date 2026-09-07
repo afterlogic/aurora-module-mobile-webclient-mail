@@ -237,13 +237,52 @@ test.describe('Mobile mail mutations', () => {
     }
   })
 
-  test('deletes message to Trash via toolbar', async ({ page }) => {
-    test.setTimeout(180000)
+  test('deletes message to Trash without dialog and confirms delete from Trash', async ({ page }) => {
+    test.setTimeout(300000)
     await loginAsTestUser(page)
-    const opened = await openFirstInboxMessage(page)
-    test.skip(!opened, 'Inbox is empty')
 
-    await step('Toolbar delete → confirm', async () => {
+    const subject = `E2E mobile delete ${Date.now()}`
+
+    await step('Send dedicated test message', async () => {
+      await sendInboxMessage(page, {
+        subject,
+        body: `E2E delete body ${Date.now()}`,
+      })
+      console.log(`  → Sent test message: ${subject}`)
+    })
+
+    await step('Open sent message in Inbox', async () => {
+      await openInboxMessageBySubject(page, subject)
+      await attachScreenshot(page, 'mail-delete-00-open')
+    })
+
+    await step('Delete from Inbox without confirm dialog', async () => {
+      await clickReady(page.getByTestId('mail-action-delete'))
+      await expect(page.getByTestId('mail-delete-dialog')).toHaveCount(0, {
+        timeout: 5000,
+      })
+      await expect(page.getByTestId('mail-message-list')).toBeVisible({
+        timeout: 30000,
+      })
+      console.log('  → Message moved to Trash without confirm dialog')
+      await attachScreenshot(page, 'mail-delete-01-moved-to-trash')
+    })
+
+    await step('Open message in Trash', async () => {
+      await openFolderByType(page, FOLDER_TYPES.TRASH)
+      const item = page
+        .getByTestId('mail-message-item')
+        .filter({ hasText: subject })
+        .first()
+      await expect(item).toBeVisible({ timeout: 60000 })
+      await clickReady(item)
+      await expect(page.getByTestId('mail-message-view')).toBeVisible({
+        timeout: 30000,
+      })
+      await attachScreenshot(page, 'mail-delete-02-trash-open')
+    })
+
+    await step('Delete from Trash with confirm dialog', async () => {
       await clickReady(page.getByTestId('mail-action-delete'))
       await expect(page.getByTestId('mail-delete-dialog')).toBeVisible({
         timeout: 15000,
@@ -255,8 +294,18 @@ test.describe('Mobile mail mutations', () => {
       await expect(page.getByTestId('mail-message-list')).toBeVisible({
         timeout: 30000,
       })
-      console.log('  → Delete confirmed, back on list')
-      await attachScreenshot(page, 'mail-delete-01-after')
+      await attachScreenshot(page, 'mail-delete-03-permanent')
+    })
+
+    await step('Deleted message no longer exists in Trash', async () => {
+      await openFolderByType(page, FOLDER_TYPES.TRASH)
+      await expect(
+        page
+          .getByTestId('mail-message-item')
+          .filter({ hasText: subject })
+      ).toHaveCount(0, { timeout: 30000 })
+      console.log(`  → Permanently deleted from Trash: ${subject}`)
+      await attachScreenshot(page, 'mail-delete-04-trash-clean')
     })
   })
 

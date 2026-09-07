@@ -133,14 +133,10 @@ test.describe('Mobile mail list filters and bulk actions', () => {
       })
     }
 
-    await step('Bulk delete → confirm', async () => {
+    await step('Bulk delete without confirm dialog', async () => {
       await clickReady(page.getByTestId('mail-select-delete'))
-      await expect(page.getByTestId('mail-delete-dialog')).toBeVisible({
-        timeout: 15000,
-      })
-      await clickReady(page.getByTestId('mail-delete-confirm'))
-      await expect(page.getByTestId('mail-delete-dialog')).toBeHidden({
-        timeout: 45000,
+      await expect(page.getByTestId('mail-delete-dialog')).toHaveCount(0, {
+        timeout: 5000,
       })
       await expect(page.getByTestId('mail-select-header')).toBeHidden({
         timeout: 30000,
