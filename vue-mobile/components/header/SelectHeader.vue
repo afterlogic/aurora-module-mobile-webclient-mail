@@ -36,10 +36,10 @@
 </template>
 
 <script>
-import { mapActions } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useMailStore } from '../../store/index-pinia'
 
-import { getSelectToolbarActions } from '../../utils/message-actions'
+import { getSelectToolbarActions, isPermanentDeleteFolderType } from '../../utils/message-actions'
 
 import ActionIcon from '../common/ActionIcon'
 import AppHeaderButton from 'src/components/common/AppHeaderButton'
@@ -58,6 +58,8 @@ export default {
   },
 
   computed: {
+    ...mapState(useMailStore, ['currentFolder']),
+
     selectToolbarActions() {
       return getSelectToolbarActions(this.items)
     },
@@ -68,9 +70,15 @@ export default {
       'resetSelectedItems',
       'changeDialogComponent',
       'asyncSetMessagesSeenForMessages',
+      'asyncDeleteMessages',
     ]),
 
     async onPerformAction(action) {
+      if (action.name === 'delete') {
+        await this.deleteSelectedMessages()
+        return
+      }
+
       if (action.component) {
         this.changeDialogComponent({ component: action.component })
         return
@@ -93,6 +101,25 @@ export default {
 
       notification.showLoading(this.$t('COREWEBCLIENT.INFO_LOADING'))
       const result = await this.asyncSetMessagesSeenForMessages(this.items, setAction)
+      notification.hideLoading()
+
+      if (result) {
+        this.resetSelectedItems()
+      }
+    },
+
+    async deleteSelectedMessages() {
+      if (!this.items.length) {
+        return
+      }
+
+      if (isPermanentDeleteFolderType(this.currentFolder?.type)) {
+        this.changeDialogComponent({ component: 'DeleteMessageDialog' })
+        return
+      }
+
+      notification.showLoading(this.$t('COREWEBCLIENT.INFO_LOADING'))
+      const result = await this.asyncDeleteMessages(this.items, false)
       notification.hideLoading()
 
       if (result) {

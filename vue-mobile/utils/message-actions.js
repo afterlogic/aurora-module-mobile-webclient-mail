@@ -32,7 +32,6 @@ export const messageActions = {
     name: 'delete',
     labelKey: 'COREWEBCLIENT.ACTION_DELETE',
     icon: 'DeleteIcon',
-    component: 'DeleteMessageDialog',
   },
   markAsRead: {
     name: 'markAsRead',
@@ -90,6 +89,10 @@ export const messageActions = {
     menuIcon: 'attach_email',
     handler: 'forwardAsAttachment',
   },
+}
+
+export function isPermanentDeleteFolderType(folderType) {
+  return folderType === FOLDER_TYPES.TRASH || folderType === FOLDER_TYPES.SPAM
 }
 
 export function getActionLabel(action, t) {

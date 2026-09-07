@@ -63,6 +63,7 @@ import {
   getToolbarActions,
   getMenuActions,
   filterVisibleActions,
+  isPermanentDeleteFolderType,
 } from '../../utils/message-actions'
 
 export default {
@@ -121,6 +122,7 @@ export default {
   methods: {
     ...mapActions(useMailStore, [
       'changeDialogComponent',
+      'asyncDeleteMessages',
       'asyncMoveCurrentMessage',
       'asyncSetMessagesSeenForMessages',
       'changeCurrentFilter',
@@ -137,6 +139,11 @@ export default {
     async onPerformAction(action) {
       if (action.routeSuffix) {
         this.$router.push(`${this.$route.path}/${action.routeSuffix}`)
+        return
+      }
+
+      if (action.name === 'delete') {
+        await this.deleteCurrentMessage()
         return
       }
 
@@ -211,6 +218,27 @@ export default {
             ),
           },
         })
+      }
+    },
+
+    async deleteCurrentMessage() {
+      const message = this.currentMessage
+      if (!message) {
+        return
+      }
+
+      if (isPermanentDeleteFolderType(this.messageFolderType)) {
+        this.changeDialogComponent({ component: 'DeleteMessageDialog' })
+        return
+      }
+
+      notification.showLoading(this.$t('COREWEBCLIENT.INFO_LOADING'))
+      const result = await this.asyncDeleteMessages([message], false)
+      notification.hideLoading()
+
+      if (result) {
+        this.changeCurrentFilter('')
+        this.$router.back()
       }
     },
 

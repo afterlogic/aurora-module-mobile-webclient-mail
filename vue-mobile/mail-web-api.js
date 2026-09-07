@@ -117,6 +117,19 @@ export default {
       .catch((error) => null)
   },
 
+  deleteMessages: async (parameters) => {
+    return webApi
+      .sendRequest({
+        moduleName: 'Mail',
+        methodName: 'DeleteMessages',
+        parameters,
+      })
+      .then((result) => {
+        return result
+      })
+      .catch(() => null)
+  },
+
   setMessageFlagged: async (parameters) => {
     return webApi
       .sendRequest({

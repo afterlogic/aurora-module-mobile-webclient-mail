@@ -519,6 +519,82 @@ export default {
     return result
   },
 
+  async asyncDeleteMessages(messages, permanentDelete = false) {
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return false
+    }
+
+    const groups = new Map()
+    messages.forEach((message) => {
+      if (!message) {
+        return
+      }
+
+      const accountId = message.accountId || message.AccountID || this.currentAccountId
+      const folder = message.folder || message.Folder
+      const uid = message.uid
+
+      if (!folder || uid === undefined || uid === null || uid === '') {
+        return
+      }
+
+      const key = `${accountId}:${folder}`
+      if (!groups.has(key)) {
+        groups.set(key, { accountId, folder, uids: [], messages: [] })
+      }
+
+      const group = groups.get(key)
+      group.uids.push(uid)
+      group.messages.push(message)
+    })
+
+    if (groups.size === 0) {
+      return false
+    }
+
+    let allSucceeded = true
+    const removedMessages = []
+
+    for (const group of groups.values()) {
+      let result = false
+
+      if (permanentDelete) {
+        result = await mailWebApi.deleteMessages({
+          AccountID: group.accountId,
+          Folder: group.folder,
+          Uids: group.uids.join(','),
+        })
+      } else {
+        const trashFolder = this.getFolderByType(group.accountId, FOLDER_TYPES.TRASH)
+        if (!trashFolder) {
+          allSucceeded = false
+          continue
+        }
+
+        result = await mailWebApi.moveMessages({
+          AccountID: group.accountId,
+          Folder: group.folder,
+          ToFolder: trashFolder.fullName,
+          Uids: group.uids.join(','),
+        })
+      }
+
+      if (!result) {
+        allSucceeded = false
+        continue
+      }
+
+      removedMessages.push(...group.messages)
+    }
+
+    if (removedMessages.length > 0) {
+      this.removeMessagesFromList(removedMessages)
+      this.resetSelectedItems()
+    }
+
+    return allSucceeded
+  },
+
   updateMessageSeenLocally(accountId, folder, uid, isSeen) {
     let becameSeen = false
     let becameUnseen = false

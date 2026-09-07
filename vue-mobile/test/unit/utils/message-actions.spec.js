@@ -5,6 +5,7 @@ import {
   getMenuActions,
   getSelectToolbarActions,
   filterVisibleActions,
+  isPermanentDeleteFolderType,
   messageActions,
 } from 'utils/message-actions.js'
 
@@ -97,5 +98,11 @@ describe('message-actions', () => {
     expect(
       filterVisibleActions(markActions, { hasSeen: true, hasUnseen: true }).map((a) => a.name)
     ).toEqual(['markAsRead', 'markAsUnread'])
+  })
+
+  it('isPermanentDeleteFolderType matches desktop delete behavior', () => {
+    expect(isPermanentDeleteFolderType(FOLDER_TYPES.TRASH)).toBe(true)
+    expect(isPermanentDeleteFolderType(FOLDER_TYPES.SPAM)).toBe(true)
+    expect(isPermanentDeleteFolderType(FOLDER_TYPES.INBOX)).toBe(false)
   })
 })
