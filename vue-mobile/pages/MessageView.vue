@@ -173,7 +173,7 @@ import AttachmentListItem from '../components/AttachmentListItem'
 import AppListLoader from 'src/components/common/AppListLoader'
 import CAttachment from '../classes/CAttachment'
 import htmlForEditor from '../utils/html-for-editor'
-import { getSubjectForDisplay, isEmptySubject } from '../utils/messages'
+import { getMessageBodyHtml, getSubjectForDisplay, isEmptySubject } from '../utils/messages'
 
 export default {
   name: 'MessageView',
@@ -240,7 +240,7 @@ export default {
         return ''
       }
 
-      return htmlForEditor.prepareHtmlForEditor(this.currentMessage.html, {
+      return htmlForEditor.prepareHtmlForEditor(getMessageBodyHtml(this.currentMessage), {
         attachments: this.currentMessage.attachments,
         foundCids: this.currentMessage.foundedCIDs,
         sourceHtml: this.currentMessage.html,

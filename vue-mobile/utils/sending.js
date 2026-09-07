@@ -6,7 +6,7 @@ import DateUtils from 'src/utils/date'
 import Types from 'src/utils/types'
 
 import { FOLDER_TYPES } from '../enums'
-import { getRecipientsString } from './messages'
+import { getMessageBodyHtml, getRecipientsString } from './messages'
 import htmlForEditor from './html-for-editor'
 
 
@@ -106,9 +106,10 @@ function getDefaultComposeBody(account) {
  * @return {string}
  */
 function getReplyMessageBody(oMessage, account, bPasteSignatureAnchor = true) {
-    const quotedHtml = htmlForEditor.prepareHtmlForEditor(oMessage.html, {
+    const quotedHtml = htmlForEditor.prepareHtmlForEditor(getMessageBodyHtml(oMessage), {
         attachments: oMessage.attachments,
         foundCids: oMessage.foundedCIDs,
+        sourceHtml: oMessage.html,
     })
     const signatureHtml = htmlForEditor.prepareHtmlForEditor(
         getSignatureText(account, bPasteSignatureAnchor),
@@ -135,9 +136,10 @@ function getReplyMessageBody(oMessage, account, bPasteSignatureAnchor = true) {
  * @return {string}
  */
 function getForwardMessageBody(oMessage, account) {
-    const quotedHtml = htmlForEditor.prepareHtmlForEditor(oMessage.html, {
+    const quotedHtml = htmlForEditor.prepareHtmlForEditor(getMessageBodyHtml(oMessage), {
         attachments: oMessage.attachments,
         foundCids: oMessage.foundedCIDs,
+        sourceHtml: oMessage.html,
     })
     const signatureHtml = htmlForEditor.prepareHtmlForEditor(getSignatureText(account, true), {
         sourceHtml: Types.pString(account?.signature),

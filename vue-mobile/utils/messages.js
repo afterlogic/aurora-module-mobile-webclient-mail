@@ -9,6 +9,30 @@ function getSubjectForDisplay(subject) {
   return isEmptySubject(subject) ? i18n.global.t('MAILWEBCLIENT.LABEL_NO_SUBJECT') : subject
 }
 
+function escapeHtml(text) {
+  return types.pString(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function getMessageBodyHtml(message) {
+  const html = types.pString(message?.html)
+  if (html) {
+    return html
+  }
+
+  const plain = types.pString(message?.plain)
+  if (!plain) {
+    return ''
+  }
+
+  return escapeHtml(plain)
+    .replace(/\r?\n/g, '<br>')
+}
+
 function getAccountId(unifiedUid, isUnifiedInbox, accountIdFromParameters = 0) {
   if (isUnifiedInbox) {
     const identifiers = unifiedUid.split(':')
@@ -87,6 +111,7 @@ export function parseMessage(messageData, accountIdFromParameters) {
 export {
   isEmptySubject,
   getSubjectForDisplay,
+  getMessageBodyHtml,
 }
 
 export function getRecipientsString(aRecipients) {

@@ -29,4 +29,26 @@ describe('sending utils', () => {
     expect(sending.buildMessageBody('hello')).toContain('data-crea="font-wrapper"')
     expect(sending.buildMessageBody('hello')).toContain('hello')
   })
+
+  it('uses plain text body when html part is missing in reply and forward', () => {
+    const message = {
+      html: '',
+      plain: 'Hello <world>\nSecond line',
+      attachments: {},
+      foundedCIDs: [],
+      timeStampInUTC: 0,
+      from: { DislpayName: 'Sender', Email: 'sender@example.com' },
+      to: { DislpayName: 'Receiver', Email: 'receiver@example.com' },
+      cc: { DislpayName: '', Email: '' },
+      subject: 'Subject',
+    }
+
+    const account = {
+      useSignature: false,
+      signature: '',
+    }
+
+    expect(sending.getReplyMessageBody(message, account)).toContain('Hello &lt;world&gt;<br>Second line')
+    expect(sending.getForwardMessageBody(message, account)).toContain('Hello &lt;world&gt;<br>Second line')
+  })
 })

@@ -109,6 +109,7 @@ import types from 'src/utils/types'
 import addressUtils from 'src/utils/address'
 import SendingUtils from '../utils/sending'
 import htmlForEditor from '../utils/html-for-editor'
+import { getMessageBodyHtml } from '../utils/messages'
 
 
 export default {
@@ -618,7 +619,7 @@ export default {
     populateDraftFields(message) {
       this.subjectInput = message.subject
 
-      let body = message.html || message.plain || ''
+      let body = getMessageBodyHtml(message)
       const wrapperMatch = body.match(/<div[^>]*data-crea="font-wrapper"[^>]*>([\s\S]*?)<\/div>\s*$/i)
       if (wrapperMatch) {
         body = wrapperMatch[1].replace(/^<br>/i, '').replace(/<br>\s*$/i, '')
