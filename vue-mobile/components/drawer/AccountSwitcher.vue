@@ -135,15 +135,25 @@ export default {
   }
 
   &__email {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap !important;
+    mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 12px), transparent 100%);
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+    -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 12px), transparent 100%);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
     font-size: 16px;
     line-height: 1.3;
     color: #000;
-    word-break: break-all;
   }
 }
 
 .account-dropdown {
   position: relative;
+  min-width: 0;
 
   &__header {
     position: relative;
@@ -163,10 +173,17 @@ export default {
   &__current-email {
     flex: 1;
     min-width: 0;
+    overflow: hidden;
+    white-space: nowrap !important;
+    mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 12px), transparent 100%);
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+    -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 12px), transparent 100%);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
     font-size: 16px;
     line-height: 1.3;
     color: #000;
-    word-break: break-all;
   }
 
   &__caret {
@@ -196,11 +213,18 @@ export default {
   }
 
   &__item {
+    overflow: hidden;
+    white-space: nowrap !important;
+    mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 12px), transparent 100%);
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+    -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 12px), transparent 100%);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
     padding: 10px 0 0;
     font-size: 16px;
     line-height: 1.3;
     color: #000;
-    word-break: break-all;
     cursor: pointer;
     transition: color 0.15s ease;
 

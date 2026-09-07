@@ -11,19 +11,17 @@
     :data-folder-type="String(folder.type)"
     @click="selectFolder"
   >
-    <q-item-section class="folder-indent" :style="indent" side></q-item-section>
-    <q-item-section side>
+    <div class="folder-indent" :style="indent"></div>
+    <div class="folder-icon">
       <FolderIcon :folderType="folder.type" :color="isFolderSelected ? '#469CF8' : '#969494'" />
-    </q-item-section>
-    <q-item-section class="folder-name">
-      {{ folder.name }}
-    </q-item-section>
-    <q-item-section side v-if="showUnseenCount" clickable @click.stop="showUnseenMessages">
+    </div>
+    <div class="folder-name">{{ folder.name }}</div>
+    <div class="folder-meta" v-if="showUnseenCount" @click.stop="showUnseenMessages">
       <div data-test-id="mail-folder-unseen-count" class="folder-counter">{{ folder.unseenCount }}</div>
-    </q-item-section>
-    <q-item-section side v-else-if="showTotalCount">
+    </div>
+    <div class="folder-meta" v-else-if="showTotalCount">
       <div class="folder-counter folder-counter_total">{{ folder.count }}</div>
-    </q-item-section>
+    </div>
   </q-item>
   <FolderItem v-for="subFolder in folder.subFolders" :key="subFolder.fullName" :folder="subFolder" :level="level + 1" />
 </template>
@@ -105,7 +103,15 @@ export default {
 <style lang="scss" scoped>
 .folder {
   height: 44px;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
   padding: 0 24px;
+  box-sizing: border-box;
+  min-width: 0;
+  overflow: hidden;
 
   &.q-item--active {
     color: #469cf8;
@@ -116,6 +122,16 @@ export default {
   }
   &-name {
     font-size: 14px;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 12px), transparent 100%);
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+    -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 12px), transparent 100%);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
   }
   &-counter {
     color: #fff;
@@ -126,10 +142,19 @@ export default {
     padding: 0px 10px;
     display: flex;
     align-items: center;
+    flex-shrink: 0;
   }
 
   &-indent {
     padding: 0px;
+  }
+
+  &-icon {
+    padding: 0 16px 0 0;
+  }
+
+  &-meta {
+    padding-left: 12px;
   }
 }
 </style>

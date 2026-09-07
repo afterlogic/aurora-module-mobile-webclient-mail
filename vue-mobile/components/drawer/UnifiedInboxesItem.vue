@@ -8,16 +8,14 @@
     v-ripple
     @click="selectUnifiedInbox"
   >
-    <q-item-section class="folder-indent" :style="indent" side></q-item-section>
-    <q-item-section side>
+    <div class="folder-indent" :style="indent"></div>
+    <div class="folder-icon">
       <FolderIcon :folderType="folderType" :color="selected ? '#469CF8' : '#969494'" />
-    </q-item-section>
-    <q-item-section class="folder-name">
-      {{ $t('MAILWEBCLIENT.LABEL_FOLDER_ALL_INBOXES') }}
-    </q-item-section>
-    <q-item-section side v-if="unifiedInboxUnseenCount" clickable @click.stop="showUnseenMessages">
+    </div>
+    <div class="folder-name">{{ $t('MAILWEBCLIENT.LABEL_FOLDER_ALL_INBOXES') }}</div>
+    <div class="folder-meta" v-if="unifiedInboxUnseenCount" @click.stop="showUnseenMessages">
       <div data-test-id="mail-folder-unseen-count" class="folder-counter">{{ unifiedInboxUnseenCount }}</div>
-    </q-item-section>
+    </div>
   </q-item>
 </template>
 
@@ -75,7 +73,15 @@ export default {
 <style lang="scss" scoped>
 .folder {
   height: 44px;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
   padding: 0 24px;
+  box-sizing: border-box;
+  min-width: 0;
+  overflow: hidden;
 
   &.q-item--active {
     color: #469cf8;
@@ -86,6 +92,16 @@ export default {
   }
   &-name {
     font-size: 14px;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 12px), transparent 100%);
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+    -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 12px), transparent 100%);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
   }
   &-counter {
     color: #fff;
@@ -96,10 +112,19 @@ export default {
     padding: 0px 10px;
     display: flex;
     align-items: center;
+    flex-shrink: 0;
   }
 
   &-indent {
     padding: 0px;
+  }
+
+  &-icon {
+    padding: 0 16px 0 0;
+  }
+
+  &-meta {
+    padding-left: 12px;
   }
 }
 </style>
