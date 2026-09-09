@@ -124,6 +124,8 @@ export default {
 
       if (result) {
         this.resetSelectedItems()
+      } else {
+        notification.showError(this.$t('MAILWEBCLIENT.ERROR_DELETING_MESSAGES'))
       }
     },
   },

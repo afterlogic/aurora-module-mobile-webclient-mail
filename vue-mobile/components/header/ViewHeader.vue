@@ -239,6 +239,8 @@ export default {
       if (result) {
         this.changeCurrentFilter('')
         this.$router.back()
+      } else {
+        notification.showError(this.$t('MAILWEBCLIENT.ERROR_DELETING_MESSAGES'))
       }
     },
 

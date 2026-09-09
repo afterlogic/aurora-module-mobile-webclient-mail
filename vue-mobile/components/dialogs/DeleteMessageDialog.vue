@@ -23,6 +23,7 @@ import { useMailStore } from '../../store/index-pinia.js'
 
 import AppDialog from 'components/common/AppDialog'
 import ButtonDialog from 'src/components/common/ButtonDialog'
+import notification from 'src/utils/notification'
 
 export default {
   name: "DeleteMessageDialog",
@@ -70,6 +71,8 @@ export default {
         if (fromMessageView) {
           this.$router.back()
         }
+      } else {
+        notification.showError(this.$t('MAILWEBCLIENT.ERROR_DELETING_MESSAGES'))
       }
       this.saving = false
     },

@@ -100,9 +100,11 @@ describe('message-actions', () => {
     ).toEqual(['markAsRead', 'markAsUnread'])
   })
 
-  it('isPermanentDeleteFolderType matches desktop delete behavior', () => {
+  it('isPermanentDeleteFolderType: Trash and Spam are permanent (desktop parity)', () => {
+    // Desktop MailUtils.isPermanentDelete treats Spam like Trash (dialog + DeleteMessages).
     expect(isPermanentDeleteFolderType(FOLDER_TYPES.TRASH)).toBe(true)
     expect(isPermanentDeleteFolderType(FOLDER_TYPES.SPAM)).toBe(true)
     expect(isPermanentDeleteFolderType(FOLDER_TYPES.INBOX)).toBe(false)
+    expect(isPermanentDeleteFolderType(FOLDER_TYPES.SENT)).toBe(false)
   })
 })

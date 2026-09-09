@@ -91,6 +91,8 @@ export const messageActions = {
   },
 }
 
+// Matches desktop MailUtils.isPermanentDelete: Trash and Spam delete permanently
+// (confirm dialog), other folders move to Trash without a dialog.
 export function isPermanentDeleteFolderType(folderType) {
   return folderType === FOLDER_TYPES.TRASH || folderType === FOLDER_TYPES.SPAM
 }
