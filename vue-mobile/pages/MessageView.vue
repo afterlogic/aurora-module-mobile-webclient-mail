@@ -133,7 +133,11 @@
           data-test-id="mail-message-subject"
           :class="{ 'message-header__subject_nosubject': isEmptySubject }"
         >{{ subjectForDisplay }}</div>
-        <div class="message-body" v-html="messageBodyHtml"></div>
+        <div
+          class="message-body"
+          :class="{ 'message-body_plain': isPlainBody }"
+          v-html="messageBodyHtml"
+        ></div>
         <div
           v-if="attachmentList.length"
           ref="attachmentsSection"
@@ -173,7 +177,7 @@ import AttachmentListItem from '../components/AttachmentListItem'
 import AppListLoader from 'src/components/common/AppListLoader'
 import CAttachment from '../classes/CAttachment'
 import htmlForEditor from '../utils/html-for-editor'
-import { getMessageBodyHtml, getSubjectForDisplay, isEmptySubject } from '../utils/messages'
+import { getMessageBodyHtml, getSubjectForDisplay, isEmptySubject, isPlainMessage } from '../utils/messages'
 
 export default {
   name: 'MessageView',
@@ -233,6 +237,10 @@ export default {
 
     subjectForDisplay() {
       return this.currentMessage ? getSubjectForDisplay(this.currentMessage.subject) : ''
+    },
+
+    isPlainBody() {
+      return this.currentMessage ? isPlainMessage(this.currentMessage) : false
     },
 
     messageBodyHtml() {
@@ -465,6 +473,10 @@ export default {
   overflow-x: auto;
   overflow-y: visible;
   width: 100vw;
+
+  &_plain {
+    white-space: pre-wrap;
+  }
 
   :deep(table) {
     max-width: 100%;

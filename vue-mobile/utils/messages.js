@@ -9,6 +9,10 @@ function getSubjectForDisplay(subject) {
   return isEmptySubject(subject) ? i18n.global.t('MAILWEBCLIENT.LABEL_NO_SUBJECT') : subject
 }
 
+function isPlainMessage(message) {
+  return !types.pString(message?.html) && !!types.pString(message?.plain)
+}
+
 function getMessageBodyHtml(message) {
   const html = types.pString(message?.html)
   if (html) {
@@ -17,7 +21,13 @@ function getMessageBodyHtml(message) {
 
   // API Plain is already HTML (server ConvertPlainToHtml: <br />, mailto/url links).
   // Escaping it makes the UI show those tags as text.
-  return types.pString(message?.plain)
+  const plain = types.pString(message?.plain)
+  if (!plain) {
+    return ''
+  }
+
+  // Preserve runs of spaces / indentation (ASCII tables, etc.) like a text viewer.
+  return '<div style="white-space: pre-wrap">' + plain + '</div>'
 }
 
 function getAccountId(unifiedUid, isUnifiedInbox, accountIdFromParameters = 0) {
@@ -98,6 +108,7 @@ export function parseMessage(messageData, accountIdFromParameters) {
 export {
   isEmptySubject,
   getSubjectForDisplay,
+  isPlainMessage,
   getMessageBodyHtml,
 }
 

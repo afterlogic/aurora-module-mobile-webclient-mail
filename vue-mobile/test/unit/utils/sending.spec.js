@@ -49,11 +49,12 @@ describe('sending utils', () => {
       signature: '',
     }
 
+    const wrappedPlain = '<div style="white-space: pre-wrap">' + plainHtml + '</div>'
     const reply = sending.getReplyMessageBody(message, account)
     const forward = sending.getForwardMessageBody(message, account)
 
-    expect(reply).toContain('<blockquote>' + plainHtml + '</blockquote>')
-    expect(forward).toContain(plainHtml)
+    expect(reply).toContain('<blockquote>' + wrappedPlain + '</blockquote>')
+    expect(forward).toContain(wrappedPlain)
     expect(reply).not.toContain('&lt;br')
     expect(forward).not.toContain('&lt;a ')
   })
