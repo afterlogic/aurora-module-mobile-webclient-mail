@@ -30,10 +30,11 @@ describe('sending utils', () => {
     expect(sending.buildMessageBody('hello')).toContain('hello')
   })
 
-  it('uses plain text body when html part is missing in reply and forward', () => {
+  it('keeps server-prepared plain html as markup in reply and forward quotes', () => {
+    const plainHtml = 'Hello &lt;world&gt;<br />Second line<br /><a target="_blank" href="mailto:a@b.c" class="external">a@b.c</a>'
     const message = {
       html: '',
-      plain: 'Hello <world>\nSecond line',
+      plain: plainHtml,
       attachments: {},
       foundedCIDs: [],
       timeStampInUTC: 0,
@@ -48,7 +49,12 @@ describe('sending utils', () => {
       signature: '',
     }
 
-    expect(sending.getReplyMessageBody(message, account)).toContain('Hello &lt;world&gt;<br>Second line')
-    expect(sending.getForwardMessageBody(message, account)).toContain('Hello &lt;world&gt;<br>Second line')
+    const reply = sending.getReplyMessageBody(message, account)
+    const forward = sending.getForwardMessageBody(message, account)
+
+    expect(reply).toContain('<blockquote>' + plainHtml + '</blockquote>')
+    expect(forward).toContain(plainHtml)
+    expect(reply).not.toContain('&lt;br')
+    expect(forward).not.toContain('&lt;a ')
   })
 })

@@ -9,10 +9,16 @@ describe('messages', () => {
     })).toBe('<p>Hello</p>')
   })
 
-  it('converts plain text body to safe html when html part is missing', () => {
+  it('returns server-prepared plain html as markup when html part is missing', () => {
+    const plainHtml = 'Hello &lt;world&gt;<br />Second line<br /><a target="_blank" href="mailto:a@b.c" class="external">a@b.c</a>'
     expect(getMessageBodyHtml({
       html: '',
-      plain: 'Hello <world>\nSecond line',
-    })).toBe('Hello &lt;world&gt;<br>Second line')
+      plain: plainHtml,
+    })).toBe(plainHtml)
+  })
+
+  it('returns empty string when both html and plain are missing', () => {
+    expect(getMessageBodyHtml({ html: '', plain: '' })).toBe('')
+    expect(getMessageBodyHtml(null)).toBe('')
   })
 })

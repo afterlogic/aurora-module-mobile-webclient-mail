@@ -9,28 +9,15 @@ function getSubjectForDisplay(subject) {
   return isEmptySubject(subject) ? i18n.global.t('MAILWEBCLIENT.LABEL_NO_SUBJECT') : subject
 }
 
-function escapeHtml(text) {
-  return types.pString(text)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-}
-
 function getMessageBodyHtml(message) {
   const html = types.pString(message?.html)
   if (html) {
     return html
   }
 
-  const plain = types.pString(message?.plain)
-  if (!plain) {
-    return ''
-  }
-
-  return escapeHtml(plain)
-    .replace(/\r?\n/g, '<br>')
+  // API Plain is already HTML (server ConvertPlainToHtml: <br />, mailto/url links).
+  // Escaping it makes the UI show those tags as text.
+  return types.pString(message?.plain)
 }
 
 function getAccountId(unifiedUid, isUnifiedInbox, accountIdFromParameters = 0) {
