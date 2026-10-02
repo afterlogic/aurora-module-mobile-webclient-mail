@@ -130,6 +130,19 @@ export default {
       .catch(() => null)
   },
 
+  setEmailSafety: async (parameters) => {
+    return webApi
+      .sendRequest({
+        moduleName: 'Mail',
+        methodName: 'SetEmailSafety',
+        parameters,
+      })
+      .then((result) => {
+        return result
+      })
+      .catch((error) => null)
+  },
+
   setMessageFlagged: async (parameters) => {
     return webApi
       .sendRequest({

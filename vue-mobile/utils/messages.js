@@ -30,6 +30,39 @@ function getMessageBodyHtml(message) {
   return '<div style="white-space: pre-wrap">' + plain + '</div>'
 }
 
+/**
+ * Shows the external pictures of a message: the server blocks them by moving the address into
+ * data-x-src (images) and data-x-style-url (styles with url()).
+ * @param {string} html Message body html
+ * @return {string}
+ */
+function showExternalPictures(html) {
+  const source = types.pString(html)
+  if (!source || typeof DOMParser === 'undefined') {
+    return source
+  }
+
+  const doc = new DOMParser().parseFromString('<div id="external-pictures-root">' + source + '</div>', 'text/html')
+  const root = doc.getElementById('external-pictures-root')
+  if (!root) {
+    return source
+  }
+
+  root.querySelectorAll('[data-x-src]').forEach((element) => {
+    element.setAttribute('src', element.getAttribute('data-x-src'))
+    element.removeAttribute('data-x-src')
+  })
+
+  root.querySelectorAll('[data-x-style-url]').forEach((element) => {
+    let style = types.pString(element.getAttribute('style')).trim()
+    style = style === '' ? '' : (style.endsWith(';') ? style + ' ' : style + '; ')
+    element.setAttribute('style', style + element.getAttribute('data-x-style-url'))
+    element.removeAttribute('data-x-style-url')
+  })
+
+  return root.innerHTML
+}
+
 function getAccountId(unifiedUid, isUnifiedInbox, accountIdFromParameters = 0) {
   if (isUnifiedInbox) {
     const identifiers = unifiedUid.split(':')
@@ -110,6 +143,7 @@ export {
   getSubjectForDisplay,
   isPlainMessage,
   getMessageBodyHtml,
+  showExternalPictures,
 }
 
 export function getRecipientsString(aRecipients) {

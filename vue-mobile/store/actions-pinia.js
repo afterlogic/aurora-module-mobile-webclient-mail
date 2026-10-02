@@ -757,6 +757,15 @@ export default {
     return result
   },
 
+  async asyncSetEmailSafety(email, accountId = 0) {
+    const result = await mailWebApi.setEmailSafety({
+      AccountID: accountId || this.currentAccountId,
+      Email: email,
+    })
+
+    return !!result
+  },
+
   removeMessagesFromList(messages) {
     messages.forEach((message) => {
       const accountId = message.accountId || message.AccountID

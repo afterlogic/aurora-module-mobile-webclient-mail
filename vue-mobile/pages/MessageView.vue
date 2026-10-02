@@ -8,6 +8,25 @@
       class="message-view__scroll col fit"
     >
       <div v-if="currentMessage">
+      <div
+        v-if="showPicturesNotice"
+        class="message-notice"
+        data-test-id="mail-message-pictures-notice"
+      >
+        <div class="message-notice__text">{{ $t('MAILWEBCLIENT.INFO_MESSAGE_BLOCKED') }}</div>
+        <div
+          v-if="showPicturesLink"
+          class="message-notice__link"
+          data-test-id="mail-message-show-pictures"
+          @click="showPictures"
+        >{{ $t('MAILWEBCLIENT.ACTION_SHOW_PICTURES') }}</div>
+        <div
+          v-if="senderEmail"
+          class="message-notice__link"
+          data-test-id="mail-message-always-show-pictures"
+          @click="alwaysShowPictures"
+        >{{ $t('MAILWEBCLIENT.ACTION_ALWAYS_SHOW_PICTURE_THIS_SENDER') }}</div>
+      </div>
       <div class="message-header">
         <div class="message-header__basic" v-show="!isDetailVisible">
           <div class="message-header__recipients">
@@ -177,7 +196,7 @@ import AttachmentListItem from '../components/AttachmentListItem'
 import AppListLoader from 'src/components/common/AppListLoader'
 import CAttachment from '../classes/CAttachment'
 import htmlForEditor from '../utils/html-for-editor'
-import { getMessageBodyHtml, getSubjectForDisplay, isEmptySubject, isPlainMessage } from '../utils/messages'
+import { getMessageBodyHtml, getSubjectForDisplay, isEmptySubject, isPlainMessage, showExternalPictures } from '../utils/messages'
 
 export default {
   name: 'MessageView',
@@ -199,6 +218,7 @@ export default {
   data() {
     return {
       isDetailVisible: false,
+      picturesShown: false,
     }
   },
 
@@ -243,12 +263,40 @@ export default {
       return this.currentMessage ? isPlainMessage(this.currentMessage) : false
     },
 
+    messageKey() {
+      return this.currentMessage ? this.currentMessage.accountId + ':' + this.currentMessage.folder + ':' + this.currentMessage.uid : ''
+    },
+
+    senderEmail() {
+      const sender = this.currentMessage?.from?.['@Collection']?.[0]
+      return types.pString(sender?.Email)
+    },
+
+    // The server blocks external pictures of a message unless the sender is marked as safe
+    hasBlockedPictures() {
+      return !!this.currentMessage?.hasExternals && !this.isPlainBody
+    },
+
+    showPicturesNotice() {
+      return this.hasBlockedPictures && !this.currentMessage.safety
+    },
+
+    showPicturesLink() {
+      return !this.picturesShown
+    },
+
+    arePicturesVisible() {
+      return this.hasBlockedPictures && (this.picturesShown || !!this.currentMessage.safety)
+    },
+
     messageBodyHtml() {
       if (!this.currentMessage) {
         return ''
       }
 
-      return htmlForEditor.prepareHtmlForEditor(getMessageBodyHtml(this.currentMessage), {
+      const bodyHtml = getMessageBodyHtml(this.currentMessage)
+
+      return htmlForEditor.prepareHtmlForEditor(this.arePicturesVisible ? showExternalPictures(bodyHtml) : bodyHtml, {
         attachments: this.currentMessage.attachments,
         foundCids: this.currentMessage.foundedCIDs,
         sourceHtml: this.currentMessage.html,
@@ -294,6 +342,10 @@ export default {
       this.setMessageFromRoute()
     },
 
+    messageKey() {
+      this.picturesShown = false
+    },
+
     isNoMessageOnServer() {
       if (this.isNoMessageOnServer && this.currentFolder) {
         if (this.isUnifiedInbox) {
@@ -316,6 +368,7 @@ export default {
       'changeCurrentMessageIdentifiers',
       'asyncGetCurrentMessage',
       'asyncSetMessageFlagged',
+      'asyncSetEmailSafety',
     ]),
 
     setMessageFromRoute() {
@@ -363,6 +416,22 @@ export default {
       }
     },
 
+    showPictures() {
+      this.picturesShown = true
+    },
+
+    async alwaysShowPictures() {
+      const message = this.currentMessage
+      this.picturesShown = true
+
+      if (message && this.senderEmail) {
+        const result = await this.asyncSetEmailSafety(this.senderEmail, message.accountId)
+        if (result) {
+          message.safety = true
+        }
+      }
+    },
+
     scrollToAttachments() {
       if (!this.attachmentList.length) {
         return
@@ -389,6 +458,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.message-notice {
+  background: #fffac8;
+  color: #000;
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 10px 12px 12px;
+
+  &__link {
+    color: var(--q-primary);
+    cursor: pointer;
+    margin-top: 10px;
+  }
+}
+
 .message-header {
   font-size: 12px;
   
