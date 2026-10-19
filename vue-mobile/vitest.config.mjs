@@ -22,7 +22,7 @@ export default defineConfig({
       resolveId (id, importer) {
         if (
           importer &&
-          importer.includes(`${path.sep}sending.js`) &&
+          importer.replaceAll('\\', '/').includes('/sending.js') &&
           (id === './html-for-editor' || id.endsWith('/html-for-editor'))
         ) {
           return path.resolve(root, 'test/unit/stubs/html-for-editor.js')
