@@ -699,6 +699,10 @@ export default {
         : SendingUtils.getReplyMessageBody(message, this.currentAccount)
       this.patchComposeImages(message.attachments)
 
+      if (isForward) {
+        this.populateDraftAttachments(message)
+      }
+
       if (!isForward) {
         if (message.from['@Count'] > 0) {
           message.from['@Collection'].forEach(item => {

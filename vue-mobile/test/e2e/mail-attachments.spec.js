@@ -17,6 +17,8 @@ const {
   openFolderByType,
   fillComposeRecipient,
   sendCompose,
+  expectComposeOpen,
+  openInboxMessageBySubject,
 } = require('./helpers/mail')
 
 const hasCredentials = !!(process.env.E2E_LOGIN && process.env.E2E_PASSWORD)
@@ -129,6 +131,91 @@ test.describe('Mobile mail attachments', () => {
       await expect(attachment).toBeVisible({ timeout: 15000 })
       console.log(`  → Attachment visible in message: ${fixtureName}`)
       await attachScreenshot(page, 'mail-attach-03-view')
+    })
+  })
+
+  test('forward keeps attachments of the original message', async ({ page }) => {
+    test.setTimeout(360000)
+
+    const subject = `E2E fwd attach ${Date.now()}`
+
+    await loginAsTestUser(page)
+    await waitForInboxList(page)
+
+    await step('Send a message with attachment to self', async () => {
+      await clickReady(page.getByTestId('mail-compose-fab'))
+      await expect(page.getByTestId('mail-compose')).toBeVisible({
+        timeout: 15000,
+      })
+      await fillComposeRecipient(page, composeTo)
+      await fieldControl(page, 'mail-compose-subject').fill(subject)
+      const [fileChooser] = await Promise.all([
+        page.waitForEvent('filechooser'),
+        page.getByTestId('mail-compose-attach').click(),
+      ])
+      await fileChooser.setFiles(attachFixturePath)
+      await expect(
+        page.getByTestId('mail-compose-attachment-item').filter({
+          hasText: fixtureName,
+        })
+      ).toBeVisible({ timeout: 60000 })
+      await sendCompose(page)
+      await expect(
+        page
+          .getByTestId('mail-message-list')
+          .or(page.getByTestId('mail-message-view'))
+      ).toBeVisible({ timeout: 45000 })
+    })
+
+    await step('Open the received message and press Forward', async () => {
+      if (await page.getByTestId('mail-message-view').isVisible().catch(() => false)) {
+        await clickReady(page.getByTestId('mail-message-back'))
+      }
+      await openInboxMessageBySubject(page, subject)
+      await clickReady(page.getByTestId('mail-message-more'))
+      await clickReady(page.getByTestId('mail-menu-forward'))
+      await expectComposeOpen(page)
+    })
+
+    await step('Forward compose shows the original attachment', async () => {
+      await expect(
+        page.getByTestId('mail-compose-attachment-item').filter({
+          hasText: fixtureName,
+        })
+      ).toBeVisible({ timeout: 30000 })
+      await attachScreenshot(page, 'mail-fwd-attach-01-compose')
+    })
+
+    await step('Send the forward to self', async () => {
+      await fillComposeRecipient(page, composeTo)
+      await sendCompose(page)
+      await expect(
+        page
+          .getByTestId('mail-message-list')
+          .or(page.getByTestId('mail-message-view'))
+      ).toBeVisible({ timeout: 45000 })
+    })
+
+    await step('Received forward contains the attachment', async () => {
+      if (await page.getByTestId('mail-message-view').isVisible().catch(() => false)) {
+        await clickReady(page.getByTestId('mail-message-back'))
+      }
+      await openInboxMessageBySubject(page, `Fwd: ${subject}`)
+      if (
+        (await page.getByTestId('mail-message-flag-attachment').count()) > 0
+      ) {
+        await clickReady(page.getByTestId('mail-message-flag-attachment'))
+      }
+      await expect(page.getByTestId('mail-message-attachments')).toBeVisible({
+        timeout: 30000,
+      })
+      await expect(
+        page
+          .getByTestId('mail-attachment-item')
+          .filter({ hasText: fixtureName })
+          .first()
+      ).toBeVisible({ timeout: 15000 })
+      await attachScreenshot(page, 'mail-fwd-attach-02-received')
     })
   })
 })
