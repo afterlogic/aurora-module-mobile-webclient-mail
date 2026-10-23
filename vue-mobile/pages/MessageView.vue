@@ -27,6 +27,12 @@
           @click="alwaysShowPictures"
         >{{ $t('MAILWEBCLIENT.ACTION_ALWAYS_SHOW_PICTURE_THIS_SENDER') }}</div>
       </div>
+      <component
+        v-for="component in beforeMessageHeadersComponents"
+        :key="component.name"
+        :is="component.component"
+        :message="currentMessage"
+      />
       <div class="message-header">
         <div class="message-header__basic" v-show="!isDetailVisible">
           <div class="message-header__recipients">
@@ -186,6 +192,7 @@ import { useMailStore } from '../store/index-pinia'
 
 import addressUtils from 'src/utils/address'
 import dateUtils from 'src/utils/date'
+import eventBus from 'src/event-bus'
 import types from 'src/utils/types'
 
 import StarIcon from '../components/icons/message-list/StarIcon'
@@ -219,7 +226,14 @@ export default {
     return {
       isDetailVisible: false,
       picturesShown: false,
+      beforeMessageHeadersComponents: [],
     }
+  },
+
+  created() {
+    const params = { components: [] }
+    eventBus.$emit('MailMobileWebclient::GetBeforeMessageHeadersComponents', params)
+    this.beforeMessageHeadersComponents = params.components
   },
 
   computed: {

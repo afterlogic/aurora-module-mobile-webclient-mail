@@ -80,7 +80,7 @@ function parseMessageListItem(messageData, isUnifiedInbox, accountIdFromParamete
     accountId,
     bcc: types.pObject(messageData.Bcc), // TODO: parse collection of addresses
     cc: types.pObject(messageData.Cc), // TODO: parse collection of addresses
-    custom: types.pArray(messageData.Custom),
+    custom: types.pObject(messageData.Custom),
     downloadAsEmlUrl: types.pString(messageData.DownloadAsEmlUrl),
     draftInfo: types.pObject(messageData.DraftInfo),
     folder: types.pString(messageData.Folder),

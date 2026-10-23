@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getMessageBodyHtml, isPlainMessage } from 'utils/messages.js'
+import { getMessageBodyHtml, isPlainMessage, parseMessage, parseMessageList } from 'utils/messages.js'
 
 describe('messages', () => {
   it('returns html body as is when available', () => {
@@ -23,5 +23,12 @@ describe('messages', () => {
     expect(getMessageBodyHtml({ html: '', plain: '' })).toBe('')
     expect(getMessageBodyHtml(null)).toBe('')
     expect(isPlainMessage({ html: '', plain: '' })).toBe(false)
+  })
+
+  it('keeps the Custom object that server modules attach to a message', () => {
+    const custom = { CustomHeaders: [{ badge: 'external', banner: 'Outside message' }] }
+    expect(parseMessageList([{ Uid: 1, Custom: custom }], false, 1)[0].custom).toEqual(custom)
+    expect(parseMessage({ Uid: 1, Custom: custom }, 1).custom).toEqual(custom)
+    expect(parseMessage({ Uid: 1 }, 1).custom).toEqual({})
   })
 })

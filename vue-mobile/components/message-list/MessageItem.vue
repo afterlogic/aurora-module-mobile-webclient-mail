@@ -19,6 +19,12 @@
         <span v-if="isCurrentSearchInMultiFolders" class="message__contour_marker">
           {{ folderDisplayName }}
         </span>
+        <component
+          v-for="component in labelComponents"
+          :key="component.name"
+          :is="component.component"
+          :message="message"
+        />
       </q-item-label>
       <q-item-label
         class="list-item__text_primary message__subject"
@@ -61,6 +67,7 @@ import { getSubjectForDisplay, isEmptySubject } from '../../utils/messages'
 
 import addressUtils from 'src/utils/address'
 import dateUtils from 'src/utils/date'
+import eventBus from 'src/event-bus'
 
 import AppItem from 'src/components/common/AppItem'
 
@@ -85,6 +92,18 @@ export default {
     AttachmentIcon,
     RepliedIcon,
     ForwardedIcon,
+  },
+
+  data() {
+    return {
+      labelComponents: [],
+    }
+  },
+
+  created() {
+    const params = { components: [] }
+    eventBus.$emit('MailMobileWebclient::GetMessageListItemLabelComponents', params)
+    this.labelComponents = params.components
   },
 
   computed: {
