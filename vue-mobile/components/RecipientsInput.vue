@@ -20,7 +20,10 @@
 
       @filter="filterFn"
       @filter-abort="abortFilterFn"
+      @input-value="onInputValue"
       @new-value="createValue"
+      @blur="onFieldBlur"
+      @popup-hide="onPopupHide"
       @add="onRecipientAdded"
     >
       <template v-slot:append v-if="showLink">
@@ -46,6 +49,7 @@
           v-close-popup
           v-bind="scope.itemProps"
           v-on="scope.itemEvents"
+          @mousedown.prevent
         >
           <q-item-section>
             <q-item-label class="recipients-input__option-label">{{ scope.opt.label }}</q-item-label>
@@ -85,6 +89,13 @@ export default {
     return {
       options: [],
       value: this.modelValue,
+      // Text typed into the search box and not yet turned into a chip.
+      pendingInput: '',
+      // Kept when Quasar clears the box on popup close (iOS dialog).
+      pendingOnClose: '',
+      // The next empty input after an iOS dialog close is Quasar's own reset.
+      ignoreNextEmptyInput: false,
+      closeTimer: null,
     }
   },
 
@@ -92,6 +103,10 @@ export default {
     value (v) {
       this.$emit('update:modelValue', v)
     }
+  },
+
+  beforeUnmount() {
+    clearTimeout(this.closeTimer)
   },
 
   methods: {
@@ -116,7 +131,89 @@ export default {
       // console.log('delayed filter aborted')
     },
 
+    onInputValue(value) {
+      const next = String(value || '').trim()
+      this.pendingInput = next
+
+      // iOS opens suggestions in a dialog and wipes the box when that dialog
+      // closes, before blur. That empty update is not the user deleting text.
+      if (next === '' && this.ignoreNextEmptyInput) {
+        this.ignoreNextEmptyInput = false
+        return
+      }
+
+      if (this.isRecipientFieldActive()) {
+        this.pendingOnClose = next
+      }
+    },
+
+    onPopupHide() {
+      if (!this.pendingInput) {
+        return
+      }
+
+      this.pendingOnClose = this.pendingInput
+      if (this.$q.platform.is.ios === true) {
+        this.ignoreNextEmptyInput = true
+      }
+
+      clearTimeout(this.closeTimer)
+      this.closeTimer = setTimeout(() => {
+        if (this.isRecipientFieldActive()) {
+          return
+        }
+        this.commitPendingRecipient()
+      }, 0)
+    },
+
+    onFieldBlur() {
+      this.commitPendingRecipient()
+    },
+
+    isRecipientFieldActive() {
+      const active = document.activeElement
+      if (!active || typeof active.closest !== 'function') {
+        return false
+      }
+
+      const root = this.$refs.selectRef?.$el
+      if (root && root.contains(active)) {
+        return true
+      }
+
+      // The iOS suggestion dialog is teleported outside the field.
+      return !!active.closest('.q-select__dialog')
+    },
+
+    commitPendingRecipient() {
+      const typed = (this.pendingInput || this.pendingOnClose || '').trim()
+      this.pendingInput = ''
+      this.pendingOnClose = ''
+      this.ignoreNextEmptyInput = false
+      clearTimeout(this.closeTimer)
+
+      if (!typed) {
+        return
+      }
+
+      const select = this.$refs.selectRef
+      if (!select) {
+        return
+      }
+
+      this.createValue(typed, (option, mode) => {
+        select.add(option, mode === 'add-unique')
+        select.updateInputValue('', true)
+      })
+    },
+
     onRecipientAdded() {
+      // A chosen suggestion replaces the search text. Do not also keep it.
+      this.pendingInput = ''
+      this.pendingOnClose = ''
+      this.ignoreNextEmptyInput = false
+      clearTimeout(this.closeTimer)
+
       this.$nextTick(() => {
         const select = this.$refs.selectRef
         if (!select) {
@@ -129,22 +226,11 @@ export default {
     },
 
     createValue (val, done) {
-        // Calling done(var) when new-value-mode is not set or "add", or done(var, "add") adds "var" content to the model
-      // and it resets the input textbox to empty string
-      // ----
-      // Calling done(var) when new-value-mode is "add-unique", or done(var, "add-unique") adds "var" content to the model
-      // only if is not already set
-      // and it resets the input textbox to empty string
-      // ----
-      // Calling done(var) when new-value-mode is "toggle", or done(var, "toggle") toggles the model with "var" content
-      // (adds to model if not already in the model, removes from model if already has it)
-      // and it resets the input textbox to empty string
-      // ----
-      // If "var" content is undefined/null, then it doesn't tampers with the model
-      // and only resets the input textbox to empty string
-
-      if (val.length > 2 && Utils.isCorrectEmail(val)) {
-        done({'label': val, 'value': val}, 'add-unique')
+      // done(value, "add-unique") adds the value when it is not already selected
+      // and clears the text box. A null value only clears the box.
+      const email = String(val || '').trim()
+      if (email.length > 2 && Utils.isCorrectEmail(email)) {
+        done({ label: email, value: email }, 'add-unique')
       }
     },
   },
