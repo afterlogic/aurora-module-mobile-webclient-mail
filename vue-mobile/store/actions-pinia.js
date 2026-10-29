@@ -646,6 +646,99 @@ export default {
     }
   },
 
+  markFolderMessagesSeenLocally(folder, accountId) {
+    if (folder) {
+      folder.unseenCount = 0
+    }
+
+    const folderName = folder?.fullName
+    const messages = Array.isArray(this.currentMessageList) ? this.currentMessageList : []
+
+    messages.forEach((message) => {
+      if (!message) {
+        return
+      }
+
+      const messageAccountId = message.accountId || message.AccountID || this.currentAccountId
+      const messageFolder = message.folder || message.Folder
+      const sameAccount = accountId === undefined || messageAccountId === accountId
+      const sameFolder = !folderName || messageFolder === folderName
+
+      if (sameAccount && sameFolder) {
+        message.isSeen = true
+      }
+    })
+  },
+
+  /**
+   * Mark every message in the current folder as read.
+   * Unified inbox marks each included account's INBOX.
+   */
+  async asyncSetAllMessagesSeen() {
+    if (this.isCurrentSearchInMultiFolders) {
+      return false
+    }
+
+    if (this.isUnifiedInbox) {
+      const accounts = (this.accountList || []).filter((account) => account.includeInUnifiedMailbox)
+      let allSucceeded = true
+
+      for (const account of accounts) {
+        const inbox = this.getFolderByType(account.id, FOLDER_TYPES.INBOX)
+        if (!inbox?.fullName) {
+          continue
+        }
+
+        const result = await mailWebApi.setAllMessagesSeen({
+          AccountID: account.id,
+          Folder: inbox.fullName,
+        })
+
+        if (!result) {
+          allSucceeded = false
+          continue
+        }
+
+        this.markFolderMessagesSeenLocally(inbox, account.id)
+      }
+
+      if (allSucceeded && this.unifiedInboxInfo) {
+        this.unifiedInboxInfo.unseenCount = 0
+      }
+
+      if (allSucceeded && this.currentFilter === 'unseen') {
+        this.resetMessageList()
+        this.changeMessageListPage(1)
+        await this.asyncGetMessages()
+      }
+
+      return allSucceeded
+    }
+
+    if (this.currentFolder?.isVirtual || !this.currentFolder?.fullName) {
+      return false
+    }
+
+    const result = await mailWebApi.setAllMessagesSeen({
+      AccountID: this.currentAccountId,
+      Folder: this.currentFolder.fullName,
+    })
+
+    if (!result) {
+      return false
+    }
+
+    this.markFolderMessagesSeenLocally(this.currentFolder, this.currentAccountId)
+
+    if (this.currentFilter === 'unseen') {
+      this.resetMessageList()
+      this.changeMessageListPage(1)
+      await this.asyncGetMessages()
+    }
+
+    return true
+  },
+
   async asyncSetMessagesSeen(uid, setAction, folder, accountId = 0) {
     const messageFolder = folder
     if (!messageFolder) {
